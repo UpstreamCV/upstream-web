@@ -17,8 +17,8 @@ function ConnectVisual() {
         width="34"
         height="22"
         rx="3"
-        fill="rgba(200,217,182,0.06)"
-        stroke="#c8d9b6"
+        fill="rgb(from var(--graph) r g b / 0.06)"
+        stroke="var(--graph)"
         strokeWidth="1.4"
       />
       <circle
@@ -26,14 +26,14 @@ function ConnectVisual() {
         cy="31"
         r="6"
         fill="none"
-        stroke="#c8d9b6"
+        stroke="var(--graph)"
         strokeWidth="1.4"
       />
-      <circle cx="25" cy="31" r="2.4" fill="#c8d9b6" />
+      <circle cx="25" cy="31" r="2.4" fill="var(--graph)" />
       <path
         d="M 50 31 Q 99 22 148 31"
         fill="none"
-        stroke="#c8d9b6"
+        stroke="var(--graph)"
         strokeWidth="1.4"
         strokeLinecap="round"
         className="step-wave step-wave-1"
@@ -41,7 +41,7 @@ function ConnectVisual() {
       <path
         d="M 50 31 Q 99 10 148 31"
         fill="none"
-        stroke="#c8d9b6"
+        stroke="var(--graph)"
         strokeWidth="1.2"
         strokeLinecap="round"
         className="step-wave step-wave-2"
@@ -49,7 +49,7 @@ function ConnectVisual() {
       <path
         d="M 50 31 Q 99 -3 148 31"
         fill="none"
-        stroke="#c8d9b6"
+        stroke="var(--graph)"
         strokeWidth="1"
         strokeLinecap="round"
         className="step-wave step-wave-3"
@@ -58,7 +58,7 @@ function ConnectVisual() {
         cx="50"
         cy="31"
         r="3.4"
-        fill="#c8d9b6"
+        fill="var(--graph)"
         stroke="rgba(10,16,6,0.5)"
         strokeWidth="0.5"
       />
@@ -66,21 +66,21 @@ function ConnectVisual() {
         cx="148"
         cy="31"
         r="3.4"
-        fill="#c8d9b6"
+        fill="var(--graph)"
         stroke="rgba(10,16,6,0.5)"
         strokeWidth="0.5"
       />
       <path
         d="M 168 22 a 12 12 0 0 1 24 0 a 8 8 0 0 1 6 16 l -36 0 a 7 7 0 0 1 6 -16 z"
-        fill="rgba(200,217,182,0.14)"
-        stroke="#c8d9b6"
+        fill="rgb(from var(--graph) r g b / 0.14)"
+        stroke="var(--graph)"
         strokeWidth="1.2"
       />
       <text
         x="181"
         y="33"
         textAnchor="middle"
-        fill="#c8d9b6"
+        fill="var(--graph)"
         fontSize="8"
         fontFamily="var(--font-mono-stack)"
       >
@@ -133,7 +133,7 @@ function ConfigureVisual() {
         pathLength="100"
         d="M 24 38 L 70 18 L 140 24 L 192 14 L 178 46 L 64 48 Z"
         fill="rgba(75,129,108,0.18)"
-        stroke="#c8d9b6"
+        stroke="var(--graph)"
         strokeWidth="1.4"
         strokeLinejoin="round"
         strokeDasharray="100"
@@ -160,12 +160,12 @@ function ConfigureVisual() {
           begin="0s"
         />
       </path>
-      <circle cx="24" cy="38" r="2.2" fill="#c8d9b6" />
-      <circle cx="70" cy="18" r="2.2" fill="#c8d9b6" />
-      <circle cx="140" cy="24" r="2.2" fill="#c8d9b6" />
-      <circle cx="192" cy="14" r="2.2" fill="#c8d9b6" />
-      <circle cx="178" cy="46" r="2.2" fill="#c8d9b6" />
-      <circle cx="64" cy="48" r="2.2" fill="#c8d9b6" />
+      <circle cx="24" cy="38" r="2.2" fill="var(--graph)" />
+      <circle cx="70" cy="18" r="2.2" fill="var(--graph)" />
+      <circle cx="140" cy="24" r="2.2" fill="var(--graph)" />
+      <circle cx="192" cy="14" r="2.2" fill="var(--graph)" />
+      <circle cx="178" cy="46" r="2.2" fill="var(--graph)" />
+      <circle cx="64" cy="48" r="2.2" fill="var(--graph)" />
       <g className="step-cursor">
         <path
           d="M 0 0 L 0 10 L 3.4 7.4 L 5.8 11.6 L 7.6 10.6 L 5.2 6.5 L 8.6 6 Z"
@@ -209,15 +209,15 @@ function LogicVisual() {
         width="50"
         height="20"
         rx="6"
-        fill="rgba(200,217,182,0.08)"
-        stroke="#c8d9b6"
+        fill="rgb(from var(--graph) r g b / 0.08)"
+        stroke="var(--graph)"
         strokeWidth="1"
         className="step-logic-rect step-logic-rect-1"
       />
       <text
         x="31"
         y="33"
-        fill="#c8d9b6"
+        fill="var(--graph)"
         fontSize="8.5"
         fontFamily="var(--font-mono-stack)"
         textAnchor="middle"
@@ -229,7 +229,7 @@ function LogicVisual() {
         y1="30"
         x2="84"
         y2="30"
-        stroke="#c8d9b6"
+        stroke="var(--graph)"
         strokeWidth="1"
         strokeDasharray="2 2"
         opacity="0.5"
@@ -261,7 +261,7 @@ function LogicVisual() {
         y1="30"
         x2="164"
         y2="30"
-        stroke="#c8d9b6"
+        stroke="var(--graph)"
         strokeWidth="1"
         strokeDasharray="2 2"
         opacity="0.5"
@@ -304,14 +304,14 @@ function TriggerVisual() {
         cx="14"
         cy="28"
         r="8"
-        fill="rgba(200,217,182,0.18)"
-        stroke="#c8d9b6"
+        fill="rgb(from var(--graph) r g b / 0.18)"
+        stroke="var(--graph)"
         strokeWidth="1.2"
       />
       <text
         x="14"
         y="31"
-        fill="#c8d9b6"
+        fill="var(--graph)"
         fontSize="7"
         fontFamily="var(--font-mono-stack)"
         textAnchor="middle"
@@ -320,24 +320,24 @@ function TriggerVisual() {
       </text>
       <path
         d="M 22 28 H 100"
-        stroke="#c8d9b6"
+        stroke="var(--graph)"
         strokeWidth="1.3"
       />
       <path
         d="M 100 28 L 168 8"
-        stroke="#c8d9b6"
+        stroke="var(--graph)"
         strokeWidth="1"
         opacity="0.55"
       />
       <path
         d="M 100 28 L 168 28"
-        stroke="#c8d9b6"
+        stroke="var(--graph)"
         strokeWidth="1"
         opacity="0.55"
       />
       <path
         d="M 100 28 L 168 48"
-        stroke="#c8d9b6"
+        stroke="var(--graph)"
         strokeWidth="1"
         opacity="0.55"
       />
@@ -347,14 +347,14 @@ function TriggerVisual() {
         width="46"
         height="12"
         rx="3"
-        fill="rgba(200,217,182,0.1)"
-        stroke="#c8d9b6"
+        fill="rgb(from var(--graph) r g b / 0.1)"
+        stroke="var(--graph)"
         strokeWidth="1"
       />
       <text
         x="191"
         y="11"
-        fill="#c8d9b6"
+        fill="var(--graph)"
         fontSize="7.5"
         fontFamily="var(--font-mono-stack)"
         textAnchor="middle"
@@ -401,7 +401,7 @@ function TriggerVisual() {
       >
         slack
       </text>
-      <circle r="2.6" fill="#c8d9b6" className="step-trigger-dot">
+      <circle r="2.6" fill="var(--graph)" className="step-trigger-dot">
         <animateMotion
           path="M 22 28 H 96 L 164 9"
           dur="1.8s"
