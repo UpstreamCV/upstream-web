@@ -1,6 +1,13 @@
 @import "tailwindcss";
 
 :root {
+  /* ===== color knobs =====
+     --accent : color of the accent (italic) words in headings
+     --graph  : color of every animated / decorative visual element
+                (step SVGs, glow halos, pipeline pulse, dots) */
+  --accent: #9dcb66;
+  --graph:  #C8D9B6;
+
   --font-display-stack: var(--font-satoshi), ui-sans-serif, system-ui, sans-serif;
   --font-body-stack: var(--font-satoshi), ui-sans-serif, system-ui, sans-serif;
   --font-mono-stack: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -271,9 +278,9 @@ nav.top {
   transform: scale(1.15);
 }
 .section-dot.active {
-  background: #c8d9b6;
-  border-color: #c8d9b6;
-  box-shadow: 0 0 10px rgba(200, 217, 182, 0.5);
+  background: var(--graph);
+  border-color: var(--graph);
+  box-shadow: 0 0 10px rgb(from var(--graph) r g b / 0.5);
 }
 .dot-label {
   position: absolute;
@@ -439,7 +446,7 @@ section {
   color: var(--ink); margin: 14px 0 18px;
   max-width: 540px; text-wrap: balance;
 }
-.preview-copy h2 em { font-style: italic; color: #c8d9b6; }
+.preview-copy h2 em { font-style: italic; color: var(--accent); }
 .preview-copy p {
   color: var(--ink-soft);
   max-width: 480px;
@@ -468,7 +475,7 @@ h1.display {
   color: var(--ink);
   text-wrap: balance;
 }
-h1.display em { font-style: italic; color: #c8d9b6; }
+h1.display em { font-style: italic; color: var(--accent); }
 .lead {
   font-size: 19px; line-height: 1.55;
   color: var(--ink-soft);
@@ -665,7 +672,7 @@ h1.display em { font-style: italic; color: #c8d9b6; }
   padding: 3px 9px 3px 7px;
   border-radius: 999px;
   background: rgba(169, 199, 179, 0.18);
-  color: #c8d9b6;
+  color: var(--accent);
   border: 1px solid rgba(169, 199, 179, 0.3);
   transition: background 0.2s ease, box-shadow 0.2s ease;
 }
@@ -675,8 +682,8 @@ h1.display em { font-style: italic; color: #c8d9b6; }
   box-shadow: 0 0 0 0 rgba(169, 199, 179, 0.6);
 }
 .event-stream .badge-ok.is-firing {
-  background: rgba(200, 217, 182, 0.35);
-  box-shadow: 0 0 14px rgba(200, 217, 182, 0.45);
+  background: rgb(from var(--graph) r g b / 0.35);
+  box-shadow: 0 0 14px rgb(from var(--graph) r g b / 0.45);
 }
 .event-stream .badge-ok.is-firing .badge-dot {
   background: #f5f1e7;
@@ -723,7 +730,7 @@ h1.display em { font-style: italic; color: #c8d9b6; }
   from {
     opacity: 0;
     transform: translateY(-6px);
-    background: rgba(200, 217, 182, 0.06);
+    background: rgb(from var(--graph) r g b / 0.06);
   }
   to {
     opacity: 1;
@@ -778,7 +785,7 @@ h1.display em { font-style: italic; color: #c8d9b6; }
   font-size: 10px;
   padding: 3px 8px; border-radius: 999px;
   background: rgba(169, 199, 179, 0.18);
-  color: #c8d9b6;
+  color: var(--accent);
   border: 1px solid rgba(169, 199, 179, 0.3);
 }
 
@@ -795,13 +802,13 @@ h1.display em { font-style: italic; color: #c8d9b6; }
   color: var(--ink); margin: 12px 0 0;
   max-width: 600px; text-wrap: balance;
 }
-.section-head h2 em { font-style: italic; color: #c8d9b6; }
+.section-head h2 em { font-style: italic; color: var(--accent); }
 .section-head p {
   color: var(--ink-soft);
   max-width: 380px; margin: 0; font-size: 15px;
 }
 .section-tag {
-  color: #c8d9b6;
+  color: var(--accent);
   font-family: var(--font-mono-stack);
   font-size: 12px; letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -827,7 +834,7 @@ h1.display em { font-style: italic; color: #c8d9b6; }
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
     0 30px 60px -30px rgba(0, 0, 0, 0.6),
-    0 0 60px -10px rgba(200, 217, 182, 0) inset;
+    0 0 60px -10px rgb(from var(--graph) r g b / 0) inset;
   transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
 }
 .step::before {
@@ -835,7 +842,7 @@ h1.display em { font-style: italic; color: #c8d9b6; }
   position: absolute;
   top: 0; left: 24px; right: 24px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(200, 217, 182, 0.6) 50%, transparent);
+  background: linear-gradient(90deg, transparent, rgb(from var(--graph) r g b / 0.6) 50%, transparent);
   opacity: 0.5;
   transition: opacity 0.35s ease;
 }
@@ -845,7 +852,7 @@ h1.display em { font-style: italic; color: #c8d9b6; }
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.08) inset,
     0 30px 60px -30px rgba(0, 0, 0, 0.6),
-    0 0 60px -10px rgba(200, 217, 182, 0.32) inset;
+    0 0 60px -10px rgb(from var(--graph) r g b / 0.32) inset;
   transition: background 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
 }
 .step:hover::before { opacity: 1; transition: opacity 0.5s ease; }
@@ -916,7 +923,7 @@ h1.display em { font-style: italic; color: #c8d9b6; }
   10% {
     opacity: 1;
     stroke-dasharray: 4 0;
-    filter: drop-shadow(0 0 4px rgba(200, 217, 182, 0.7));
+    filter: drop-shadow(0 0 4px rgb(from var(--graph) r g b / 0.7));
   }
 }
 
@@ -928,11 +935,11 @@ h1.display em { font-style: italic; color: #c8d9b6; }
   font-style: italic;
   font-size: clamp(56px, 5vw, 84px);
   font-weight: 800;
-  color: #c8d9b6;
+  color: var(--accent);
   line-height: 0.9;
   margin-bottom: 32px;
   letter-spacing: -0.04em;
-  text-shadow: 0 0 30px rgba(200, 217, 182, 0.25);
+  text-shadow: 0 0 30px rgb(from var(--graph) r g b / 0.25);
 }
 .step h3 {
   font-family: var(--font-body-stack);
@@ -953,12 +960,12 @@ h1.display em { font-style: italic; color: #c8d9b6; }
   position: absolute;
   right: -22px;
   top: 80px;
-  color: #c8d9b6;
+  color: var(--accent);
   opacity: 0.7;
   font-family: var(--font-mono-stack);
   font-size: 20px;
   z-index: 2;
-  text-shadow: 0 0 10px rgba(200, 217, 182, 0.5);
+  text-shadow: 0 0 10px rgb(from var(--graph) r g b / 0.5);
 }
 .step:last-child .arrow { display: none; }
 .steps {
@@ -982,7 +989,7 @@ h1.display em { font-style: italic; color: #c8d9b6; }
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
     0 30px 60px -30px rgba(0, 0, 0, 0.6),
-    0 0 60px -15px rgba(200, 217, 182, 0) inset;
+    0 0 60px -15px rgb(from var(--graph) r g b / 0) inset;
   transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
 }
 .cap-card:hover {
@@ -991,7 +998,7 @@ h1.display em { font-style: italic; color: #c8d9b6; }
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.08) inset,
     0 30px 60px -30px rgba(0, 0, 0, 0.6),
-    0 0 60px -15px rgba(200, 217, 182, 0.28) inset;
+    0 0 60px -15px rgb(from var(--graph) r g b / 0.28) inset;
   transition: background 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
 }
 .cap-card h3 {
@@ -1006,7 +1013,7 @@ h1.display em { font-style: italic; color: #c8d9b6; }
   font-size: 14px; margin: 0 0 22px; max-width: 90%;
 }
 .cap-card .top {
-  color: #c8d9b6;
+  color: var(--accent);
   font-family: var(--font-mono-stack);
   font-size: 11px; letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1088,14 +1095,14 @@ h1.display em { font-style: italic; color: #c8d9b6; }
     box-shadow: none;
   }
   4% {
-    background: rgba(200, 217, 182, 0.2);
-    border-color: rgba(200, 217, 182, 0.55);
-    box-shadow: 0 0 18px rgba(200, 217, 182, 0.4);
+    background: rgb(from var(--graph) r g b / 0.2);
+    border-color: rgb(from var(--graph) r g b / 0.55);
+    box-shadow: 0 0 18px rgb(from var(--graph) r g b / 0.4);
   }
 }
 @keyframes pip-dot-pulse {
   0%, 92%, 100% { background: #a9c7b3; box-shadow: none; }
-  4% { background: #f5f1e7; box-shadow: 0 0 8px #c8d9b6; }
+  4% { background: #f5f1e7; box-shadow: 0 0 8px var(--graph); }
 }
 @keyframes pip-arrow-flow {
   0%, 92%, 100% { color: #d4c98a; opacity: 0.5; }
@@ -1127,7 +1134,7 @@ h1.display em { font-style: italic; color: #c8d9b6; }
   font-size: 14px;
   font-family: var(--font-body-stack);
   font-weight: 500;
-  color: #c8d9b6;
+  color: var(--accent);
   margin-left: 6px;
 }
 .metric .k {
@@ -1197,7 +1204,7 @@ h1.display em { font-style: italic; color: #c8d9b6; }
   color: var(--ink);
   letter-spacing: -0.03em; line-height: 1.02;
 }
-.use-head h3 em { font-style: italic; color: #c8d9b6; }
+.use-head h3 em { font-style: italic; color: var(--accent); }
 .use-head p {
   color: var(--ink-soft);
   font-size: 15px; margin: 0;
@@ -1218,7 +1225,7 @@ h1.display em { font-style: italic; color: #c8d9b6; }
   background: rgba(169, 199, 179, 0.1);
   border: 1px solid rgba(169, 199, 179, 0.22);
   display: grid; place-items: center;
-  color: #c8d9b6;
+  color: var(--accent);
   font-family: var(--font-mono-stack);
   font-size: 11px; font-weight: 600;
 }
@@ -1496,7 +1503,7 @@ footer {
     box-shadow:
       0 1px 0 rgba(255, 255, 255, 0.06) inset,
       0 30px 60px -30px rgba(0, 0, 0, 0.6),
-      0 0 60px -10px rgba(200, 217, 182, 0) inset;
+      0 0 60px -10px rgb(from var(--graph) r g b / 0) inset;
     transition: none;
   }
   .cap-card:hover {
@@ -1505,7 +1512,7 @@ footer {
     box-shadow:
       0 1px 0 rgba(255, 255, 255, 0.06) inset,
       0 30px 60px -30px rgba(0, 0, 0, 0.6),
-      0 0 60px -15px rgba(200, 217, 182, 0) inset;
+      0 0 60px -15px rgb(from var(--graph) r g b / 0) inset;
     transition: none;
   }
   .step:hover::before { opacity: 0.5; transition: none; }
