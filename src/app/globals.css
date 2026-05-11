@@ -59,16 +59,21 @@ button { font: inherit; cursor: pointer; }
 }
 .mono { font-family: var(--font-mono-stack); }
 
-/* ----- fixed background video ----- */
+/* ----- fixed background video -----
+   iOS Safari quirk: 100lvh + viewport-fit=cover still undershoot on
+   some devices (iPhone 16 Pro Max, etc). Overshoot with a buffer and
+   negative top so chrome areas always end up covered. */
 .bg-video {
   position: fixed;
-  top: 0;
+  top: -80px;
   left: 0;
   width: 100vw;
-  /* Fallback for browsers without dynamic viewport units */
-  height: 100vh;
-  /* Large viewport = full screen including under iOS Safari chrome */
-  height: 100lvh;
+  /* Fallback for older browsers */
+  height: calc(100vh + 160px);
+  /* WebKit-specific fallback for older iOS */
+  height: calc(-webkit-fill-available + 160px);
+  /* Modern: large viewport + iOS chrome buffer */
+  height: calc(100lvh + 160px);
   width: 100lvw;
   object-fit: cover;
   z-index: 0;
@@ -1383,13 +1388,25 @@ footer {
   .preview-copy p { font-size: 15px; }
   .preview .section-tag { font-size: 11px; }
   .hero-meta { gap: 14px 18px; font-size: 12px; margin-top: 20px !important; }
-  .feed-stack { aspect-ratio: 4 / 5; max-width: 100%; }
+  .feed-stack {
+    aspect-ratio: auto;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .feed-card {
+    position: relative;
+    inset: auto;
+    aspect-ratio: 4 / 3;
+    width: 100%;
+  }
   .event-panel,
   .event-stream {
     position: relative;
-    right: auto; bottom: auto;
+    right: auto;
+    bottom: auto;
     width: 100%;
-    margin-top: 14px;
     font-size: 12px;
   }
 
