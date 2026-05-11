@@ -62,9 +62,14 @@ button { font: inherit; cursor: pointer; }
 /* ----- fixed background video ----- */
 .bg-video {
   position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  /* Fallback for browsers without dynamic viewport units */
+  height: 100vh;
+  /* Large viewport = full screen including under iOS Safari chrome */
+  height: 100lvh;
+  width: 100lvw;
   object-fit: cover;
   z-index: 0;
   pointer-events: none;
@@ -1351,7 +1356,7 @@ footer {
   .splash-inner { padding: 90px 0 80px; }
   .splash-inner h1.display { max-width: 16ch; }
   h1.display {
-    font-size: clamp(38px, 11vw, 60px);
+    font-size: clamp(50px, 14vw, 80px);
     margin: 14px 0 18px;
     line-height: 1.02;
   }
@@ -1467,17 +1472,35 @@ footer {
 }
 
 /* ----- touch / no-hover: skip hover lifts ----- */
-@media (hover: none) {
-  .step:hover, .cap-card:hover {
-    background: inherit;
-    border-color: inherit;
+@media (hover: none), (pointer: coarse) {
+  .step:hover {
+    background: var(--glass-bg);
+    border-color: var(--glass-stroke);
     box-shadow:
       0 1px 0 rgba(255, 255, 255, 0.06) inset,
       0 30px 60px -30px rgba(0, 0, 0, 0.6),
       0 0 60px -10px rgba(200, 217, 182, 0) inset;
+    transition: none;
   }
-  .step:hover::before { opacity: 0.5; }
+  .cap-card:hover {
+    background: var(--glass-bg);
+    border-color: var(--glass-stroke);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.06) inset,
+      0 30px 60px -30px rgba(0, 0, 0, 0.6),
+      0 0 60px -15px rgba(200, 217, 182, 0) inset;
+    transition: none;
+  }
+  .step:hover::before { opacity: 0.5; transition: none; }
   .use-item:hover { background: transparent; }
-  .section-dot:hover { transform: none; }
+  .section-dot:hover { transform: none; border-color: rgba(245, 241, 231, 0.35); }
   .section-dot:hover .dot-label { opacity: 0; }
+  .btn-primary:hover { background: var(--ink); }
+  .btn-ghost:hover { background: rgba(245, 241, 231, 0.06); }
+  .nav-links a:hover { color: var(--ink-soft); }
+  .foot-links a:hover { color: var(--ink-mute); }
+  .hero-install-copy:hover {
+    background: rgba(245, 241, 231, 0.08);
+    color: var(--ink-soft);
+  }
 }
