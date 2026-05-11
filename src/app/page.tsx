@@ -1,6 +1,440 @@
 import Image from "next/image";
-import SplashMedia from "./SplashMedia";
 import SectionDots from "./SectionDots";
+import EventStream from "./EventStream";
+import Metric from "./Metric";
+
+function ConnectVisual() {
+  return (
+    <svg
+      viewBox="0 0 220 56"
+      className="step-svg"
+      role="img"
+      aria-hidden="true"
+    >
+      <rect
+        x="8"
+        y="20"
+        width="34"
+        height="22"
+        rx="3"
+        fill="rgba(200,217,182,0.06)"
+        stroke="#c8d9b6"
+        strokeWidth="1.4"
+      />
+      <circle
+        cx="25"
+        cy="31"
+        r="6"
+        fill="none"
+        stroke="#c8d9b6"
+        strokeWidth="1.4"
+      />
+      <circle cx="25" cy="31" r="2.4" fill="#c8d9b6" />
+      <path
+        d="M 50 31 Q 99 22 148 31"
+        fill="none"
+        stroke="#c8d9b6"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        className="step-wave step-wave-1"
+      />
+      <path
+        d="M 50 31 Q 99 10 148 31"
+        fill="none"
+        stroke="#c8d9b6"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        className="step-wave step-wave-2"
+      />
+      <path
+        d="M 50 31 Q 99 -3 148 31"
+        fill="none"
+        stroke="#c8d9b6"
+        strokeWidth="1"
+        strokeLinecap="round"
+        className="step-wave step-wave-3"
+      />
+      <circle
+        cx="50"
+        cy="31"
+        r="3.4"
+        fill="#c8d9b6"
+        stroke="rgba(10,16,6,0.5)"
+        strokeWidth="0.5"
+      />
+      <circle
+        cx="148"
+        cy="31"
+        r="3.4"
+        fill="#c8d9b6"
+        stroke="rgba(10,16,6,0.5)"
+        strokeWidth="0.5"
+      />
+      <path
+        d="M 168 22 a 12 12 0 0 1 24 0 a 8 8 0 0 1 6 16 l -36 0 a 7 7 0 0 1 6 -16 z"
+        fill="rgba(200,217,182,0.14)"
+        stroke="#c8d9b6"
+        strokeWidth="1.2"
+      />
+      <text
+        x="181"
+        y="33"
+        textAnchor="middle"
+        fill="#c8d9b6"
+        fontSize="8"
+        fontFamily="var(--font-mono-stack)"
+      >
+        upstream
+      </text>
+    </svg>
+  );
+}
+
+function ConfigureVisual() {
+  return (
+    <svg
+      viewBox="0 0 220 56"
+      className="step-svg"
+      role="img"
+      aria-hidden="true"
+    >
+      <rect
+        x="2"
+        y="2"
+        width="216"
+        height="52"
+        rx="4"
+        fill="none"
+        stroke="rgba(245,241,231,0.06)"
+        strokeWidth="0.8"
+      />
+      <path
+        d="M 1 22 L 220 22"
+        stroke="rgba(245,241,231,0.04)"
+        strokeWidth="0.6"
+      />
+      <path
+        d="M 1 42 L 220 42"
+        stroke="rgba(245,241,231,0.04)"
+        strokeWidth="0.6"
+      />
+      <path
+        d="M 60 12 L 158 12"
+        stroke="rgba(245,241,231,0.04)"
+        strokeWidth="0.6"
+      />
+      <path
+        d="M 100 12 L 100 52"
+        stroke="rgba(245,241,231,0.04)"
+        strokeWidth="0.6"
+      />
+      <path
+        id="step-trace-path-d"
+        pathLength="100"
+        d="M 24 38 L 70 18 L 140 24 L 192 14 L 178 46 L 64 48 Z"
+        fill="rgba(75,129,108,0.18)"
+        stroke="#c8d9b6"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+        strokeDasharray="100"
+        strokeDashoffset="100"
+        fillOpacity="0"
+        className="step-trace-path"
+      >
+        <animate
+          attributeName="stroke-dashoffset"
+          dur="4.5s"
+          repeatCount="indefinite"
+          calcMode="linear"
+          values="100;0;0;0;100"
+          keyTimes="0;0.55;0.68;0.85;1"
+          begin="0s"
+        />
+        <animate
+          attributeName="fill-opacity"
+          dur="4.5s"
+          repeatCount="indefinite"
+          calcMode="linear"
+          values="0;0;0.6;0.6;0"
+          keyTimes="0;0.55;0.68;0.85;1"
+          begin="0s"
+        />
+      </path>
+      <circle cx="24" cy="38" r="2.2" fill="#c8d9b6" />
+      <circle cx="70" cy="18" r="2.2" fill="#c8d9b6" />
+      <circle cx="140" cy="24" r="2.2" fill="#c8d9b6" />
+      <circle cx="192" cy="14" r="2.2" fill="#c8d9b6" />
+      <circle cx="178" cy="46" r="2.2" fill="#c8d9b6" />
+      <circle cx="64" cy="48" r="2.2" fill="#c8d9b6" />
+      <g className="step-cursor">
+        <path
+          d="M 0 0 L 0 10 L 3.4 7.4 L 5.8 11.6 L 7.6 10.6 L 5.2 6.5 L 8.6 6 Z"
+          fill="#f5f1e7"
+          stroke="#0a1006"
+          strokeWidth="0.6"
+          strokeLinejoin="round"
+        />
+        <animateMotion
+          dur="4.5s"
+          repeatCount="indefinite"
+          calcMode="linear"
+          keyPoints="0;1;1"
+          keyTimes="0;0.55;1"
+          path="M 24 38 L 70 18 L 140 24 L 192 14 L 178 46 L 64 48 Z"
+        />
+        <animate
+          attributeName="opacity"
+          dur="4.5s"
+          repeatCount="indefinite"
+          calcMode="linear"
+          values="1;1;0;0;1"
+          keyTimes="0;0.5;0.62;0.98;1"
+        />
+      </g>
+    </svg>
+  );
+}
+
+function LogicVisual() {
+  return (
+    <svg
+      viewBox="0 0 220 56"
+      className="step-svg"
+      role="img"
+      aria-hidden="true"
+    >
+      <rect
+        x="6"
+        y="20"
+        width="50"
+        height="20"
+        rx="6"
+        fill="rgba(200,217,182,0.08)"
+        stroke="#c8d9b6"
+        strokeWidth="1"
+        className="step-logic-rect step-logic-rect-1"
+      />
+      <text
+        x="31"
+        y="33"
+        fill="#c8d9b6"
+        fontSize="8.5"
+        fontFamily="var(--font-mono-stack)"
+        textAnchor="middle"
+      >
+        person
+      </text>
+      <line
+        x1="56"
+        y1="30"
+        x2="84"
+        y2="30"
+        stroke="#c8d9b6"
+        strokeWidth="1"
+        strokeDasharray="2 2"
+        opacity="0.5"
+        className="step-logic-connector step-logic-connector-1"
+      />
+      <rect
+        x="84"
+        y="20"
+        width="52"
+        height="20"
+        rx="6"
+        fill="rgba(212,201,138,0.1)"
+        stroke="#d4c98a"
+        strokeWidth="1"
+        className="step-logic-rect step-logic-rect-2"
+      />
+      <text
+        x="110"
+        y="33"
+        fill="#d4c98a"
+        fontSize="8.5"
+        fontFamily="var(--font-mono-stack)"
+        textAnchor="middle"
+      >
+        if &gt; 30s
+      </text>
+      <line
+        x1="136"
+        y1="30"
+        x2="164"
+        y2="30"
+        stroke="#c8d9b6"
+        strokeWidth="1"
+        strokeDasharray="2 2"
+        opacity="0.5"
+        className="step-logic-connector step-logic-connector-2"
+      />
+      <rect
+        x="164"
+        y="20"
+        width="50"
+        height="20"
+        rx="6"
+        fill="rgba(232,167,106,0.12)"
+        stroke="#e8a76a"
+        strokeWidth="1"
+        className="step-logic-rect step-logic-rect-3"
+      />
+      <text
+        x="189"
+        y="33"
+        fill="#e8a76a"
+        fontSize="8.5"
+        fontFamily="var(--font-mono-stack)"
+        textAnchor="middle"
+      >
+        fire
+      </text>
+    </svg>
+  );
+}
+
+function TriggerVisual() {
+  return (
+    <svg
+      viewBox="0 0 220 56"
+      className="step-svg"
+      role="img"
+      aria-hidden="true"
+    >
+      <circle
+        cx="14"
+        cy="28"
+        r="8"
+        fill="rgba(200,217,182,0.18)"
+        stroke="#c8d9b6"
+        strokeWidth="1.2"
+      />
+      <text
+        x="14"
+        y="31"
+        fill="#c8d9b6"
+        fontSize="7"
+        fontFamily="var(--font-mono-stack)"
+        textAnchor="middle"
+      >
+        evt
+      </text>
+      <path
+        d="M 22 28 H 100"
+        stroke="#c8d9b6"
+        strokeWidth="1.3"
+      />
+      <path
+        d="M 100 28 L 168 8"
+        stroke="#c8d9b6"
+        strokeWidth="1"
+        opacity="0.55"
+      />
+      <path
+        d="M 100 28 L 168 28"
+        stroke="#c8d9b6"
+        strokeWidth="1"
+        opacity="0.55"
+      />
+      <path
+        d="M 100 28 L 168 48"
+        stroke="#c8d9b6"
+        strokeWidth="1"
+        opacity="0.55"
+      />
+      <rect
+        x="168"
+        y="2"
+        width="46"
+        height="12"
+        rx="3"
+        fill="rgba(200,217,182,0.1)"
+        stroke="#c8d9b6"
+        strokeWidth="1"
+      />
+      <text
+        x="191"
+        y="11"
+        fill="#c8d9b6"
+        fontSize="7.5"
+        fontFamily="var(--font-mono-stack)"
+        textAnchor="middle"
+      >
+        webhook
+      </text>
+      <rect
+        x="168"
+        y="22"
+        width="46"
+        height="12"
+        rx="3"
+        fill="rgba(212,201,138,0.1)"
+        stroke="#d4c98a"
+        strokeWidth="1"
+      />
+      <text
+        x="191"
+        y="31"
+        fill="#d4c98a"
+        fontSize="7.5"
+        fontFamily="var(--font-mono-stack)"
+        textAnchor="middle"
+      >
+        queue
+      </text>
+      <rect
+        x="168"
+        y="42"
+        width="46"
+        height="12"
+        rx="3"
+        fill="rgba(232,167,106,0.1)"
+        stroke="#e8a76a"
+        strokeWidth="1"
+      />
+      <text
+        x="191"
+        y="51"
+        fill="#e8a76a"
+        fontSize="7.5"
+        fontFamily="var(--font-mono-stack)"
+        textAnchor="middle"
+      >
+        slack
+      </text>
+      <circle r="2.6" fill="#c8d9b6" className="step-trigger-dot">
+        <animateMotion
+          path="M 22 28 H 96 L 164 9"
+          dur="1.8s"
+          repeatCount="indefinite"
+          begin="0s"
+        />
+      </circle>
+      <circle r="2.4" fill="#d4c98a" className="step-trigger-dot">
+        <animateMotion
+          path="M 22 28 H 96 L 164 28"
+          dur="1.8s"
+          repeatCount="indefinite"
+          begin="0.5s"
+        />
+      </circle>
+      <circle r="2.4" fill="#e8a76a" className="step-trigger-dot">
+        <animateMotion
+          path="M 22 28 H 96 L 164 47"
+          dur="1.8s"
+          repeatCount="indefinite"
+          begin="1s"
+        />
+      </circle>
+    </svg>
+  );
+}
+
+const stepVisuals: Record<string, () => React.ReactElement> = {
+  "01": ConnectVisual,
+  "02": ConfigureVisual,
+  "03": LogicVisual,
+  "04": TriggerVisual,
+};
 
 const LOGO_SRC = "/assets/upstream-logo-white.png";
 
@@ -66,16 +500,17 @@ const useCases = [
 export default function Page() {
   return (
     <>
-      <div className="backdrop">
-        <div className="blob blob-1" />
-        <div className="blob blob-2" />
-        <div className="blob blob-3" />
-        <div className="blob blob-4" />
-        <div className="orb orb-1" />
-        <div className="orb orb-2" />
-        <div className="orb orb-3" />
-        <div className="backdrop-dim" />
-      </div>
+      <video
+        className="bg-video"
+        src="/assets/river.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        aria-hidden="true"
+        tabIndex={-1}
+      />
 
       <SectionDots />
 
@@ -103,31 +538,41 @@ export default function Page() {
                 Sign in
               </a>
               <a className="btn btn-primary" href="#start">
-                Start building
+                Get ready
               </a>
             </div>
           </div>
         </nav>
 
         <section className="splash" id="splash">
-          <SplashMedia />
           <div className="splash-tint" />
           <div className="splash-inner">
             <span className="eyebrow">
-              Real-time computer vision infrastructure
+              Camera intelligence infrastructure for developers
             </span>
             <h1 className="display">
-              Cameras, <em>upstream</em> of your code.
+              Cameras <em>in.</em>
+              <br />
+              Events <em>out.</em>
             </h1>
+            <div
+              className="hero-status"
+              role="status"
+              aria-label="Project status"
+            >
+              <span>Coming Soon</span>
+              <span className="hero-status-divider" aria-hidden="true">·</span>
+              <span>Expected beta 2027</span>
+            </div>
             <div className="hero-cta">
               <a className="btn btn-primary" href="#start">
-                Start building
+                Get ready
                 <span className="mono" aria-hidden="true">
                   →
                 </span>
               </a>
               <a className="btn btn-ghost" href="#preview">
-                See it work
+                See how it works
               </a>
             </div>
           </div>
@@ -137,30 +582,31 @@ export default function Page() {
           </a>
         </section>
 
+        <div className="curtain">
         <section className="preview" id="preview">
           <div className="preview-copy">
             <span className="section-tag">
-              Now processing 2.4M frames / second
+              Open-source agent · Hosted CV cloud
             </span>
             <h2>
-              Turn live cameras into <em>production-ready events.</em>
+              Skip the pipeline. Ship <em>the product.</em>
             </h2>
             <p>
-              Upstream is real-time computer vision infrastructure for teams
-              that want to ship product, not pipelines. Connect a camera,
-              configure detections and tracking zones visually, and Upstream
-              watches every frame — firing typed events into your stack the
-              moment something happens.
+              Drop the open-source agent next to your camera, draw your zones
+              and triggers in the dashboard, and Upstream streams typed events
+              into your stack. RTSP ingestion, GPU inference, tracking, and
+              event delivery are handled — so you ship product logic instead
+              of pipelines.
             </p>
             <div className="hero-meta" style={{ marginTop: 28 }}>
               <span>
                 <b>Sub-100ms</b> end-to-end latency
               </span>
               <span>
-                <b>RTSP, WebRTC, ONVIF</b> ingestion
+                <b>RTSP · IP cameras · webcam</b> ingestion
               </span>
               <span>
-                <b>SOC 2 Type II</b>
+                <b>Webhooks · REST · WebSocket</b> event delivery
               </span>
             </div>
           </div>
@@ -198,9 +644,10 @@ export default function Page() {
                     fontSize="2"
                     fontFamily="var(--font-mono-stack)"
                   >
-                    DOCK ZONE A
+                    ZONE_A · front_door
                   </text>
                 </svg>
+
 
                 <div
                   className="box"
@@ -209,12 +656,12 @@ export default function Page() {
                 />
                 <div
                   className="box alt"
-                  data-label="person · 0.92"
+                  data-label="person · 0.92 · trk_789"
                   style={{ left: "57%", top: "78%", width: "7.5%", height: "17%" }}
                 />
                 <div
                   className="box alt"
-                  data-label="person · 0.88"
+                  data-label="person · 0.88 · trk_792"
                   style={{ left: "71%", top: "80%", width: "7%", height: "15%" }}
                 />
                 <div
@@ -225,7 +672,7 @@ export default function Page() {
 
                 <div className="hud">
                   <span className="hud-tag">
-                    <span className="rec-dot" /> LIVE · cam_dock_03
+                    <span className="rec-dot" /> agent · cam_dock_03
                   </span>
                   <span className="hud-tag">28.4 fps · 1080p</span>
                 </div>
@@ -235,28 +682,7 @@ export default function Page() {
                 </div>
               </div>
 
-              <div className="event-panel">
-                <div className="head">
-                  <span className="title">Event fired</span>
-                  <span className="badge-ok">200 OK</span>
-                </div>
-                <div className="row">
-                  <span className="label">trigger</span>
-                  <span className="val">truck.entered_zone</span>
-                </div>
-                <div className="row">
-                  <span className="label">zone</span>
-                  <span className="val">dock_zone_a</span>
-                </div>
-                <div className="row">
-                  <span className="label">webhook</span>
-                  <span className="val">/api/inbound</span>
-                </div>
-                <div className="row">
-                  <span className="label">latency</span>
-                  <span className="val">84ms</span>
-                </div>
-              </div>
+              <EventStream />
             </div>
           </div>
         </section>
@@ -277,14 +703,17 @@ export default function Page() {
           </div>
 
           <div className="steps">
-            {steps.map((step) => (
-              <div key={step.n} className="step glass">
-                <div className="num">{step.n}</div>
-                <h3>{step.title}</h3>
-                <p>{step.body}</p>
-                <span className="arrow" aria-hidden="true">→</span>
-              </div>
-            ))}
+            {steps.map((step) => {
+              const Visual = stepVisuals[step.n];
+              return (
+                <div key={step.n} className="step glass">
+                  <div className="step-visual">{Visual ? <Visual /> : null}</div>
+                  <div className="num">{step.n}</div>
+                  <h3>{step.title}</h3>
+                  <p>{step.body}</p>
+                </div>
+              );
+            })}
           </div>
         </section>
 
@@ -428,24 +857,14 @@ export default function Page() {
                 MLOps team.
               </p>
               <div className="metric-row">
-                <div className="metric">
-                  <div className="v">
-                    84<sup>ms</sup>
-                  </div>
-                  <div className="k">P50 LATENCY</div>
-                </div>
-                <div className="metric">
-                  <div className="v">
-                    99.98<sup>%</sup>
-                  </div>
-                  <div className="k">UPTIME · 30D</div>
-                </div>
-                <div className="metric">
-                  <div className="v">
-                    12<sup>×</sup>
-                  </div>
-                  <div className="k">REGIONS</div>
-                </div>
+                <Metric target={84} suffix="ms" label="P50 LATENCY" />
+                <Metric
+                  target={99.98}
+                  suffix="%"
+                  decimals={2}
+                  label="UPTIME · 30D"
+                />
+                <Metric target={12} suffix="×" label="REGIONS" />
                 <div className="metric">
                   <div className="v">∞</div>
                   <div className="k">STREAMS</div>
@@ -583,6 +1002,7 @@ export default function Page() {
             </div>
           </div>
         </footer>
+        </div>
       </div>
     </>
   );
