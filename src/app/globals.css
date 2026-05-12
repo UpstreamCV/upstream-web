@@ -1295,6 +1295,157 @@ h1.display em { font-style: italic; color: var(--accent); }
 }
 .cta-card .btn-ghost:hover { background: rgba(245, 241, 231, 0.2); }
 
+/* ----- about page ----- */
+.about-hero {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 240px 32px 60px;
+  text-align: center;
+}
+.about-hero .eyebrow { margin-inline: auto; }
+.about-hero h1.display {
+  text-align: center;
+  margin: 22px auto 24px;
+  max-width: 22ch;
+}
+.about-hero .lead {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.team-section { padding: 60px 32px 160px; }
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.team-card {
+  position: relative;
+  padding: 36px 28px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 30px 60px -30px rgba(0, 0, 0, 0.6),
+    0 0 60px -10px rgb(from var(--graph) r g b / 0) inset;
+  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+.team-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 24px; right: 24px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgb(from var(--graph) r g b / 0.6) 50%, transparent);
+  opacity: 0.5;
+  transition: opacity 0.35s ease;
+}
+.team-card:hover {
+  background: rgba(245, 241, 231, 0.1);
+  border-color: rgba(245, 241, 231, 0.22);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 30px 60px -30px rgba(0, 0, 0, 0.6),
+    0 0 60px -10px rgb(from var(--graph) r g b / 0.32) inset;
+  transition: background 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+}
+.team-card:hover::before { opacity: 1; transition: opacity 0.5s ease; }
+.team-external {
+  position: absolute;
+  top: 22px; right: 22px;
+  display: inline-flex;
+  color: var(--ink-mute);
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+.team-card:hover .team-external {
+  color: var(--accent);
+  transform: translate(2px, -2px);
+}
+.team-avatar {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid rgb(from var(--accent) r g b / 0.45);
+  background: rgb(from var(--accent) r g b / 0.1);
+  margin-bottom: 22px;
+}
+.team-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.team-name {
+  font-family: var(--font-display-stack);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--ink);
+}
+.team-role {
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+
+.company-link-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 56px;
+}
+.company-link {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-stroke);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  font-size: 14px;
+  color: var(--ink);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.company-link:hover {
+  background: rgba(245, 241, 231, 0.12);
+  border-color: rgba(245, 241, 231, 0.25);
+}
+
+@media (max-width: 960px) {
+  .about-hero { padding: 180px 24px 40px; }
+  .team-section { padding: 40px 24px 120px; }
+  .team-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .about-hero { padding: 130px 18px 32px; }
+  .team-section { padding: 24px 18px 90px; }
+  .team-card { padding: 28px 24px 26px; }
+  .team-external { top: 18px; right: 18px; }
+  .team-name { font-size: 20px; }
+  .company-link-wrap { margin-top: 36px; }
+  .company-link { padding: 11px 18px; font-size: 13px; }
+}
+@media (hover: none), (pointer: coarse) {
+  .team-card:hover {
+    background: var(--glass-bg);
+    border-color: var(--glass-stroke);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.06) inset,
+      0 30px 60px -30px rgba(0, 0, 0, 0.6),
+      0 0 60px -10px rgb(from var(--graph) r g b / 0) inset;
+    transition: none;
+  }
+  .team-card:hover::before { opacity: 0.5; transition: none; }
+  .team-card:hover .team-external {
+    color: var(--ink-mute);
+    transform: none;
+  }
+}
+
 /* ----- footer ----- */
 footer {
   border-top: 1px solid var(--glass-stroke-2);

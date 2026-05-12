@@ -442,8 +442,7 @@ const navLinks = [
   { href: "#how", label: "How it works" },
   { href: "#capabilities", label: "Platform" },
   { href: "#use-cases", label: "Use cases" },
-  { href: "#docs", label: "Docs" },
-  { href: "#pricing", label: "Pricing" },
+  { href: "/about", label: "About" },
 ];
 
 const steps = [
