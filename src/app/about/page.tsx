@@ -14,19 +14,19 @@ const navLinks = [
 const team = [
   {
     name: "Elkan Bruha",
-    role: "Co-founder & Software Engineer",
+    role: "Co-Founder & Engineer",
     photo: "/assets/ElkanProfile.jpeg",
     linkedin: "https://www.linkedin.com/in/elkanbruha",
   },
   {
     name: "Josh D'Annunzio",
-    role: "Co-founder & Software Engineer",
+    role: "Co-Founder & Engineer",
     photo: "/assets/JoshProfile.jpeg",
     linkedin: "https://www.linkedin.com/in/josh-d'annunzio-3b0171227/",
   },
   {
     name: "Hayden Forbes",
-    role: "Business Lead",
+    role: "Co-Founder & COO",
     photo: "/assets/HaydenProfile.jpeg",
     linkedin: "https://www.linkedin.com/in/hayden-forbes",
   },
