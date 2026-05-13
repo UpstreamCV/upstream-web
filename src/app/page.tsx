@@ -1,7 +1,7 @@
 import Image from "next/image";
-import SectionDots from "./SectionDots";
 import EventStream from "./EventStream";
 import Metric from "./Metric";
+import Terminal from "./Terminal";
 
 function ConnectVisual() {
   return (
@@ -511,8 +511,6 @@ export default function Page() {
         tabIndex={-1}
       />
 
-      <SectionDots />
-
       <div className="page">
         <nav className="top">
           <div className="nav-inner">
@@ -550,9 +548,9 @@ export default function Page() {
               Camera intelligence infrastructure for developers
             </span>
             <h1 className="display">
-              Cameras <em>in.</em>
+              Build camera intelligence,
               <br />
-              Events <em>out.</em>
+              <em>not infrastructure.</em>
             </h1>
             <div
               className="hero-status"
@@ -881,52 +879,12 @@ export default function Page() {
                 <span />
                 <span />
               </div>
-              <div className="code-title">upstream/handlers/forklift.ts</div>
+              <div className="code-title">bash · ~/.upstream</div>
               <div className="code-title" style={{ opacity: 0.4 }}>
-                webhook
+                upstream-agent · MIT
               </div>
             </div>
-            <pre className="code-body">
-              <span className="c">{`// Triggered when a forklift dwells in a restricted zone`}</span>
-              {`\n`}
-              <span className="k">import</span>
-              {` { upstream } `}
-              <span className="k">from</span>
-              {` `}
-              <span className="s">{`"@upstream/sdk"`}</span>
-              {`;\n\n`}
-              <span className="k">export const</span>
-              {` `}
-              <span className="f">onEvent</span>
-              {` = upstream.`}
-              <span className="f">on</span>
-              {`(`}
-              <span className="s">{`"forklift.dwell"`}</span>
-              {`, `}
-              <span className="k">async</span>
-              {` (e) => {\n  `}
-              <span className="k">if</span>
-              {` (e.zone === `}
-              <span className="s">{`"aisle_3"`}</span>
-              {` && e.duration_s > `}
-              <span className="n">30</span>
-              {`) {\n    `}
-              <span className="k">await</span>
-              {` alerts.`}
-              <span className="f">page</span>
-              {`({\n      team:     `}
-              <span className="s">{`"floor-safety"`}</span>
-              {`,\n      camera:   e.camera_id,\n      `}
-              <span className="c">{`// signed, 5-min URL to the clip frame`}</span>
-              {`\n      preview:  e.`}
-              <span className="f">frame</span>
-              {`({ format: `}
-              <span className="s">{`"jpeg"`}</span>
-              {`, w: `}
-              <span className="n">1280</span>
-              {` }),\n    });\n  }\n});\n\n`}
-              <span className="c">{`// Latency: 84ms · Delivery: at-least-once · Region: us-west-2`}</span>
-            </pre>
+            <Terminal />
           </div>
 
           <div className="use-cases">

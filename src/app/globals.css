@@ -249,67 +249,6 @@ nav.top {
 .nav-links a:hover { color: var(--ink); }
 .nav-cta { display: flex; gap: 10px; }
 
-/* ----- section dots (right-edge navigator) ----- */
-.section-dots {
-  position: fixed;
-  right: 24px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 40;
-  display: flex; flex-direction: column;
-  gap: 14px;
-  padding: 14px 9px;
-  border-radius: 999px;
-  background: rgba(20, 32, 13, 0.4);
-  border: 1px solid rgba(245, 241, 231, 0.1);
-  backdrop-filter: blur(14px) saturate(140%);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
-}
-.section-dot {
-  position: relative;
-  width: 9px; height: 9px;
-  border-radius: 50%;
-  background: transparent;
-  border: 1.5px solid rgba(245, 241, 231, 0.35);
-  transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
-  display: block;
-}
-.section-dot:hover {
-  border-color: rgba(245, 241, 231, 0.85);
-  transform: scale(1.15);
-}
-.section-dot.active {
-  background: var(--graph);
-  border-color: var(--graph);
-  box-shadow: 0 0 10px rgb(from var(--graph) r g b / 0.5);
-}
-.dot-label {
-  position: absolute;
-  right: calc(100% + 14px);
-  top: 50%;
-  transform: translateY(-50%);
-  white-space: nowrap;
-  font-family: var(--font-mono-stack);
-  font-size: 10.5px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.18s ease;
-  background: rgba(20, 32, 13, 0.7);
-  padding: 5px 10px;
-  border-radius: 999px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(245, 241, 231, 0.12);
-}
-.section-dot:hover .dot-label { opacity: 1; }
-
-@media (max-width: 760px) {
-  .section-dots { display: none; }
-}
-
 /* ----- buttons ----- */
 .btn {
   border: 1px solid transparent;
@@ -1195,6 +1134,189 @@ h1.display em { font-style: italic; color: var(--accent); }
 .code-body .n { color: #e8a76a; }
 .code-body .f { color: #b9d9c4; }
 
+/* ----- terminal: real upstream-agent CLI session ----- */
+.terminal {
+  position: relative;
+  font-family: var(--font-mono-stack);
+  font-size: 12.5px;
+  line-height: 1.65;
+  padding: 22px 22px 24px;
+  color: #d9d3c0;
+  overflow: hidden;
+  min-height: 540px;
+}
+.terminal-scrim {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(95,184,134,0.06), transparent 55%),
+    repeating-linear-gradient(180deg, transparent 0 2px, rgba(255,255,255,0.014) 2px 3px);
+  pointer-events: none;
+}
+.terminal-body {
+  position: relative;
+  z-index: 1;
+}
+.term-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 1.65em;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+.term-line.is-in {
+  opacity: 1;
+  transform: none;
+}
+.term-blank {
+  min-height: 0.5em;
+  gap: 0;
+}
+.term-sep {
+  display: block;
+  height: 1px;
+  min-height: 0;
+  margin: 4px 0 6px;
+  background: linear-gradient(
+    90deg,
+    rgba(245, 241, 231, 0.16),
+    rgba(245, 241, 231, 0.04) 60%,
+    transparent
+  );
+}
+
+/* prompt: ~/agent ❯ cmd args */
+.term-prompt { gap: 8px; }
+.term-cwd {
+  color: #d4c98a;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.term-caret {
+  color: var(--accent);
+  font-weight: 700;
+  text-shadow: 0 0 10px rgb(from var(--accent) r g b / 0.55);
+}
+.term-cmd {
+  color: #f5f1e7;
+  font-weight: 600;
+}
+.term-args {
+  color: #b9d9c4;
+}
+
+/* bullets */
+.term-bullet {
+  width: 14px;
+  flex-shrink: 0;
+  text-align: center;
+  font-weight: 700;
+}
+.term-bullet.is-ok {
+  color: var(--accent);
+  text-shadow: 0 0 8px rgb(from var(--accent) r g b / 0.5);
+}
+.term-bullet.is-mute {
+  color: #6a7560;
+  font-weight: 400;
+}
+
+/* step (bullet + free text + optional pill) */
+.term-step-text {
+  color: #d9d3c0;
+  flex: 1;
+  min-width: 0;
+}
+
+/* field (bullet + label column + value + optional pill) */
+.term-field {
+  display: grid;
+  grid-template-columns: 14px 84px 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+.term-field-label {
+  color: rgba(245, 241, 231, 0.5);
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+}
+.term-field-value {
+  color: #f0ead6;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* comment */
+.term-comment {
+  color: #6a7560;
+  font-style: italic;
+}
+
+/* pills */
+.term-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.term-pill-pass {
+  background: rgb(from var(--accent) r g b / 0.16);
+  border: 1px solid rgb(from var(--accent) r g b / 0.42);
+  color: #a9c7b3;
+  text-transform: uppercase;
+  box-shadow: 0 0 14px rgb(from var(--accent) r g b / 0.18);
+}
+.term-pill-time {
+  background: rgba(212, 201, 138, 0.12);
+  border: 1px solid rgba(212, 201, 138, 0.32);
+  color: #d4c98a;
+}
+
+/* blinking cursor on the final prompt line */
+.term-blink {
+  display: inline-block;
+  width: 8px;
+  height: 1em;
+  margin-left: 2px;
+  background: var(--accent);
+  vertical-align: -2px;
+  animation: term-blink-pulse 1.05s steps(1) infinite;
+  box-shadow: 0 0 8px rgb(from var(--accent) r g b / 0.55);
+}
+@keyframes term-blink-pulse {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .term-line {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+  .term-blink { animation: none; }
+}
+
+@media (max-width: 640px) {
+  .terminal {
+    font-size: 11.5px;
+    padding: 18px 16px 20px;
+    min-height: 480px;
+  }
+  .term-field {
+    grid-template-columns: 14px 70px 1fr auto;
+    gap: 10px;
+  }
+}
+
 .use-cases {
   display: grid; grid-template-rows: auto 1fr; gap: 16px;
 }
@@ -1669,8 +1791,6 @@ footer {
   }
   .step:hover::before { opacity: 0.5; transition: none; }
   .use-item:hover { background: transparent; }
-  .section-dot:hover { transform: none; border-color: rgba(245, 241, 231, 0.35); }
-  .section-dot:hover .dot-label { opacity: 0; }
   .btn-primary:hover { background: var(--ink); }
   .btn-ghost:hover { background: rgba(245, 241, 231, 0.06); }
   .nav-links a:hover { color: var(--ink-soft); }
