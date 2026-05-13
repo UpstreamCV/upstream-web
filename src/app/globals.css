@@ -5,7 +5,7 @@
      --accent : color of the accent (italic) words in headings
      --graph  : color of every animated / decorative visual element
                 (step SVGs, glow halos, pipeline pulse, dots) */
-  --accent: #5fb886;
+  --accent: #5fb869;
   --graph:  #C8D9B6;
 
   --font-display-stack: var(--font-satoshi), ui-sans-serif, system-ui, sans-serif;
