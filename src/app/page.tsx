@@ -548,9 +548,9 @@ export default function Page() {
               Camera intelligence infrastructure for developers
             </span>
             <h1 className="display">
-              Build camera intelligence,
+              <span className="display-dim">Build</span> camera intelligence<span className="display-dim">,</span>
               <br />
-              <em>not infrastructure.</em>
+              <span className="display-dim">not</span> infrastructure<span className="display-dim">.</span>
             </h1>
             <div
               className="hero-status"
@@ -559,7 +559,7 @@ export default function Page() {
             >
               <span>Coming Soon</span>
               <span className="hero-status-divider" aria-hidden="true">·</span>
-              <span>Expected beta 2027</span>
+              <span>Expected Q1 2027</span>
             </div>
             <div className="hero-cta">
               <a className="btn btn-primary" href="#start">
