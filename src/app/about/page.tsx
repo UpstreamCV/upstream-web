@@ -22,7 +22,7 @@ const team = [
     name: "Josh D'Annunzio",
     role: "Co-Founder & CTO",
     photo: "/assets/JoshProfile.jpeg",
-    linkedin: "https://www.linkedin.com/in/josh-d'annunzio-3b0171227/",
+    linkedin: "https://www.linkedin.com/in/josh-d’annunzio-3b0171227/",
   },
   {
     name: "Hayden Forbes",
