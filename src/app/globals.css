@@ -89,7 +89,12 @@ button { font: inherit; cursor: pointer; }
   background: #344C2C;
 }
 
-/* ----- frosted glass curtain that rises over the video ----- */
+/* ----- frosted glass curtain that rises over the video. The flicker that
+   was previously behind the step cards came from the NESTED backdrop-filter
+   stack (this one + the one on .step.glass) compounding every time a
+   descendant repainted. We keep this single (outer) blur and remove the
+   inner one on the cards (see .step.glass override below), plus paint
+   containment on .step-visual so SVG animations don't reach this layer. */
 .curtain {
   position: relative;
   z-index: 1;
@@ -648,6 +653,7 @@ h1.display .display-dim {
 .event-stream .badge-ok.is-firing .badge-dot {
   background: #f5f1e7;
   animation: badge-dot-pulse 0.6s ease-out;
+  will-change: box-shadow;
 }
 @keyframes badge-dot-pulse {
   0%   { box-shadow: 0 0 0 0 rgba(245, 241, 231, 0.7); }
@@ -796,6 +802,21 @@ h1.display .display-dim {
     0 30px 60px -30px rgba(0, 0, 0, 0.6),
     0 0 60px -10px rgb(from var(--graph) r g b / 0) inset;
   transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  /* Promote each card to its own compositor layer so SVG animations inside
+     don't force the curtain's backdrop-filter shader to re-execute. Paired
+     with the bg-video pause-on-scroll in BgVideo.tsx, this is what stops
+     the rectangular flicker behind cards 2/3/4. */
+  transform: translateZ(0);
+  will-change: transform;
+}
+/* Step cards do NOT get .glass's backdrop-filter — stacking a card blur on
+   top of the curtain's blur is what caused the flicker rectangle behind
+   2/3/4. The curtain handles the frosted effect for the whole region;
+   the cards just sit on it with a translucent tint and the .glass border. */
+.step.glass {
+  background: rgba(20, 32, 13, 0.35);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 .step::before {
   content: '';
@@ -823,6 +844,7 @@ h1.display .display-dim {
   height: 60px;
   margin-bottom: 18px;
   opacity: 0.95;
+  contain: layout paint;
 }
 .step-svg { width: 100%; height: 60px; display: block; overflow: visible; }
 
@@ -839,15 +861,16 @@ h1.display .display-dim {
 
 /* step 02: configure — polygon traces then fills */
 /* .step-trace-path: animation driven by SMIL <animate> inside the path
-   element so the trace and cursor share the same animation clock */
-.step-cursor {
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
-}
-/* step 03: rects and connectors light up sequentially */
+   element so the trace and cursor share the same animation clock.
+   No filter on .step-cursor: drop-shadow on a SMIL-animated <g> re-rasters
+   every frame as the element moves, which reads as a visible jitter. */
+/* step 03: rects and connectors light up sequentially. The drop-shadow glow
+   lives on sibling .step-logic-glow / .step-logic-glow-line elements with a
+   STATIC filter; only their opacity animates. Animating filter directly on
+   the pulsing element forced a per-frame raster of the drop-shadow source
+   and showed up as a rectangular flicker around each rect. */
 .step-logic-rect {
   animation: step-logic-rect-pulse 3.4s ease-in-out infinite;
-  transform-box: fill-box;
-  transform-origin: center;
 }
 .step-logic-rect-1 { animation-delay: 0s; }
 .step-logic-rect-2 { animation-delay: 0.55s; }
@@ -856,17 +879,14 @@ h1.display .display-dim {
   0%, 65%, 100% {
     stroke-width: 1;
     fill-opacity: 0.5;
-    filter: none;
   }
   6% {
     stroke-width: 1.8;
     fill-opacity: 1;
-    filter: drop-shadow(0 0 5px currentColor);
   }
   18% {
     stroke-width: 1;
     fill-opacity: 0.5;
-    filter: none;
   }
 }
 .step-logic-connector {
@@ -883,12 +903,12 @@ h1.display .display-dim {
   10% {
     opacity: 1;
     stroke-dasharray: 4 0;
-    filter: drop-shadow(0 0 4px rgb(from var(--graph) r g b / 0.7));
   }
 }
 
-/* step 04: glow on traveling dots */
-.step-trigger-dot { filter: drop-shadow(0 0 4px rgba(200,217,182,0.55)); }
+
+/* step 04: traveling dots. No filter — drop-shadow on SMIL-animated circles
+   re-rasters per frame as they move, which reads as jitter. */
 
 .step .num {
   font-family: var(--font-display-stack);
@@ -1052,7 +1072,7 @@ h1.display .display-dim {
   0%, 92%, 100% {
     background: rgba(245, 241, 231, 0.05);
     border-color: var(--glass-stroke-2);
-    box-shadow: none;
+    box-shadow: 0 0 18px rgb(from var(--graph) r g b / 0);
   }
   4% {
     background: rgb(from var(--graph) r g b / 0.2);
@@ -1061,15 +1081,19 @@ h1.display .display-dim {
   }
 }
 @keyframes pip-dot-pulse {
-  0%, 92%, 100% { background: #a9c7b3; box-shadow: none; }
+  0%, 92%, 100% { background: #a9c7b3; box-shadow: 0 0 8px rgb(from var(--graph) r g b / 0); }
   4% { background: #f5f1e7; box-shadow: 0 0 8px var(--graph); }
 }
 @keyframes pip-arrow-flow {
-  0%, 92%, 100% { color: #d4c98a; opacity: 0.5; }
+  0%, 92%, 100% {
+    color: #d4c98a;
+    opacity: 0.5;
+    text-shadow: 0 0 10px rgba(200, 217, 182, 0);
+  }
   10% {
     color: #f5f1e7;
     opacity: 1;
-    text-shadow: 0 0 10px rgba(200,217,182,0.7);
+    text-shadow: 0 0 10px rgba(200, 217, 182, 0.7);
   }
 }
 
@@ -1187,7 +1211,7 @@ h1.display .display-dim {
 }
 .term-line.is-in {
   opacity: 1;
-  transform: none;
+  transform: translateY(0);
 }
 .term-blank {
   min-height: 0.5em;
