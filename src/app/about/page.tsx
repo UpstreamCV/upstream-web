@@ -14,13 +14,13 @@ const navLinks = [
 const team = [
   {
     name: "Elkan Bruha",
-    role: "Co-Founder & Engineer",
+    role: "Co-Founder & CEO",
     photo: "/assets/ElkanProfile.jpeg",
     linkedin: "https://www.linkedin.com/in/elkanbruha",
   },
   {
     name: "Josh D'Annunzio",
-    role: "Co-Founder & Engineer",
+    role: "Co-Founder & CTO",
     photo: "/assets/JoshProfile.jpeg",
     linkedin: "https://www.linkedin.com/in/josh-d'annunzio-3b0171227/",
   },

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import BgVideo from "./BgVideo";
 import EventStream from "./EventStream";
 import Metric from "./Metric";
 import Terminal from "./Terminal";
@@ -499,17 +500,7 @@ const useCases = [
 export default function Page() {
   return (
     <>
-      <video
-        className="bg-video"
-        src="/assets/river.mp4"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        aria-hidden="true"
-        tabIndex={-1}
-      />
+      <BgVideo />
 
       <div className="page">
         <nav className="top">
@@ -951,11 +942,8 @@ export default function Page() {
               <span>© 2026 Upstream Labs, Inc. · Started in Boulder, CO</span>
             </div>
             <div className="foot-links">
-              <a href="#docs">Docs</a>
-              <a href="#status">Status</a>
-              <a href="#security">Security</a>
-              <a href="#careers">Careers</a>
-              <a href="#twitter">/ x</a>
+              <a href="/about">About</a>
+              <a href="https://linkedin.com/company/upstreamcomputervision">LinkedIn</a>
             </div>
           </div>
         </footer>
