@@ -939,7 +939,7 @@ export default function Page() {
           <div className="foot-inner">
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <Image src={LOGO_SRC} alt="" width={22} height={22} />
-              <span>© 2026 Upstream Labs, Inc. · Started in Boulder, CO</span>
+              <span>© 2026 Upstream Vision, Inc. · Started in Boulder, CO</span>
             </div>
             <div className="foot-links">
               <a href="/about">About</a>
