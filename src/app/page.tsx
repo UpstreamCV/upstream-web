@@ -535,9 +535,6 @@ export default function Page() {
         <section className="splash" id="splash">
           <div className="splash-tint" />
           <div className="splash-inner">
-            <span className="eyebrow">
-              Camera intelligence infrastructure for developers
-            </span>
             <h1 className="display">
               <span className="display-dim">Build</span> camera intelligence<span className="display-dim">,</span>
               <br />
