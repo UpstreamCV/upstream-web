@@ -81,11 +81,8 @@ export default function AboutPage() {
               ))}
             </div>
             <div className="nav-cta">
-              <a className="btn btn-ghost" href="/#signin">
-                Sign in
-              </a>
-              <a className="btn btn-primary" href="/#start">
-                Get ready
+              <a className="btn btn-primary" href="/#waitlist">
+                Waitlist
               </a>
             </div>
           </div>
