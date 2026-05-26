@@ -522,11 +522,8 @@ export default function Page() {
               ))}
             </div>
             <div className="nav-cta">
-              <a className="btn btn-ghost" href="#signin">
-                Sign in
-              </a>
-              <a className="btn btn-primary" href="#start">
-                Get ready
+              <a className="btn btn-primary" href="#waitlist">
+                Waitlist
               </a>
             </div>
           </div>
@@ -547,11 +544,11 @@ export default function Page() {
             >
               <span>Coming Soon</span>
               <span className="hero-status-divider" aria-hidden="true">·</span>
-              <span>Expected Q1 2027</span>
+              <span>Expected Late 2026</span>
             </div>
             <div className="hero-cta">
-              <a className="btn btn-primary" href="#start">
-                Get ready
+              <a className="btn btn-primary" href="#waitlist">
+                Waitlist
                 <span className="mono" aria-hidden="true">
                   →
                 </span>
@@ -922,8 +919,8 @@ export default function Page() {
               working event flowing into your stack in under ten minutes.
             </p>
             <div className="btn-row">
-              <a className="btn btn-primary" href="#start">
-                Start free <span className="mono">→</span>
+              <a className="btn btn-primary" href="#waitlist">
+                Waitlist <span className="mono">→</span>
               </a>
               <a className="btn btn-ghost" href="#sales">
                 Talk to engineering
