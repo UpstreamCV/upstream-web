@@ -49,8 +49,8 @@ export function stagger(children: number, base = 0.06): number[] {
 }
 
 /**
- * Magnetic-pull primitive — used by every cursor-tracking CTA so they all
- * behave identically. Returns:
+ * Magnetic-pull primitive — used by every cursor-tracking surface so
+ * they all behave identically. Returns:
  *   - ref:     attach to the element being magnetised
  *   - sx, sy:  spring-smoothed translate of the WHOLE element toward cursor
  *   - slx, sly: spring-smoothed translate of an INNER span (subtle parallax)
@@ -58,9 +58,25 @@ export function stagger(children: number, base = 0.06): number[] {
  *   - hovered: pointer is over the element
  *   - handlers: spread onto the element (onMouseMove / Enter / Leave / Focus / Blur)
  *
+ * The default intensity (outer 0.08, inner 0.03) is calibrated for CTAs
+ * like NavCta. Content surfaces (glass text boxes, marginalia cards)
+ * pass a lower `outer` / `inner` so the magnet feels present but quiet.
+ *
  * Generic over the element type so callers don't need an extra cast.
  */
-export function useMagnetic<T extends HTMLElement = HTMLElement>() {
+interface MagneticOptions {
+  /** Outer translate multiplier — fraction of the cursor-to-center delta
+   *  applied to the whole element. CTAs use 0.08; content surfaces 0.025–0.04. */
+  outer?: number;
+  /** Inner translate multiplier — fraction applied to the inner motion span
+   *  for parallax. CTAs use 0.03; content surfaces ~0.012. */
+  inner?: number;
+}
+
+export function useMagnetic<T extends HTMLElement = HTMLElement>(
+  options: MagneticOptions = {},
+) {
+  const { outer = 0.08, inner = 0.03 } = options;
   const ref = useRef<T | null>(null);
   const reduced = useReducedMotion();
   const [focused, setFocused] = useState(false);
@@ -91,10 +107,10 @@ export function useMagnetic<T extends HTMLElement = HTMLElement>() {
     const radius = Math.max(rect.width, rect.height) * 0.9;
     const dist = Math.hypot(dx, dy);
     const pull = Math.max(0, 1 - dist / (radius * 2));
-    x.set(dx * 0.08 * pull);
-    y.set(dy * 0.08 * pull);
-    lx.set(dx * 0.03 * pull);
-    ly.set(dy * 0.03 * pull);
+    x.set(dx * outer * pull);
+    y.set(dy * outer * pull);
+    lx.set(dx * inner * pull);
+    ly.set(dy * inner * pull);
     gx.set(((e.clientX - rect.left) / rect.width) * 100);
     gy.set(((e.clientY - rect.top) / rect.height) * 100);
   };

@@ -10,7 +10,8 @@
  * voice "A report, not a haystack." in its own intro strip.
  */
 
-import { motion } from "framer-motion";
+import { motion, useMotionTemplate } from "framer-motion";
+import { useMagnetic } from "@/lib/motion";
 import { ActShell } from "./ActShell";
 
 interface Report {
@@ -24,53 +25,53 @@ interface Report {
 
 const REPORTS: Report[] = [
   {
-    kicker: "drift event · jan 14",
-    facility: "midwest cold storage · 124 cameras",
+    kicker: "scenario · drift event",
+    facility: "cold-storage facility · 100+ cameras",
     headline: (
       <>
-        Eight cameras drifted on the same afternoon.{" "}
-        <em className="italic-accent">We caught all eight.</em>
+        When a facility&apos;s cameras drift in unison,{" "}
+        <em className="italic-accent">Upstream can catch every one.</em>
       </>
     ),
-    body: "A golden-hour exposure shift took p50 confidence below 0.75 on every dock-facing lens at the same facility. Drift events on all eight were in the queue before the morning standup.",
+    body: "Imagine a golden-hour exposure shift pulling p50 confidence below 0.75 on every dock-facing lens at once. Upstream is built to land that drift in your queue before the morning standup, so the cameras get re-tuned before the next shift starts paging.",
     metrics: [
-      { k: "drift flagged", v: "8 / 124" },
-      { k: "mean lead-time", v: "3.2 days" },
-      { k: "alerts before resolve", v: "0" },
+      { k: "drift flagged", v: "every affected cam" },
+      { k: "lead-time", v: "days, not hours" },
+      { k: "stale alerts", v: "none during fix" },
     ],
     spark: [0.92, 0.91, 0.9, 0.88, 0.82, 0.71, 0.68, 0.64, 0.62, 0.61],
   },
   {
-    kicker: "false alert audit · feb 03",
+    kicker: "scenario · false alert audit",
     facility: "regional logistics hub",
     headline: (
       <>
-        A 34% drop in alerts, not by lowering thresholds.{" "}
-        <em className="italic-accent">By reading shadows correctly.</em>
+        Drop false alerts by reading the scene correctly,{" "}
+        <em className="italic-accent">not by lowering thresholds.</em>
       </>
     ),
-    body: "The old rule fired on every cast shadow near gate_01. The new rule, replayed against the past 30 days, dropped 34% of alerts without missing a single real PPE event.",
+    body: "Imagine an old rule firing on every cast shadow near a gate. Replayed against the past 30 days of footage, a new rule can trim the false-positive load substantially without missing a single real PPE event — the review queue gets shorter, the operator gets their afternoon back.",
     metrics: [
-      { k: "fp reduction", v: "−34%" },
-      { k: "tp recovered", v: "+12%" },
-      { k: "review queue", v: "22 → 14 / day" },
+      { k: "fp reduction", v: "double-digit %" },
+      { k: "tp recovered", v: "no real events missed" },
+      { k: "review queue", v: "smaller daily" },
     ],
     spark: [0.74, 0.72, 0.7, 0.65, 0.58, 0.51, 0.48, 0.44, 0.42, 0.4],
   },
   {
-    kicker: "blocked lens · mar 22",
-    facility: "industrial yard, pacific NW",
+    kicker: "scenario · blocked lens",
+    facility: "industrial yard",
     headline: (
       <>
-        A pallet wrap covered cam_lot_22 for fourteen hours.{" "}
-        <em className="italic-accent">We told them in fifteen minutes.</em>
+        When a pallet wrap covers a camera for hours,{" "}
+        <em className="italic-accent">Upstream can flag it in minutes.</em>
       </>
     ),
-    body: "Silent failures are the worst kind. The camera was technically online, returning frames, returning nothing. The entropy collapse showed up before the next shift change.",
+    body: "Silent failures are the worst kind: the camera is technically online, returning frames, returning nothing. Upstream is built to catch the entropy collapse before the next shift change, so blocked lenses get cleared instead of sitting unmonitored all night.",
     metrics: [
-      { k: "time to flag", v: "14 min" },
-      { k: "time to fix", v: "1h 22m" },
-      { k: "missed alerts", v: "0" },
+      { k: "time to flag", v: "minutes, not hours" },
+      { k: "time to fix", v: "same shift" },
+      { k: "missed alerts", v: "none during outage" },
     ],
     spark: [0.18, 0.17, 0.16, 0.15, 0.12, 0.08, 0.04, 0.02, 0.02, 0.02],
   },
@@ -80,7 +81,10 @@ export function Act05Reports() {
   return (
     <ActShell id="act-reports" index="05" kicker="field reports" drench="base" phase={3}>
       <div className="shell relative z-10 pb-24 pt-12 md:pb-32 md:pt-16">
-        {/* Section voice strip */}
+        {/* Section voice strip. Honest framing: the three reports below
+            are illustrative scenarios, not actual production incidents.
+            The "illustrative" pill makes that explicit so the operator
+            reader doesn't mistake them for case-study claims. */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -88,9 +92,22 @@ export function Act05Reports() {
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
           className="grid grid-cols-12 items-baseline gap-x-8 gap-y-4 border-b border-glass-stroke pb-8 md:pb-10"
         >
-          <p className="col-span-12 font-mono text-[10px] tracking-mono uppercase text-ink-mute md:col-span-7">
-            three cases · edited from real production debug sessions
-          </p>
+          <div className="col-span-12 flex flex-wrap items-center gap-3 md:col-span-7">
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full border border-glass-stroke px-2.5 py-1 font-mono text-[9.5px] tracking-kicker uppercase text-ink-soft"
+              style={{ background: "rgba(245, 241, 231, 0.04)" }}
+            >
+              <span
+                aria-hidden
+                className="inline-block h-1.5 w-1.5 rounded-full"
+                style={{ background: "var(--ink-soft)" }}
+              />
+              illustrative
+            </span>
+            <p className="font-mono text-[10px] tracking-mono uppercase text-ink-mute">
+              three scenarios · not actual incidents
+            </p>
+          </div>
           <div
             className="col-span-12 font-display md:col-span-5 md:text-right"
             style={{
@@ -118,15 +135,42 @@ function ReportBlock({ r, index }: { r: Report; index: number }) {
   // Alternate left/right alignment for asymmetry inside each glass box,
   // but keep mobile predictable.
   const flip = index % 2 === 1;
+
+  // Quiet magnetic pull on the whole report card + a soft reed-cream
+  // blob that follows the pointer. Lower intensity than NavCta because
+  // this is a 1000px-wide editorial surface, not a 100px CTA pill.
+  const { ref, sx, sy, slx, sly, gx, gy, hovered, handlers } =
+    useMagnetic<HTMLElement>({ outer: 0.018, inner: 0.008 });
+  const blob = useMotionTemplate`radial-gradient(520px circle at ${gx}% ${gy}%, rgba(245, 241, 231, 0.07), transparent 70%)`;
+
   return (
-    <motion.article
+    // Outer wrapper owns the scroll-in reveal so the magnetic transforms
+    // on the article underneath don't collide with the entry animation.
+    <motion.div
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px -20% 0px" }}
       transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-      className="glass-pane relative overflow-hidden rounded-3xl p-7 md:p-12"
     >
-      <div className="grid grid-cols-12 items-start gap-x-8 gap-y-8">
+      <motion.article
+        ref={ref as React.RefObject<HTMLElement>}
+        className="glass-pane relative overflow-hidden rounded-3xl p-7 md:p-12"
+        style={{ x: sx, y: sy }}
+        {...handlers}
+      >
+        <motion.span
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: blob,
+            opacity: hovered ? 1 : 0,
+            transition: "opacity 320ms cubic-bezier(0.22, 1, 0.36, 1)",
+          }}
+        />
+        <motion.div
+          className="relative z-10 grid grid-cols-12 items-start gap-x-8 gap-y-8"
+          style={{ x: slx, y: sly }}
+        >
         {/* Left rail: meta + sparkline */}
         <div
           className={`col-span-12 md:col-span-3 ${flip ? "md:order-2 md:col-start-10" : ""}`}
@@ -167,28 +211,51 @@ function ReportBlock({ r, index }: { r: Report; index: number }) {
         >
           {r.body}
         </p>
-        <div className="mt-8 grid grid-cols-3 gap-x-6 border-t border-glass-stroke-2 pt-6 md:gap-x-10 md:pt-7">
-          {r.metrics.map((m) => (
-            <div key={m.k}>
-              <div className="font-mono text-[9px] tracking-mono uppercase text-ink-mute md:text-[10px]">
-                {m.k}
+        <div className="mt-8 border-t border-glass-stroke-2 pt-6 md:pt-7">
+          {/* Honest framing: these aren't logged production numbers, they're
+              the kind of outcomes Upstream is built to deliver in this
+              scenario. The "illustrative" pill keeps that unambiguous. */}
+          <div className="mb-4 flex items-center gap-2 md:mb-5">
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full border border-glass-stroke px-2.5 py-1 font-mono text-[9px] tracking-kicker uppercase text-ink-soft md:text-[9.5px]"
+              style={{ background: "rgba(245, 241, 231, 0.04)" }}
+            >
+              <span
+                aria-hidden
+                className="inline-block h-1.5 w-1.5 rounded-full"
+                style={{ background: "var(--ink-soft)" }}
+              />
+              illustrative
+            </span>
+            <span className="font-mono text-[9px] tracking-mono uppercase text-ink-mute md:text-[10px]">
+              what Upstream can deliver
+            </span>
+          </div>
+          <div className="grid grid-cols-3 gap-x-6 md:gap-x-10">
+            {r.metrics.map((m) => (
+              <div key={m.k}>
+                <div className="font-mono text-[9px] tracking-mono uppercase text-ink-mute md:text-[10px]">
+                  {m.k}
+                </div>
+                <div
+                  className="mt-1 font-display text-ink"
+                  style={{
+                    fontSize: "clamp(15px, 1.4vw, 20px)",
+                    lineHeight: 1.2,
+                    letterSpacing: "-0.014em",
+                    fontWeight: 500,
+                  }}
+                >
+                  {m.v}
+                </div>
               </div>
-              <div
-                className="mt-1 font-display text-ink"
-                style={{
-                  fontSize: "clamp(18px, 1.8vw, 28px)",
-                  letterSpacing: "-0.018em",
-                  fontWeight: 500,
-                }}
-              >
-                {m.v}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
-      </div>
-    </motion.article>
+        </motion.div>
+      </motion.article>
+    </motion.div>
   );
 }
 

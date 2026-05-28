@@ -40,12 +40,12 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Upstream / Live computer vision, kept honest.",
+  title: "Upstream",
   description:
     "Reliability-native infrastructure for live computer vision. Upstream runs the pipeline behind your cameras and tells you the moment a single one stops telling the truth.",
   metadataBase: new URL("https://upstreamcv.com"),
   openGraph: {
-    title: "Upstream / Live computer vision, kept honest.",
+    title: "Upstream",
     description:
       "Reliability-native infrastructure for live computer vision. Drift detected before it costs you.",
     images: ["/assets/river-splash.jpeg"],
