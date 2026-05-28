@@ -1,12 +1,18 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { JetBrains_Mono } from "next/font/google";
+
 import "./globals.css";
+
+import { SmoothScrollProvider } from "@/components/atmosphere/SmoothScrollProvider";
+import { ScrollProgress } from "@/components/atmosphere/ScrollProgress";
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  // Must match --base-2 in globals.css. Next requires a static color here.
+  themeColor: "#0f1809",
 };
 
 const satoshi = localFont({
@@ -26,16 +32,25 @@ const satoshi = localFont({
   display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-mono",
+const jetbrains = JetBrains_Mono({
+  variable: "--font-jetbrains",
   subsets: ["latin"],
   display: "swap",
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
-  title: "Upstream",
+  title: "Upstream / Live computer vision, kept honest.",
   description:
-    "Upstream is real-time computer vision infrastructure for teams that want to ship product, not pipelines. Turn live camera feeds into production-ready events, analytics, and automations.",
+    "Reliability-native infrastructure for live computer vision. Upstream runs the pipeline behind your cameras and tells you the moment a single one stops telling the truth.",
+  metadataBase: new URL("https://upstream.vision"),
+  openGraph: {
+    title: "Upstream / Live computer vision, kept honest.",
+    description:
+      "Reliability-native infrastructure for live computer vision. Drift detected before it costs you.",
+    images: ["/assets/river-splash.jpeg"],
+    type: "website",
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -56,9 +71,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${satoshi.variable} ${jetbrainsMono.variable}`}
+      className={`${satoshi.variable} ${jetbrains.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <SmoothScrollProvider>
+          <ScrollProgress />
+          {children}
+        </SmoothScrollProvider>
+      </body>
     </html>
   );
 }

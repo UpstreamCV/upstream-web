@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-27T00:00:00Z",
+  "title": "Design System: Upstream",
+  "extensions": {
+    "colorMeta": {
+      "creek-deep": {
+        "role": "primary",
+        "displayName": "Deep Creek",
+        "canonical": "oklch(32% 0.07 138)",
+        "tonalRamp": ["#1A2716", "#243520", "#344C2C", "#4A6940", "#5F8553", "#82A877", "#B0CCA3", "#DDE5D3"]
+      },
+      "creek-mid": {
+        "role": "primary",
+        "displayName": "River Mid",
+        "canonical": "oklch(52% 0.07 156)",
+        "tonalRamp": ["#1F362D", "#2C4D40", "#3B6553", "#4B816C", "#659B85", "#82B5A0", "#B0D2C3", "#DDEAE2"]
+      },
+      "creek-moss": {
+        "role": "primary",
+        "displayName": "Streambank Moss",
+        "canonical": "oklch(52% 0.06 90)",
+        "tonalRamp": ["#2A2719", "#443F26", "#5C5535", "#81764B", "#9B9266", "#B6AE87", "#D2CDB0", "#EAE7D9"]
+      },
+      "signal-bright": {
+        "role": "secondary",
+        "displayName": "Signal Bright",
+        "canonical": "oklch(70% 0.17 144)",
+        "tonalRamp": ["#1F3320", "#2D4D2D", "#3F6E3F", "#5FB869", "#7DCA85", "#9EDCA4", "#C2EAC6", "#E2F4E4"]
+      },
+      "signal-amber": {
+        "role": "secondary",
+        "displayName": "Signal Amber",
+        "canonical": "oklch(80% 0.14 80)",
+        "tonalRamp": ["#2A2210", "#46371A", "#6A5526", "#E8C06B", "#EDCC88", "#F2D9A6", "#F7E6C3", "#FCF3E1"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Reed Cream",
+        "canonical": "oklch(95% 0.01 80)",
+        "tonalRamp": ["#2D2C24", "#5A5848", "#88857F", "#B5B1A8", "#DAD6CC", "#F5F1E7", "#FAF7F0", "#FFFCF4"]
+      },
+      "base": {
+        "role": "neutral",
+        "displayName": "Riverbed Base",
+        "canonical": "oklch(15% 0.015 138)",
+        "tonalRamp": ["#060A03", "#0F1809", "#1A2613", "#2A3923", "#3F5236", "#5C7250", "#889D7A", "#B7C9A8"]
+      },
+      "base-deep": {
+        "role": "neutral",
+        "displayName": "Riverbed Deep",
+        "canonical": "oklch(8% 0.01 138)",
+        "tonalRamp": ["#020401", "#060A03", "#0A0E06", "#101610", "#1A2412", "#2A3923", "#3F5236", "#5C7250"]
+      },
+      "base-panel": {
+        "role": "neutral",
+        "displayName": "Riverbed Panel",
+        "canonical": "oklch(18% 0.02 138)",
+        "tonalRamp": ["#080D04", "#10180B", "#1A2613", "#27361D", "#384830", "#506247", "#788D6C", "#A8BC97"]
+      },
+      "glass-stroke": {
+        "role": "neutral",
+        "displayName": "Glass Stroke",
+        "canonical": "oklch(22% 0.01 138)",
+        "tonalRamp": ["#0B0F08", "#141A10", "#1E2618", "#262C20", "#343D2D", "#4D5944", "#737F66", "#A4AE96"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero headlines and section overture text. Italicized spans take Signal Bright." },
+      "headline": { "displayName": "Headline", "purpose": "Major section openers (InferenceLens, DriftTimeline, RuleComposer)." },
+      "title": { "displayName": "Title", "purpose": "Card titles, sub-section headers, named-step labels in ribbons." },
+      "body": { "displayName": "Body", "purpose": "Long-form paragraphs. Capped at 65-75ch via max-width." },
+      "label": { "displayName": "Kicker / Eyebrow", "purpose": "Mono kickers (01 — ingest), data labels, timestamps, IDs." }
+    },
+    "shadows": [
+      {
+        "name": "soft-inset",
+        "value": "0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 30px 60px -30px rgba(0, 0, 0, 0.6)",
+        "purpose": "Standard glass pane lift. Top highlight + ambient bottom shadow."
+      },
+      {
+        "name": "deep-ambient",
+        "value": "0 40px 90px -40px rgba(0, 0, 0, 0.85), 0 1px 0 rgba(255, 255, 255, 0.04) inset",
+        "purpose": "Hero panel, replay scrubber pinned moment, About hero — deepest lift."
+      },
+      {
+        "name": "focus-ring",
+        "value": "outline 1px solid rgba(245, 241, 231, 0.6); outline-offset: 3px;",
+        "purpose": "Default :focus-visible ring for all interactive elements."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-quint",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Default ease-out for component state transitions (button hover, panel lift, scroll reveals)."
+      },
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Hero stream entrance, drift timeline tick reveals — more aggressive ease-out for dramatic moments."
+      },
+      {
+        "name": "ease-in-out-cubic",
+        "value": "cubic-bezier(0.65, 0, 0.35, 1)",
+        "purpose": "Two-way transitions where both ends need a settled feel (modal open/close, accordion)."
+      },
+      {
+        "name": "magnetic-spring",
+        "value": "framer-motion spring: stiffness 280, damping 22, mass 1.1",
+        "purpose": "Magnetic CTA buttons — pointer-near translation."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1320px", "purpose": "Shell max-width — matches .shell container cap." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Pill CTA in Reed Cream with Riverbed label; hover transitions to Signal Bright.",
+      "html": "<button class=\"ds-btn-primary\">JOIN WAITLIST</button>",
+      "css": ".ds-btn-primary { background: #F5F1E7; color: #0F1809; padding: 14px 28px; border: 0; border-radius: 9999px; font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; cursor: pointer; transition: background 220ms cubic-bezier(0.22, 1, 0.36, 1), color 220ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-btn-primary:hover { background: #5FB869; color: #060A03; } .ds-btn-primary:focus-visible { outline: 1px solid rgba(245, 241, 231, 0.6); outline-offset: 3px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Transparent pill for nav and secondary actions.",
+      "html": "<button class=\"ds-btn-ghost\">READ THE PHILOSOPHY</button>",
+      "css": ".ds-btn-ghost { background: transparent; color: #F5F1E7; padding: 14px 28px; border: 0; border-radius: 9999px; font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; cursor: pointer; transition: background 220ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-btn-ghost:hover { background: #262C20; } .ds-btn-ghost:focus-visible { outline: 1px solid rgba(245, 241, 231, 0.6); outline-offset: 3px; }"
+    },
+    {
+      "name": "Glass Panel",
+      "kind": "card",
+      "refersTo": "glass-pane",
+      "description": "Primary frosted-glass surface — 22px blur, 140% saturation, 1px Reed Cream stroke at 14% opacity.",
+      "html": "<div class=\"ds-glass-pane\"><span class=\"ds-glass-eyebrow\">01 — INGEST</span><h3 class=\"ds-glass-title\">Live computer vision, kept honest.</h3><p class=\"ds-glass-body\">Upstream runs the pipeline behind your cameras and tells you the moment a single one stops telling the truth.</p></div>",
+      "css": ".ds-glass-pane { position: relative; background: rgba(245, 241, 231, 0.06); border: 1px solid rgba(245, 241, 231, 0.14); border-radius: 20px; padding: 32px; backdrop-filter: blur(22px) saturate(140%); -webkit-backdrop-filter: blur(22px) saturate(140%); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 30px 60px -30px rgba(0, 0, 0, 0.6); max-width: 520px; } .ds-glass-eyebrow { display: block; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(245, 241, 231, 0.5); margin-bottom: 20px; } .ds-glass-title { font-family: 'Satoshi Variable', ui-sans-serif, system-ui, sans-serif; font-size: 1.75rem; font-weight: 500; line-height: 1.12; letter-spacing: -0.02em; color: #F5F1E7; margin: 0 0 14px; } .ds-glass-body { font-family: 'Satoshi', ui-sans-serif, system-ui, sans-serif; font-size: 1.0625rem; font-weight: 400; line-height: 1.55; color: rgba(245, 241, 231, 0.7); margin: 0; max-width: 65ch; }"
+    },
+    {
+      "name": "Quieter Glass Panel",
+      "kind": "card",
+      "refersTo": "glass-pane",
+      "description": "Nested / secondary glass — 14px blur, lighter stroke. Used inside primary glass or for sidebar panels.",
+      "html": "<div class=\"ds-glass-pane-2\"><span class=\"ds-glass-eyebrow-2\">SESSION</span><span class=\"ds-glass-id\">sess_8f3a1c7e9b2d4f60</span></div>",
+      "css": ".ds-glass-pane-2 { background: rgba(245, 241, 231, 0.04); border: 1px solid rgba(245, 241, 231, 0.08); border-radius: 12px; padding: 16px 20px; backdrop-filter: blur(14px) saturate(130%); -webkit-backdrop-filter: blur(14px) saturate(130%); display: flex; flex-direction: column; gap: 6px; max-width: 320px; } .ds-glass-eyebrow-2 { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(245, 241, 231, 0.5); } .ds-glass-id { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; color: #F5F1E7; letter-spacing: 0.02em; }"
+    },
+    {
+      "name": "Eyebrow Kicker",
+      "kind": "custom",
+      "refersTo": "eyebrow-label",
+      "description": "Numbered mono kicker that opens every major section.",
+      "html": "<span class=\"ds-kicker\"><span class=\"ds-kicker-num\">02</span><span class=\"ds-kicker-sep\">—</span><span class=\"ds-kicker-label\">INFERENCE</span></span>",
+      "css": ".ds-kicker { display: inline-flex; align-items: center; gap: 12px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(245, 241, 231, 0.5); } .ds-kicker-num { color: #4B816C; } .ds-kicker-sep { color: rgba(245, 241, 231, 0.22); } .ds-kicker-label { color: rgba(245, 241, 231, 0.7); }"
+    },
+    {
+      "name": "Waitlist Input",
+      "kind": "input",
+      "refersTo": "waitlist-input",
+      "description": "Riverbed-panel filled input with River Mid focus glow.",
+      "html": "<div class=\"ds-input-group\"><label class=\"ds-input-label\" for=\"camera-detail\">Tell us about your worst camera</label><input class=\"ds-input\" id=\"camera-detail\" type=\"text\" placeholder=\"e.g. dock entrance, glare after 4pm\" /></div>",
+      "css": ".ds-input-group { display: flex; flex-direction: column; gap: 8px; max-width: 480px; } .ds-input-label { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(245, 241, 231, 0.5); } .ds-input { background: #1A2613; color: #F5F1E7; border: 1px solid #262C20; border-radius: 12px; padding: 14px 18px; font-family: 'Satoshi', ui-sans-serif, system-ui, sans-serif; font-size: 1.0625rem; font-weight: 400; line-height: 1.55; transition: border-color 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-input::placeholder { color: rgba(245, 241, 231, 0.35); } .ds-input:focus { outline: none; border-color: #4B816C; box-shadow: 0 0 0 4px rgba(75, 129, 108, 0.16); } .ds-input:focus-visible { outline: 1px solid rgba(245, 241, 231, 0.6); outline-offset: 3px; }"
+    },
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "button-ghost",
+      "description": "Top-nav link with River Mid active-dot indicator.",
+      "html": "<a class=\"ds-nav-link ds-nav-link--active\" href=\"#\">Philosophy</a>",
+      "css": ".ds-nav-link { position: relative; display: inline-block; padding: 8px 14px; font-family: 'Satoshi', ui-sans-serif, system-ui, sans-serif; font-size: 0.95rem; font-weight: 500; color: rgba(245, 241, 231, 0.7); text-decoration: none; transition: color 180ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-nav-link:hover { color: #F5F1E7; } .ds-nav-link:focus-visible { outline: 1px solid rgba(245, 241, 231, 0.6); outline-offset: 3px; border-radius: 6px; } .ds-nav-link--active { color: #F5F1E7; } .ds-nav-link--active::after { content: ''; position: absolute; left: 50%; bottom: 0; width: 4px; height: 4px; background: #4B816C; border-radius: 9999px; transform: translateX(-50%); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Confluence",
+    "overview": "Three streams of equal weight, meeting. The Upstream brand makes the river metaphor literal — the product is an upstream system in the camera pipeline, and the visual language reinforces that idea instead of decorating around it. Deep creek green, mid-creek teal-green, and streambank mossy gold sit at equal weight across the surface; no single hue dominates. They are joined by a warm reed-cream ink on a near-black riverbed base, with frosted glass providing depth at every interactive layer.\n\nThe system rejects four reflex aesthetics common to AI infrastructure marketing: the SaaS-cream startup template, the dark-blue Datadog/Grafana observability cliché, crypto neon-on-black, and the generic 'AI for X' workflow tool with a gradient hero and feature-card grid. Upstream sits in a quieter, earthier, more editorial lane — closer to a long-form magazine feature about industrial systems than a hero-features-CTA stack.\n\nGlass is core, not decorative. Surfaces stack with 22-28px backdrop blur at saturation 140%, sitting against the dark riverbed so the green primaries glow through from behind. Motion is restrained but choreographed at key moments. Kicker numbering carries the editorial rhythm.",
+    "keyCharacteristics": [
+      "Three equal earth-toned primaries on a near-black base; no hero accent.",
+      "Frosted glass at depth — 22-28px blur, 140% saturation, stacked over a radial-glow background.",
+      "Satoshi Variable for display and body; JetBrains Mono for kickers, eyebrows, IDs, timestamps.",
+      "Kicker numbering, generous gutters (clamp(20px, 5vw, 64px)), editorial pacing.",
+      "Scroll-pinned moments instead of carousel-of-features.",
+      "prefers-reduced-motion is honored; nothing critical lives only in animation."
+    ],
+    "rules": [
+      { "name": "The Equal Confluence Rule", "body": "Deep Creek, River Mid, and Streambank Moss carry equal billing across the system. No one of them is the brand color. If a screen leans on a single green and ignores the other two, redesign the surface so all three appear, even in small doses.", "section": "colors" },
+      { "name": "The One-Tenth Signal Rule", "body": "Signal Bright (#5FB869) is allowed only as italicized emphasis in display text or as a state cue. It is never section fill, never button fill, never link color. If it covers more than 10% of the visible viewport, it is misused.", "section": "colors" },
+      { "name": "The No-Pure-Black Rule", "body": "#000 is forbidden. The Riverbed base is tinted toward Deep Creek (chroma > 0). The same applies to text: never #FFF. Always Reed Cream.", "section": "colors" },
+      { "name": "The Italic-as-Accent Rule", "body": "The only place Signal Bright appears in text is the italic span inside display headlines (.display em, .italic-accent). It is never used as regular text color. The italic is the accent.", "section": "typography" },
+      { "name": "The Kicker Number Rule", "body": "Every major section opens with a mono kicker numbered in two-digit form (01 — ingest, 02 — inference, 03 — rules). The numbering is editorial pacing; it counts the story, not the features.", "section": "typography" },
+      { "name": "The 65ch Body Rule", "body": "Body prose is capped at 65-75 characters per line. Glass panels with body text inside must enforce this even if the panel itself is wider — pad inward or constrain the prose column.", "section": "typography" },
+      { "name": "The No-Black-Shadow Rule", "body": "Shadows are always paired with a 1px inset white highlight at 4-6% opacity. A shadow without a highlight reads as a 2014 drop-shadow card; a shadow with a highlight reads as glass catching light.", "section": "elevation" },
+      { "name": "The Glass-Has-Something-To-Refract Rule", "body": "Glass panels must sit over a textured surface — the radial creek glow on body, or a deeper panel underneath. Glass on a flat color is wasted blur.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do treat Deep Creek (#344C2C), River Mid (#4B816C), and Streambank Moss (#81764B) as equal primaries. Every major section should let at least two of the three breathe somewhere on screen.",
+      "Do use Signal Bright (#5FB869) for italic emphasis in display headlines (<em> / .italic-accent) and for nothing else.",
+      "Do stack glass over a textured surface — the body's radial creek glow, or a Riverbed Panel underneath.",
+      "Do open every major section with a mono kicker number (01 — , 02 — ).",
+      "Do cap body prose at 65-75ch even when the surrounding glass panel is wider.",
+      "Do honor prefers-reduced-motion — scroll-pinned sections must degrade to static layouts.",
+      "Do pair every shadow with a 1px inset white highlight at 4-6% opacity."
+    ],
+    "donts": [
+      "Don't make one green dominant. The Equal Confluence Rule: no hero color.",
+      "Don't use Signal Bright as a button fill, link color, or section background. ≤10% of any viewport, italic emphasis only.",
+      "Don't use #000 or #FFF. Riverbed and Reed Cream only.",
+      "Don't reach for the SaaS-cream startup template — pastel gradients, friendly blob illustrations, hero-metric template, identical card grids of features.",
+      "Don't drift into the dark-blue observability cliché — navy/teal Datadog-Grafana-Splunk lookalike. If the palette starts looking like blue infra, the river is gone.",
+      "Don't reach for crypto neon-on-black — cyberpunk gradients, glitch effects, magenta/cyan accents.",
+      "Don't generate the generic AI workflow tool — gradient hero, 'AI for X' headline, 'transform your workflow' copy, feature cards stamped from a template.",
+      "Don't use glass as decoration. Every glass surface must have a reason — content lives on it, or it sits between two elevations.",
+      "Don't add side-stripe borders (border-left > 1px as a colored accent). Use full borders, background tints, or numbered kickers instead.",
+      "Don't use gradient text (background-clip: text on a gradient). Single solid color; emphasis via weight or italic accent.",
+      "Don't animate CSS layout properties. Use transform / opacity. GSAP and Framer Motion are already wired — use them.",
+      "Don't open a modal as a first thought. Inline / progressive disclosure first; modals only when the affordance truly requires it.",
+      "Don't write copy with em dashes — commas, colons, semicolons, periods, or parentheses only.",
+      "Don't claim accuracy numbers (precision, recall, FP/FN rate) on the site. Without ground-truth labels, we don't have them. Reliability risk, quality signals, status language only."
+    ]
+  }
+}
