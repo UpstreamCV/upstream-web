@@ -46,27 +46,30 @@ const WASH: Record<Drench, string> = {
   // anchors the bottom-left, the linear descent goes from lighter creek
   // (top) → deep creek (mid) → near-black (bottom). Same recipe as moss.
   deep:
-    "radial-gradient(calc(120% * var(--o1s)) calc(70% * var(--o1s)) at var(--o1x) var(--o1y), rgb(75 129 108 / calc(0.40 * var(--o1a))), transparent 55%), " +
-    "radial-gradient(calc(80% * var(--o2s)) calc(90% * var(--o2s)) at var(--o2x) var(--o2y), rgb(129 118 75 / calc(0.24 * var(--o2a))), transparent 65%), " +
+    // "radial-gradient(120% 70% at var(--o1x) var(--o1y), rgba(75, 129, 108, 0.40), rgba(75, 129, 108, 0) 55%), " +
+    // "radial-gradient(80% 90% at var(--o2x) var(--o2y), rgba(129, 118, 75, 0.24), rgba(129, 118, 75, 0) 65%), " +
     "linear-gradient(180deg, #3d5731 0%, #1c2a17 55%, #0f1809 100%)",
   // River Mid dominant. Moss washes in from the top center, Deep Creek
   // anchors the bottom-right, the linear descent goes from brighter mid
   // (top) → mid (middle) → deep creek (bottom). Same recipe as moss.
   mid:
-    "radial-gradient(calc(120% * var(--o1s)) calc(70% * var(--o1s)) at var(--o1x) var(--o1y), rgb(129 118 75 / calc(0.36 * var(--o1a))), transparent 55%), " +
-    "radial-gradient(calc(70% * var(--o2s)) calc(80% * var(--o2s)) at var(--o2x) var(--o2y), rgb(52 76 44 / calc(0.42 * var(--o2a))), transparent 65%), " +
+    // "radial-gradient(120% 70% at var(--o1x) var(--o1y), rgba(129, 118, 75, 0.36), rgba(129, 118, 75, 0) 55%), " +
+    // "radial-gradient(70% 80% at var(--o2x) var(--o2y), rgba(52, 76, 44, 0.42), rgba(52, 76, 44, 0) 65%), " +
     "linear-gradient(180deg, #557f6d 0%, #2e5045 50%, #1c2a17 100%)",
   // Streambank Moss dominant. Warm gold-green field; deep creek at the top
   // grounding it; river mid pooling at the bottom-left.
   moss:
-    "radial-gradient(calc(100% * var(--o1s)) calc(80% * var(--o1s)) at var(--o1x) var(--o1y), rgb(52 76 44 / calc(0.55 * var(--o1a))), transparent 55%), " +
-    "radial-gradient(calc(60% * var(--o2s)) calc(70% * var(--o2s)) at var(--o2x) var(--o2y), rgb(75 129 108 / calc(0.30 * var(--o2a))), transparent 65%), " +
-    "linear-gradient(180deg, #5d563a 0%, #3f3a26 100%)",
+    // "radial-gradient(100% 80% at var(--o1x) var(--o1y), rgba(52, 76, 44, 0.55), rgba(52, 76, 44, 0) 55%), " +
+    // "radial-gradient(60% 70% at var(--o2x) var(--o2y), rgba(75, 129, 108, 0.30), rgba(75, 129, 108, 0) 65%), " +
+    // Mid-dark moss palette — darker than the original gold-moss
+    // (which read too light against the chart) but not pitch-black at
+    // the bottom; the chart strokes and amber markers still pop.
+    "linear-gradient(180deg, #3f3a26 0%, #1f1c11 60%, #100e08 100%)",
   // Riverbed base. River Mid washes in from the top, Moss anchors the
   // bottom-left, the linear descent ends near pitch. Same recipe as moss.
   base:
-    "radial-gradient(calc(120% * var(--o1s)) calc(80% * var(--o1s)) at var(--o1x) var(--o1y), rgb(75 129 108 / calc(0.28 * var(--o1a))), transparent 55%), " +
-    "radial-gradient(calc(80% * var(--o2s)) calc(70% * var(--o2s)) at var(--o2x) var(--o2y), rgb(129 118 75 / calc(0.16 * var(--o2a))), transparent 65%), " +
+    // "radial-gradient(120% 80% at var(--o1x) var(--o1y), rgba(75, 129, 108, 0.28), rgba(75, 129, 108, 0) 55%), " +
+    // "radial-gradient(80% 70% at var(--o2x) var(--o2y), rgba(129, 118, 75, 0.16), rgba(129, 118, 75, 0) 65%), " +
     "linear-gradient(180deg, #1a2613 0%, #0f1809 55%, #060a03 100%)",
 };
 

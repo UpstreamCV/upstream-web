@@ -17,6 +17,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import Lenis from "lenis";
+import Snap from "lenis/snap";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -69,11 +70,41 @@ export function SmoothScrollProvider({ children }: Props) {
       window.addEventListener("load", onLoad, { once: true });
     }
 
+    // Per-section soft snap. Lenis Snap is velocity-aware, so it only
+    // fires when the smooth-scroll settles within `distanceThreshold` of
+    // a registered section. The debounce gives the user a beat to keep
+    // scrolling past a section without being yanked back into it.
+    let snap: Snap | null = null;
+    let snapAddTimeout: number | null = null;
+    if (!reduced) {
+      snap = new Snap(lenis, {
+        type: "proximity",
+        duration: 0.7,
+        easing: (t: number) => 1 - Math.pow(1 - t, 3),
+        distanceThreshold: "30%",
+        debounce: 220,
+      });
+      // Wait one frame so the page tree is in the DOM, then register
+      // every direct <section> child of <main> EXCEPT Act 06 (the final
+      // CTA) — snapping into the CTA fold yanks the user out of the
+      // scroll-to-the-footer flow.
+      snapAddTimeout = window.setTimeout(() => {
+        const sections = document.querySelectorAll<HTMLElement>(
+          "main > section:not(#act-current)",
+        );
+        sections.forEach((section) => {
+          snap?.addElement(section, { align: "start" });
+        });
+      }, 0);
+    }
+
     return () => {
       window.clearTimeout(refreshTimeout);
       window.removeEventListener("load", onLoad);
+      if (snapAddTimeout !== null) window.clearTimeout(snapAddTimeout);
       lenis.off("scroll", onScroll);
       gsap.ticker.remove(tick);
+      snap?.destroy();
       lenis.destroy();
       lenisRef.current = null;
     };

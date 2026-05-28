@@ -27,7 +27,9 @@ export function Act06Current() {
       phase={4}
     >
       <div className="relative h-[100svh] min-h-[680px] w-full overflow-hidden">
-        {/* Deep creek-mid pool that anchors the fish */}
+        {/* Deep creek-mid pool blobs removed — Act 06 now reads against
+            the base drench's linear gradient only. */}
+        {/*
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
@@ -37,12 +39,13 @@ export function Act06Current() {
               "radial-gradient(70% 60% at 0% 0%, rgba(52, 76, 44, 0.40), transparent 70%)",
           }}
         />
+        */}
 
         {/* Fish, anchored bottom-right and rotated into the corner */}
         <motion.div
           aria-hidden="true"
           initial={{ opacity: 0, y: 60, rotate: -8 }}
-          whileInView={{ opacity: 0.55, y: 0, rotate: -10 }}
+          whileInView={{ opacity: 1, y: 0, rotate: -10 }}
           viewport={{ once: true, margin: "0px 0px -10% 0px" }}
           transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
           className="pointer-events-none absolute -bottom-12 -right-12 md:-bottom-20 md:-right-24"
@@ -57,7 +60,9 @@ export function Act06Current() {
             fill
             sizes="(max-width: 768px) 80vw, 720px"
             className="object-contain"
-            style={{ filter: "saturate(0.5) brightness(1.4)", opacity: 0.85 }}
+            // brightness(0) invert(1) flattens the source to a pure white
+            // silhouette; opacity 0.6 holds it back from being too bright.
+            style={{ filter: "brightness(0) invert(1)", opacity: 0.6 }}
           />
         </motion.div>
 

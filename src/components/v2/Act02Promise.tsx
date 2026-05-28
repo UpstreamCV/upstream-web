@@ -76,7 +76,7 @@ export function Act02Promise() {
               }}
             >
               Upstream helps teams{" "}
-              <em className="italic-accent">trust</em> it once it&apos;s running.
+              <em className="italic-accent">trust</em>{" "}it once it&apos;s running.
             </motion.p>
 
             <motion.p

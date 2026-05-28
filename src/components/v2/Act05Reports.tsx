@@ -115,7 +115,8 @@ export function Act05Reports() {
 }
 
 function ReportBlock({ r, index }: { r: Report; index: number }) {
-  // Alternate left/right alignment for asymmetry, but keep mobile predictable.
+  // Alternate left/right alignment for asymmetry inside each glass box,
+  // but keep mobile predictable.
   const flip = index % 2 === 1;
   return (
     <motion.article
@@ -123,12 +124,13 @@ function ReportBlock({ r, index }: { r: Report; index: number }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px -20% 0px" }}
       transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-      className="grid grid-cols-12 items-start gap-x-8 gap-y-8"
+      className="glass-pane relative overflow-hidden rounded-3xl p-7 md:p-12"
     >
-      {/* Left rail: meta + sparkline */}
-      <div
-        className={`col-span-12 md:col-span-3 ${flip ? "md:order-2 md:col-start-10" : ""}`}
-      >
+      <div className="grid grid-cols-12 items-start gap-x-8 gap-y-8">
+        {/* Left rail: meta + sparkline */}
+        <div
+          className={`col-span-12 md:col-span-3 ${flip ? "md:order-2 md:col-start-10" : ""}`}
+        >
         <div className="font-mono text-[10px] tracking-kicker uppercase text-ink">
           {String(index + 1).padStart(2, "0")}
         </div>
@@ -184,6 +186,7 @@ function ReportBlock({ r, index }: { r: Report; index: number }) {
             </div>
           ))}
         </div>
+      </div>
       </div>
     </motion.article>
   );

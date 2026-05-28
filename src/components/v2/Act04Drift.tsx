@@ -3,26 +3,28 @@
 /**
  * Act 04 — Drift, kept visible.
  *
- * Drenched Streambank Moss. Pinned for ~150vh. The drift visualization
- * lives as water-level lines (literal river metaphor) rather than a
- * dashboard chart: three lanes (exposure, focus, confidence p50) flow
- * across a 14-day window, each rendered as a surface line with a filled
- * reflection underneath. The confidence lane drops at day 10 — the
- * divergence — and a fish silhouette breaches at the moment the line
- * dips. Glass marginalia slides up with the cause attribution.
+ * Drenched Streambank Moss. Pinned for ~120% of scroll. Three water-level
+ * lanes (exposure, focus, confidence p50) flow across a 14-day window.
+ * Each lane carries its OWN anomaly visible in the data: an exposure dip
+ * at D-9, a focus sag from D-7 onward, and the confidence drop from D-4.
+ * As the needle scrubs past each event day, that lane's marker dot
+ * appears, the lane line glows, and the matching alert card at top-right
+ * of the chart lights up.
  *
- * This act is the brand heart. The metaphor (water level = signal
- * reliability) reinforces the product idea instead of decorating it.
+ * Implementation notes:
+ *   - Lane paths stay in SVG (so the water-shape stretches with viewport,
+ *     which is the desired river-level feel).
+ *   - Dots — both event markers and the needle head — render as HTML
+ *     elements positioned by %, so they stay circular instead of being
+ *     stretched into ellipses by the SVG's preserveAspectRatio="none".
  */
 
-import Image from "next/image";
 import { useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { useReducedMotion } from "@/lib/motion";
 import { ActShell } from "./ActShell";
-import { MarginaliaPanel } from "./MarginaliaPanel";
 
 if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
@@ -34,25 +36,62 @@ interface Lane {
   data: number[];
 }
 
+// Each lane reads HIGH when healthy and DROPS during its anomaly window —
+// the chart shape literally is the alert.
 const LANES: Lane[] = [
   {
     k: "exposure",
-    color: "#F5F1E7", // Reed Cream — steady
-    data: [0.86, 0.84, 0.85, 0.83, 0.82, 0.84, 0.85, 0.84, 0.83, 0.82, 0.84, 0.85, 0.84, 0.83],
+    color: "#F5F1E7", // Reed Cream
+    // Brief dip at D-9/D-8: backlight saturated the lens, quality bottomed
+    // out at 0.62 for two windows, then recovered.
+    data: [0.93, 0.92, 0.93, 0.92, 0.93, 0.62, 0.58, 0.92, 0.93, 0.92, 0.93, 0.92, 0.93, 0.92],
   },
   {
     k: "focus",
-    color: "#B6AE87", // Moss-bright — steady
-    data: [0.78, 0.79, 0.78, 0.77, 0.78, 0.77, 0.78, 0.79, 0.78, 0.77, 0.78, 0.78, 0.77, 0.78],
+    color: "#B6AE87", // Moss-bright
+    // Steady decline from D-7 onward: sharpness sags as the lens fouls.
+    data: [0.88, 0.87, 0.88, 0.87, 0.88, 0.87, 0.86, 0.78, 0.66, 0.54, 0.42, 0.32, 0.24, 0.18],
   },
   {
     k: "confidence p50",
-    color: "#5FB869", // Signal Bright — this is the lane that DROPS
-    data: [0.92, 0.91, 0.92, 0.91, 0.90, 0.90, 0.89, 0.88, 0.86, 0.82, 0.74, 0.68, 0.61, 0.55],
+    color: "#5FB869", // Signal Bright
+    // Drop from D-5: p50 collapses 0.88 → 0.22 in five days.
+    data: [0.92, 0.91, 0.92, 0.91, 0.90, 0.90, 0.89, 0.88, 0.84, 0.74, 0.58, 0.44, 0.32, 0.22],
   },
 ];
 
-const DIVERGENCE_DAY = 10; // 0-indexed; visually around day 10 of 14
+interface Event {
+  laneIdx: number;
+  day: number;
+  label: string;
+  body: string;
+}
+
+const EVENTS: Event[] = [
+  {
+    laneIdx: 0,
+    day: 5,
+    label: "exposure dipped",
+    body: "Backlight saturated the lens between 18:40 and 19:10. Quality bottomed at 0.62 for two windows.",
+  },
+  {
+    laneIdx: 1,
+    day: 8,
+    label: "focus declining",
+    body: "Sharpness sagging since D-7. Likely lens fouling — schedule a clean before it hits zero.",
+  },
+  {
+    laneIdx: 2,
+    day: 10,
+    label: "confidence drop",
+    body: "p50 fell 0.88 → 0.58 in five days, still falling. Cause: sun-angle shift on the dock-facing lens.",
+  },
+];
+
+const AMBER = "#E8C06B";
+// Vertical amp used by lanePath. Higher = more dramatic drops on screen.
+// 9 keeps the three lanes from colliding inside the viewBox 0..60.
+const AMP = 9;
 
 export function Act04Drift() {
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -98,9 +137,15 @@ export function Act04Drift() {
 
   const dayIdx = Math.min(13, Math.floor(progress * 14));
   const dayLabel = `D-${14 - dayIdx}`;
-  const calloutOn = progress > DIVERGENCE_DAY / 14;
-  const fishOn = progress > (DIVERGENCE_DAY + 1) / 14;
   const needleX = 4 + progress * 92;
+
+  // Each event activates when the needle has passed its day. Lanes glow
+  // independently based on their own event status.
+  const eventsActive = EVENTS.map((e) => progress > e.day / 13);
+  const laneActiveByIdx = LANES.map((_, li) => {
+    const idx = EVENTS.findIndex((e) => e.laneIdx === li);
+    return idx >= 0 ? eventsActive[idx] : false;
+  });
 
   return (
     <ActShell
@@ -141,7 +186,7 @@ export function Act04Drift() {
                   lineHeight: 1.0,
                   letterSpacing: "-0.035em",
                   fontWeight: 700,
-                  color: "rgba(245, 241, 231, 0.6)",
+                  color: "rgba(245, 241, 231, 0.85)",
                 }}
               >
                 The water level drops <em className="italic-accent">before</em>
@@ -149,7 +194,7 @@ export function Act04Drift() {
                 the pager goes off.
               </h2>
               <p
-                className="col-span-12 max-w-[44ch] text-ink-soft md:col-span-3 md:justify-self-end md:text-right"
+                className="col-span-12 max-w-[44ch] text-ink md:col-span-3 md:justify-self-end md:text-right"
                 style={{ lineHeight: 1.55 }}
               >
                 Three signals per camera. The same model that ran cleanly all
@@ -158,7 +203,7 @@ export function Act04Drift() {
             </div>
 
             {/* The water-level chart */}
-            <div className="relative mt-10 flex-1 md:mt-12">
+            <div className="relative mt-8 flex-1 md:mt-10">
               <div className="relative h-full w-full overflow-visible">
                 <svg
                   viewBox="0 0 100 60"
@@ -189,31 +234,19 @@ export function Act04Drift() {
                       y1={5 + i * 17}
                       x2="100"
                       y2={5 + i * 17}
-                      stroke="rgba(245,241,231,0.06)"
+                      stroke="rgba(245,241,231,0.10)"
                       strokeWidth="0.12"
                       vectorEffect="non-scaling-stroke"
                     />
                   ))}
 
-                  {/* divergence vertical */}
-                  <line
-                    x1={4 + (DIVERGENCE_DAY / 13) * 92}
-                    x2={4 + (DIVERGENCE_DAY / 13) * 92}
-                    y1="2"
-                    y2="58"
-                    stroke="rgba(232,192,107,0.55)"
-                    strokeWidth="0.18"
-                    strokeDasharray="1.4 1.6"
-                    vectorEffect="non-scaling-stroke"
-                  />
-
-                  {/* lanes — paths only; labels render as HTML below so
-                      the text doesn't warp with preserveAspectRatio="none". */}
+                  {/* lanes — paths only; dots and labels are HTML below so
+                      they don't warp with preserveAspectRatio="none". */}
                   {LANES.map((lane, li) => {
                     const baseY = 14 + li * 15;
-                    const surface = lanePath(lane.data, baseY, 7);
-                    const reflection = `${surface} L 100 ${baseY + 9} L 0 ${baseY + 9} Z`;
-                    const isConfidence = lane.k === "confidence p50";
+                    const surface = lanePath(lane.data, baseY, AMP);
+                    const reflection = `${surface} L 100 ${baseY + AMP + 1} L 0 ${baseY + AMP + 1} Z`;
+                    const active = laneActiveByIdx[li];
                     return (
                       <g key={lane.k}>
                         <path d={reflection} fill={`url(#drift-fill-${li})`} />
@@ -221,22 +254,47 @@ export function Act04Drift() {
                           d={surface}
                           fill="none"
                           stroke={lane.color}
-                          strokeWidth={isConfidence ? "0.45" : "0.32"}
+                          strokeWidth={active ? "0.55" : "0.35"}
                           strokeLinejoin="round"
                           vectorEffect="non-scaling-stroke"
                           style={{
-                            filter:
-                              isConfidence && calloutOn
-                                ? "drop-shadow(0 0 4px rgba(232,192,107,0.7))"
-                                : "none",
-                            transition: "filter 600ms ease",
+                            filter: active
+                              ? "drop-shadow(0 0 4px rgba(232,192,107,0.7))"
+                              : "none",
+                            transition:
+                              "filter 600ms ease, stroke-width 600ms ease",
                           }}
                         />
                       </g>
                     );
                   })}
 
-                  {/* needle */}
+                  {/* Per-event vertical guide lines, scoped to each lane.
+                      Stretching is in the line's own direction (vertical),
+                      so visible warping is minimal — these stay in SVG. */}
+                  {EVENTS.map((event, i) => {
+                    const x = 4 + (event.day / 13) * 92;
+                    const baseY = 14 + event.laneIdx * 15;
+                    return (
+                      <line
+                        key={i}
+                        x1={x}
+                        x2={x}
+                        y1={baseY - 1.5}
+                        y2={baseY + AMP + 1}
+                        stroke="rgba(232,192,107,0.6)"
+                        strokeWidth="0.18"
+                        strokeDasharray="1.2 1.4"
+                        vectorEffect="non-scaling-stroke"
+                        style={{
+                          opacity: eventsActive[i] ? 1 : 0,
+                          transition: "opacity 600ms ease",
+                        }}
+                      />
+                    );
+                  })}
+
+                  {/* needle (vertical line — vertical stretching is fine) */}
                   <line
                     x1={needleX}
                     x2={needleX}
@@ -246,8 +304,46 @@ export function Act04Drift() {
                     strokeWidth="0.22"
                     vectorEffect="non-scaling-stroke"
                   />
-                  <circle cx={needleX} cy="2" r="0.7" fill="#F5F1E7" />
                 </svg>
+
+                {/* HTML overlays — anything circular goes here so the
+                    chart's preserveAspectRatio="none" doesn't squash dots
+                    into ellipses. */}
+                <div className="pointer-events-none absolute inset-0">
+                  {/* Per-event data-point dots */}
+                  {EVENTS.map((event, i) => {
+                    const x = 4 + (event.day / 13) * 92;
+                    const baseY = 14 + event.laneIdx * 15;
+                    const dataPointY =
+                      baseY + (1 - LANES[event.laneIdx].data[event.day]) * AMP;
+                    return (
+                      <div
+                        key={i}
+                        className="absolute h-2.5 w-2.5 rounded-full transition-opacity duration-700 md:h-3 md:w-3"
+                        style={{
+                          left: `${x}%`,
+                          top: `${(dataPointY / 60) * 100}%`,
+                          transform: "translate(-50%, -50%)",
+                          background: AMBER,
+                          opacity: eventsActive[i] ? 1 : 0,
+                          boxShadow:
+                            "0 0 0 4px rgba(232, 192, 107, 0.22), 0 0 12px rgba(232, 192, 107, 0.4)",
+                        }}
+                      />
+                    );
+                  })}
+
+                  {/* Needle head dot */}
+                  <div
+                    className="absolute h-2 w-2 rounded-full"
+                    style={{
+                      left: `${needleX}%`,
+                      top: `${(2 / 60) * 100}%`,
+                      transform: "translate(-50%, -50%)",
+                      background: "#F5F1E7",
+                    }}
+                  />
+                </div>
 
                 {/* Lane labels — HTML overlay positioned by %; text renders
                     at native proportions instead of being stretched by the
@@ -263,7 +359,7 @@ export function Act04Drift() {
                         style={{
                           left: "0.5%",
                           bottom: `${((60 - labelY) / 60) * 100}%`,
-                          color: "rgba(245, 241, 231, 0.62)",
+                          color: "rgba(245, 241, 231, 0.88)",
                         }}
                       >
                         {lane.k.toUpperCase()}
@@ -280,76 +376,49 @@ export function Act04Drift() {
                   {dayLabel}
                 </div>
 
-                {/* Time axis */}
-                <div className="absolute inset-x-0 bottom-0 flex justify-between pt-2 font-mono text-[10px] tracking-mono uppercase text-ink-mute">
-                  <span>14 days ago</span>
-                  <span>{calloutOn ? "drift event" : "—"}</span>
-                  <span>today</span>
-                </div>
-
-                {/* Fish breach at divergence */}
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute"
-                  style={{
-                    left: `${4 + (DIVERGENCE_DAY / 13) * 92 - 6}%`,
-                    bottom: "44%",
-                    width: "12%",
-                    aspectRatio: "1 / 1",
-                    opacity: fishOn ? 0.6 : 0,
-                    transform: fishOn
-                      ? "translateY(0) rotate(-12deg)"
-                      : "translateY(20px) rotate(-12deg)",
-                    transition:
-                      "opacity 700ms cubic-bezier(0.22, 1, 0.36, 1), transform 800ms cubic-bezier(0.22, 1, 0.36, 1)",
-                    filter: "saturate(0.5) brightness(1.1)",
-                  }}
-                >
-                  <Image
-                    src="/assets/UpstreamFish.png"
-                    alt=""
-                    fill
-                    sizes="200px"
-                    className="object-contain"
-                  />
-                </div>
-
-                {/* Divergence callout — glass marginalia that slides in */}
-                <div
-                  className="pointer-events-none absolute right-2 top-2 max-w-[300px] transition-all duration-700 md:right-4 md:top-4"
-                  style={{
-                    opacity: calloutOn ? 1 : 0,
-                    transform: calloutOn ? "translateY(0)" : "translateY(14px)",
-                  }}
-                >
-                  <MarginaliaPanel kicker="drift event · cam_bay_07" size="md">
-                    <p
-                      className="font-display text-ink"
+                {/* Per-event alert cards positioned next to their dots.
+                    Each card hugs its event's data-point with a small
+                    horizontal offset; cards whose dot sits in the right
+                    half of the chart flip to the left so they don't
+                    overflow the chart container. */}
+                {EVENTS.map((event, i) => {
+                  const dotX = 4 + (event.day / 13) * 92;
+                  const baseY = 14 + event.laneIdx * 15;
+                  const dotY =
+                    ((baseY +
+                      (1 - LANES[event.laneIdx].data[event.day]) * AMP) /
+                      60) *
+                    100;
+                  const placeRight = dotX < 60;
+                  return (
+                    <div
+                      key={i}
+                      className="pointer-events-none absolute z-10 w-[min(70vw,240px)]"
                       style={{
-                        fontSize: "clamp(15px, 1.3vw, 18px)",
-                        lineHeight: 1.35,
-                        letterSpacing: "-0.012em",
-                        fontWeight: 500,
+                        left: `${dotX}%`,
+                        top: `${dotY}%`,
+                        transform: placeRight
+                          ? "translate(14px, -80%)"
+                          : "translate(calc(-100% - 14px), -80%)",
                       }}
                     >
-                      Confidence p50 fell from 0.88 to 0.61 over four days.
-                    </p>
-                    <div className="mt-3 font-mono text-[10px] tracking-mono uppercase text-ink-mute">
-                      cause · sun-angle shift, golden-hour exposure
+                      <EventCard
+                        event={event}
+                        lane={LANES[event.laneIdx]}
+                        active={eventsActive[i]}
+                      />
                     </div>
-                    <div className="mt-3 grid grid-cols-3 gap-x-3 border-t border-glass-stroke-2 pt-3">
-                      <Stat k="lead time" v="3.2d" />
-                      <Stat k="alerts" v="0" />
-                      <Stat k="status" v="at risk" amber />
-                    </div>
-                  </MarginaliaPanel>
+                  );
+                })}
+
+                {/* Time axis */}
+                <div className="absolute inset-x-0 bottom-0 flex justify-between pt-2 font-mono text-[10px] tracking-mono uppercase text-ink-soft">
+                  <span>14 days ago</span>
+                  <span>today</span>
                 </div>
               </div>
             </div>
 
-            <p className="mt-6 font-mono text-[10px] tracking-mono uppercase text-ink-mute md:mt-8">
-              scroll to scrub the window · lower confidence = less to trust
-            </p>
           </div>
         </div>
       </div>
@@ -357,16 +426,64 @@ export function Act04Drift() {
   );
 }
 
-function Stat({ k, v, amber = false }: { k: string; v: string; amber?: boolean }) {
+function EventCard({
+  event,
+  lane,
+  active,
+}: {
+  event: Event;
+  lane: Lane;
+  active: boolean;
+}) {
   return (
-    <div>
-      <div className="font-mono text-[9px] tracking-mono uppercase text-ink-mute">{k}</div>
-      <div
-        className={`mt-0.5 font-display ${amber ? "text-signal-warn" : "text-ink"}`}
-        style={{ fontSize: "14px", letterSpacing: "-0.018em", fontWeight: 500 }}
-      >
-        {v}
+    <div
+      className="rounded-2xl border p-4 transition-all duration-700 md:p-5"
+      style={{
+        // Same Reed-Cream-tinted glass recipe the original single divergence
+        // callout used (MarginaliaPanel size="md"): low-alpha cream wash,
+        // 1px hairline that tints amber when the event is active, 18px blur.
+        background: "rgba(245, 241, 231, 0.05)",
+        borderColor: active
+          ? "rgba(232, 192, 107, 0.5)"
+          : "rgba(245, 241, 231, 0.10)",
+        backdropFilter: "blur(18px) saturate(135%)",
+        WebkitBackdropFilter: "blur(18px) saturate(135%)",
+        opacity: active ? 1 : 0.4,
+        transform: active ? "translateY(0)" : "translateY(6px)",
+        boxShadow: active
+          ? "0 20px 44px -22px rgba(232, 192, 107, 0.4), 0 1px 0 rgba(255,255,255,0.06) inset"
+          : "0 1px 0 rgba(255,255,255,0.04) inset",
+      }}
+    >
+      <div className="mb-2 flex items-baseline justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <span
+            aria-hidden="true"
+            className="inline-block h-1.5 w-1.5 rounded-full transition-colors duration-500"
+            style={{
+              background: active ? AMBER : "rgba(245, 241, 231, 0.3)",
+              boxShadow: active ? "0 0 0 3px rgba(232, 192, 107, 0.20)" : "none",
+            }}
+          />
+          <span
+            className="font-mono text-[10px] tracking-kicker uppercase"
+            style={{
+              color: active ? AMBER : "rgba(245, 241, 231, 0.5)",
+            }}
+          >
+            {event.label}
+          </span>
+        </div>
+        <span className="font-mono text-[9px] tracking-mono uppercase text-ink-faint">
+          D-{14 - event.day} · {lane.k}
+        </span>
       </div>
+      <p
+        className="text-[12px] text-ink md:text-[12.5px]"
+        style={{ lineHeight: 1.55, opacity: active ? 1 : 0.75 }}
+      >
+        {event.body}
+      </p>
     </div>
   );
 }
