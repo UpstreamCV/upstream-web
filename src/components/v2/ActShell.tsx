@@ -13,7 +13,7 @@
 
 import type { ReactNode } from "react";
 
-type Drench = "deep" | "mid" | "moss" | "base";
+type Drench = "deep" | "mid" | "moss" | "base" | "river";
 
 interface Props {
   id?: string;
@@ -61,16 +61,27 @@ const WASH: Record<Drench, string> = {
   moss:
     // "radial-gradient(100% 80% at var(--o1x) var(--o1y), rgba(52, 76, 44, 0.55), rgba(52, 76, 44, 0) 55%), " +
     // "radial-gradient(60% 70% at var(--o2x) var(--o2y), rgba(75, 129, 108, 0.30), rgba(75, 129, 108, 0) 65%), " +
-    // Mid-dark moss palette — darker than the original gold-moss
-    // (which read too light against the chart) but not pitch-black at
-    // the bottom; the chart strokes and amber markers still pop.
-    "linear-gradient(180deg, #3f3a26 0%, #1f1c11 60%, #100e08 100%)",
+    // Mid moss palette — gently darkening from the warm top so the
+    // chart strokes and amber markers stay legible without the bottom
+    // collapsing toward black.
+    "linear-gradient(180deg, #3f3a26 0%, #2a2418 55%, #1e1a12 100%)",
   // Riverbed base. River Mid washes in from the top, Moss anchors the
-  // bottom-left, the linear descent ends near pitch. Same recipe as moss.
+  // bottom-left. The linear descent stays dark and earth-toned but no
+  // longer collapses to near-black at the bottom — keeps the lower
+  // sections (Act 05 Reports, Act 06 Current) legible without losing
+  // the brand's riverbed weight.
   base:
     // "radial-gradient(120% 80% at var(--o1x) var(--o1y), rgba(75, 129, 108, 0.28), rgba(75, 129, 108, 0) 55%), " +
     // "radial-gradient(80% 70% at var(--o2x) var(--o2y), rgba(129, 118, 75, 0.16), rgba(129, 118, 75, 0) 65%), " +
-    "linear-gradient(180deg, #1a2613 0%, #0f1809 55%, #060a03 100%)",
+    "linear-gradient(180deg, #1f2e1c 0%, #182419 55%, #12190f 100%)",
+  // River-through-overlay. A translucent dark gradient that lets the
+  // fixed Act 01 river video peek through — combined with the
+  // backdrop-filter blur applied to the section (see ActShell below).
+  // The top stays open (~20% black-green tint) so the water reads as
+  // motion, the bottom is denser (~75%) so the CTA + headline still
+  // hold contrast over moving footage.
+  river:
+    "linear-gradient(180deg, rgba(15, 24, 9, 0.20) 0%, rgba(15, 24, 9, 0.50) 55%, rgba(6, 10, 3, 0.78) 100%)",
 };
 
 
@@ -90,6 +101,10 @@ export function ActShell({
   // never sit at the same point in the drift cycle.
   const animationDuration = `${24 + phase * 1.7}s`;
   const animationDelay = `-${phase * 5.3}s`;
+  // River drench is the only translucent surface — it carries a backdrop
+  // blur so the fixed Act 01 video softens behind the headline + CTA.
+  // The other drenches stay opaque, so backdrop-filter would be wasted.
+  const isRiver = drench === "river";
   return (
     <section
       id={id}
@@ -97,7 +112,14 @@ export function ActShell({
       style={{
         minHeight: tall ? undefined : "100svh",
         background: WASH[drench],
-        backgroundAttachment: fixedBg ? "fixed" : "scroll",
+        // background-attachment: fixed on a translucent surface would
+        // glue the gradient to the viewport AND prevent backdrop-filter
+        // from reading through to the underlying video. River uses
+        // scroll so the overlay flows with content and the blur sees
+        // the actual page background (the fixed river video).
+        backgroundAttachment: isRiver ? "scroll" : fixedBg ? "fixed" : "scroll",
+        backdropFilter: isRiver ? "blur(8px) saturate(115%)" : undefined,
+        WebkitBackdropFilter: isRiver ? "blur(8px) saturate(115%)" : undefined,
         animationDuration,
         animationDelay,
       }}

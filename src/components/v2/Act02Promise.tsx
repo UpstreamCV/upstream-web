@@ -400,12 +400,12 @@ function StreamComparison() {
       <StreamStrip lane="launch" callsCount={callsCount} />
 
       {/* The connective tissue between strips — a faint hairline plus a
-          mono callout so the visual relationship reads as "same stream,
+          mono callout so the visual relationship reads as "same calls,
           different observation" rather than "two separate things." */}
       <div className="my-6 flex items-center gap-3 md:my-7">
         <div className="h-[1px] flex-1 bg-ink-faint" />
         <span className="font-mono text-[9.5px] tracking-mono uppercase text-ink-mute">
-          same stream · different observation
+          same calls · different observation
         </span>
         <div className="h-[1px] flex-1 bg-ink-faint" />
       </div>

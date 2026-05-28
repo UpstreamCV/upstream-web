@@ -10,13 +10,17 @@
  * voice "A report, not a haystack." in its own intro strip.
  */
 
+import type { SVGProps } from "react";
 import { motion, useMotionTemplate } from "framer-motion";
 import { useMagnetic } from "@/lib/motion";
 import { ActShell } from "./ActShell";
 
+type ScenarioGlyph = "drift" | "funnel" | "blocked-lens";
+
 interface Report {
   kicker: string;
   facility: string;
+  glyph: ScenarioGlyph;
   headline: React.ReactNode;
   body: string;
   metrics: { k: string; v: string }[];
@@ -27,6 +31,7 @@ const REPORTS: Report[] = [
   {
     kicker: "scenario · drift event",
     facility: "cold-storage facility · 100+ cameras",
+    glyph: "drift",
     headline: (
       <>
         When a facility&apos;s cameras drift in unison,{" "}
@@ -44,6 +49,7 @@ const REPORTS: Report[] = [
   {
     kicker: "scenario · false alert audit",
     facility: "regional logistics hub",
+    glyph: "funnel",
     headline: (
       <>
         Drop false alerts by reading the scene correctly,{" "}
@@ -61,6 +67,7 @@ const REPORTS: Report[] = [
   {
     kicker: "scenario · blocked lens",
     facility: "industrial yard",
+    glyph: "blocked-lens",
     headline: (
       <>
         When a pallet wrap covers a camera for hours,{" "}
@@ -76,6 +83,100 @@ const REPORTS: Report[] = [
     spark: [0.18, 0.17, 0.16, 0.15, 0.12, 0.08, 0.04, 0.02, 0.02, 0.02],
   },
 ];
+
+/* ───────────────────────────────────────────────────────────────────────
+   Scenario glyph chip — small hairline icon inside a rounded square,
+   stationed near the kicker so each scenario carries a unique visual
+   signature: a falling-edge curve for drift events, a funnel for false-
+   alert audits, a blocked-lens for silent-camera scenarios.
+   ──────────────────────────────────────────────────────────────────── */
+
+const GLYPH_LABEL: Record<ScenarioGlyph, string> = {
+  drift: "drift",
+  funnel: "audit",
+  "blocked-lens": "silent",
+};
+
+function ScenarioChip({ glyph }: { glyph: ScenarioGlyph }) {
+  const Icon = GLYPHS[glyph];
+  return (
+    <div className="inline-flex items-center gap-2.5">
+      <span
+        aria-hidden
+        className="grid h-10 w-10 shrink-0 place-items-center rounded-md md:h-11 md:w-11"
+        style={{
+          background: "rgba(245, 241, 231, 0.04)",
+          border: "1px solid rgba(245, 241, 231, 0.16)",
+          color: "var(--ink-soft)",
+        }}
+      >
+        <Icon className="h-5 w-5 md:h-[22px] md:w-[22px]" />
+      </span>
+      <span
+        className="font-mono uppercase"
+        style={{
+          fontSize: "10px",
+          letterSpacing: "0.22em",
+          color: "var(--ink-soft)",
+        }}
+      >
+        {GLYPH_LABEL[glyph]}
+      </span>
+    </div>
+  );
+}
+
+const STROKE: Pick<
+  SVGProps<SVGSVGElement>,
+  "stroke" | "strokeWidth" | "strokeLinecap" | "strokeLinejoin" | "fill"
+> = {
+  stroke: "currentColor",
+  strokeWidth: 1.25,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  fill: "none",
+};
+
+function IconDriftEdge(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" {...STROKE} {...props}>
+      {/* falling-edge curve with a small drop marker — drift event */}
+      <path d="M3 7c3.5 0 5 1 7 3.5S15 17 21 17" />
+      <path d="M18 14l3 3-3 3" opacity="0.6" />
+      <circle cx="10" cy="10.5" r="0.9" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function IconFunnel(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" {...STROKE} {...props}>
+      {/* funnel — false-positive filter */}
+      <path d="M3 4h18l-7 8.5v6l-4 1.5v-7.5L3 4z" />
+      <path d="M9 8h6" opacity="0.55" />
+    </svg>
+  );
+}
+
+function IconBlockedLens(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" {...STROKE} {...props}>
+      {/* camera lens with a slash — silent / blocked */}
+      <circle cx="12" cy="12" r="6.5" />
+      <circle cx="12" cy="12" r="2.5" opacity="0.6" />
+      <path d="M5 19L19 5" strokeWidth="1.6" />
+    </svg>
+  );
+}
+
+const GLYPHS: Record<
+  ScenarioGlyph,
+  (props: SVGProps<SVGSVGElement>) => React.ReactNode
+> = {
+  drift: IconDriftEdge,
+  funnel: IconFunnel,
+  "blocked-lens": IconBlockedLens,
+};
 
 export function Act05Reports() {
   return (
@@ -179,7 +280,10 @@ function ReportBlock({ r, index }: { r: Report; index: number }) {
           {String(index + 1).padStart(2, "0")}
         </div>
         <div className="mt-3 h-[1px] w-10 bg-creek-moss/70" />
-        <div className="mt-4 font-mono text-[10px] tracking-mono uppercase text-ink-soft">
+        <div className="mt-5 md:mt-6">
+          <ScenarioChip glyph={r.glyph} />
+        </div>
+        <div className="mt-5 font-mono text-[10px] tracking-mono uppercase text-ink-soft">
           {r.kicker}
         </div>
         <div className="mt-1 font-mono text-[10px] tracking-mono uppercase text-ink-mute">
