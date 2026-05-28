@@ -3,13 +3,20 @@
 /**
  * Act 04 — Drift, kept visible.
  *
- * Drenched moss (Streambank Moss color token). Pinned for ~120% of
- * scroll. Three signal lanes (exposure, focus, confidence p50) span a
- * 14-day window. Each lane carries its OWN anomaly visible in the data:
- * an exposure dip at D-9, a focus sag from D-7 onward, and the
- * confidence drop from D-4. As the needle scrubs past each event day,
- * that lane's marker dot appears, the lane line glows, and the matching
- * alert card at top-right of the chart lights up.
+ * Drenched moss (Streambank Moss color token). The section scrolls
+ * normally; the needle auto-sweeps once (0 → 1) when the section enters
+ * the viewport, then stops. After that the handle is manual-only: users
+ * grab it to scrub (cursor + touch + keyboard ←/→/Home/End). If the user
+ * grabs the handle DURING the first sweep, the sweep pauses and resumes
+ * from where they left off — but only until it reaches 1, after which
+ * the chart stays where the user puts it.
+ *
+ * Three signal lanes (exposure, focus, confidence p50) span a 14-day
+ * window. Each lane carries its OWN anomaly visible in the data: an
+ * exposure dip at D-11, a focus sag from D-10 onward, and the confidence
+ * drop from D-7. As the needle passes each event day, that lane's marker
+ * dot appears, the lane line glows, and the matching alert card lights
+ * up.
  *
  * Implementation notes:
  *   - Lane paths stay in SVG so the curves stretch with viewport.
@@ -18,15 +25,10 @@
  *     stretched into ellipses by the SVG's preserveAspectRatio="none".
  */
 
-import { useRef, useState } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useMotionTemplate } from "framer-motion";
 import { useReducedMotion, useMagnetic } from "@/lib/motion";
 import { ActShell } from "./ActShell";
-
-if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
 interface Lane {
   k: string;
@@ -95,47 +97,134 @@ const AMBER = "#E8C06B";
 // 9 keeps the three lanes from colliding inside the viewBox 0..60.
 const AMP = 9;
 
+// Seconds for the one-shot auto-sweep to traverse 0 → 1, eased.
+const SWEEP_SECONDS = 5;
+
+// easeInOutCubic — slow start, fast middle, slow end. The same curve
+// scroll-driven animations use to feel "physical" rather than mechanical.
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
 export function Act04Drift() {
   const rootRef = useRef<HTMLDivElement | null>(null);
-  const pinRef = useRef<HTMLDivElement | null>(null);
+  const chartRef = useRef<HTMLDivElement | null>(null);
+  // Starts at 0; auto-sweeps to 1 once when the section enters the
+  // viewport, then becomes manual-only.
   const [progress, setProgress] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const [inView, setInView] = useState(false);
+  const playedRef = useRef(false);
   const reduced = useReducedMotion();
 
-  useGSAP(
-    () => {
-      const root = rootRef.current;
-      const pin = pinRef.current;
-      if (!root || !pin) return;
+  const updateFromX = (clientX: number) => {
+    const el = chartRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const p = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    setProgress(p);
+  };
 
-      if (reduced) {
-        setProgress(1);
+  const onHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // Any user interaction aborts the auto-sweep permanently — the
+    // handle becomes manual-only from this point on.
+    playedRef.current = true;
+    setDragging(true);
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    updateFromX(e.clientX);
+  };
+  const onHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragging) return;
+    updateFromX(e.clientX);
+  };
+  const onHandleUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    setDragging(false);
+    e.currentTarget.releasePointerCapture?.(e.pointerId);
+  };
+
+  const onHandleKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const step = 1 / 13;
+    if (e.key === "ArrowLeft") {
+      setProgress((p) => Math.max(0, p - step));
+      e.preventDefault();
+    } else if (e.key === "ArrowRight") {
+      setProgress((p) => Math.min(1, p + step));
+      e.preventDefault();
+    } else if (e.key === "Home") {
+      setProgress(0);
+      e.preventDefault();
+    } else if (e.key === "End") {
+      setProgress(1);
+      e.preventDefault();
+    }
+  };
+
+  // While dragging, pin cursor + suppress text selection on the body.
+  // Both persist even when the pointer leaves the small handle target
+  // during a fast drag, and both restore cleanly on release.
+  useEffect(() => {
+    if (!dragging) return;
+    const prevCursor = document.body.style.cursor;
+    const prevUserSelect = document.body.style.userSelect;
+    const prevWebkitUserSelect = document.body.style.webkitUserSelect;
+    document.body.style.cursor = "grabbing";
+    document.body.style.userSelect = "none";
+    document.body.style.webkitUserSelect = "none";
+    return () => {
+      document.body.style.cursor = prevCursor;
+      document.body.style.userSelect = prevUserSelect;
+      document.body.style.webkitUserSelect = prevWebkitUserSelect;
+    };
+  }, [dragging]);
+
+  // Reduced-motion users see the fully-scrubbed end state immediately
+  // and skip the sweep entirely.
+  useEffect(() => {
+    if (reduced) {
+      playedRef.current = true;
+      setProgress(1);
+    }
+  }, [reduced]);
+
+  // Trigger the one-shot sweep when the section comes into view. We
+  // disconnect after the first hit so re-entering doesn't replay it.
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || playedRef.current) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setInView(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.35 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  // Auto-sweep loop — runs once when the section first enters view.
+  // Time-based easing means progress = ease(elapsed / SWEEP_SECONDS), so
+  // the needle accelerates into the middle of the window and decelerates
+  // into "today". Any drag interaction sets playedRef.current = true,
+  // which causes this effect (re-run on dragging-change) to bail.
+  useEffect(() => {
+    if (!inView || dragging || reduced || playedRef.current) return;
+    let raf = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / 1000 / SWEEP_SECONDS);
+      setProgress(easeInOutCubic(t));
+      if (t >= 1) {
+        playedRef.current = true;
         return;
       }
-
-      const tween = gsap.to(
-        { p: 0 },
-        {
-          p: 1,
-          ease: "none",
-          onUpdate: function () {
-            setProgress(this.targets()[0].p);
-          },
-          scrollTrigger: {
-            trigger: root,
-            start: "top top",
-            end: "+=120%",
-            scrub: 0.6,
-            pin,
-            pinSpacing: true,
-          },
-        },
-      );
-      return () => {
-        tween.kill();
-      };
-    },
-    { dependencies: [reduced], scope: rootRef },
-  );
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [inView, dragging, reduced]);
 
   const dayIdx = Math.min(13, Math.floor(progress * 14));
   const dayLabel = `D-${14 - dayIdx}`;
@@ -166,7 +255,7 @@ export function Act04Drift() {
         className="relative"
         style={{ minHeight: "100vh" }}
       >
-        <div ref={pinRef} className="relative h-screen w-full overflow-hidden">
+        <div className="relative h-screen w-full overflow-hidden">
           <div className="shell relative z-10 flex h-full flex-col pt-28 pb-10 md:pt-32 md:pb-14">
             <div className="flex items-baseline gap-3">
               <span className="font-mono text-[11px] tracking-kicker uppercase text-ink">
@@ -206,7 +295,7 @@ export function Act04Drift() {
 
             {/* The signal-lane chart */}
             <div className="relative mt-8 flex-1 md:mt-10">
-              <div className="relative h-full w-full overflow-visible">
+              <div ref={chartRef} className="relative h-full w-full overflow-visible">
                 <svg
                   viewBox="0 0 100 60"
                   preserveAspectRatio="none"
@@ -296,16 +385,9 @@ export function Act04Drift() {
                     );
                   })}
 
-                  {/* needle (vertical line — vertical stretching is fine) */}
-                  <line
-                    x1={needleX}
-                    x2={needleX}
-                    y1="2"
-                    y2="58"
-                    stroke="rgba(245,241,231,0.9)"
-                    strokeWidth="0.22"
-                    vectorEffect="non-scaling-stroke"
-                  />
+                  {/* Needle line is rendered in the transform-locked
+                      group below alongside the handle — so the two can
+                      never desync (see NeedleGroup wrapper). */}
                 </svg>
 
                 {/* HTML overlays — anything circular goes here so the
@@ -335,16 +417,9 @@ export function Act04Drift() {
                     );
                   })}
 
-                  {/* Needle head dot */}
-                  <div
-                    className="absolute h-2 w-2 rounded-full"
-                    style={{
-                      left: `${needleX}%`,
-                      top: `${(2 / 60) * 100}%`,
-                      transform: "translate(-50%, -50%)",
-                      background: "#F5F1E7",
-                    }}
-                  />
+                  {/* Static needle head dot removed — the draggable
+                      handle below now sits at the top of the needle and
+                      serves as the visible "head". */}
                 </div>
 
                 {/* Lane labels — HTML overlay positioned by %; text renders
@@ -370,12 +445,105 @@ export function Act04Drift() {
                   })}
                 </div>
 
-                {/* Day label following the needle */}
+                {/* NeedleGroup — vertical line + draggable handle live
+                    inside this wrapper as siblings. Only the wrapper
+                    moves (one translate3d on a GPU layer); the line
+                    and handle have static positions inside it, so they
+                    are rigidly locked together no matter how often
+                    `needleX` updates.
+
+                    `inset: 0` makes the wrapper reliably span the full
+                    chart area (more robust than `height: 100%` through
+                    a flex-1 chain); `translate3d(${needleX}%, …)`
+                    translates by a percentage of the wrapper's own
+                    width, which equals the chart width — so the bar
+                    lands at needleX% of the chart with no JS-measured
+                    sizes. */}
                 <div
-                  className="pointer-events-none absolute -top-1 -translate-x-1/2 font-mono text-[10px] tracking-kicker uppercase text-ink"
-                  style={{ left: `${needleX}%` }}
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 z-20"
+                  style={{
+                    transform: `translate3d(${needleX}%, 0, 0)`,
+                    willChange: "transform",
+                  }}
                 >
-                  {dayLabel}
+                  {/* Needle line — kept as a sub-SVG so the stroke
+                      preserves the same hairline look it had inside
+                      the main chart SVG. Static content; only the
+                      wrapper transforms. */}
+                  <svg
+                    preserveAspectRatio="none"
+                    viewBox="0 0 1 60"
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "1px",
+                      height: "100%",
+                      overflow: "visible",
+                      transform: "translateX(-0.5px)",
+                    }}
+                  >
+                    <line
+                      x1="0.5"
+                      x2="0.5"
+                      y1="2"
+                      y2="58"
+                      stroke="rgba(245,241,231,0.9)"
+                      strokeWidth="0.22"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  </svg>
+
+                  {/* Draggable handle — sits at the top of the needle
+                      line and serves as its visible head. Arrows hint
+                      the affordance; the handle is a slider for a11y
+                      and supports keyboard nav (←/→/Home/End). */}
+                  <div
+                    className={`absolute flex select-none touch-none items-center gap-1.5 whitespace-nowrap rounded-full border border-ink/35 bg-glass-bg px-2.5 py-1 backdrop-blur-md transition-[border-color,box-shadow] duration-200 hover:border-ink/55 focus-visible:border-ink/70 focus-visible:outline-none ${
+                      dragging ? "cursor-grabbing" : "cursor-grab"
+                    }`}
+                    style={{
+                      top: `${(2 / 60) * 100}%`,
+                      left: 0,
+                      transform: "translate(-50%, -50%)",
+                      pointerEvents: "auto",
+                      boxShadow: dragging
+                        ? "0 0 0 3px rgba(245,241,231,0.10), 0 6px 18px -8px rgba(0,0,0,0.6)"
+                        : "0 4px 12px -8px rgba(0,0,0,0.5)",
+                    }}
+                    role="slider"
+                    aria-label="Scrub the 14-day drift window"
+                    aria-valuemin={0}
+                    aria-valuemax={13}
+                    aria-valuenow={dayIdx}
+                    aria-valuetext={dayLabel}
+                    tabIndex={0}
+                    onPointerDown={onHandleDown}
+                    onPointerMove={onHandleMove}
+                    onPointerUp={onHandleUp}
+                    onPointerCancel={onHandleUp}
+                    onKeyDown={onHandleKey}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="font-mono text-[11px] leading-none text-ink-soft"
+                    >
+                      ‹
+                    </span>
+                    <span
+                      className="inline-block text-center font-mono text-[10px] tracking-kicker uppercase text-ink"
+                      style={{ minWidth: "3.6ch" }}
+                    >
+                      {dayLabel}
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="font-mono text-[11px] leading-none text-ink-soft"
+                    >
+                      ›
+                    </span>
+                  </div>
                 </div>
 
                 {/* Per-event alert cards positioned next to their dots.
@@ -422,7 +590,7 @@ export function Act04Drift() {
             </div>
 
             <p className="mt-4 font-mono text-[10px] tracking-mono uppercase text-ink-soft md:mt-5">
-              scroll to scrub the window · each lane carries its own anomaly
+              drag the marker to scrub the window · each lane carries its own anomaly
             </p>
           </div>
         </div>
@@ -461,7 +629,6 @@ function EventCard({
         backdropFilter: "blur(18px) saturate(135%)",
         WebkitBackdropFilter: "blur(18px) saturate(135%)",
         opacity: active ? 1 : 0,
-        visibility: active ? "visible" : "hidden",
         // Magnetic transforms compose with the inactive-state lift via
         // translateY done in motion.div's style.y below.
         x: sx,
