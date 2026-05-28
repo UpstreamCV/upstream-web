@@ -11,7 +11,6 @@ interface Member {
   photo: string;
   bio: string;
   linkedin: string;
-  initial: string;
 }
 
 const TEAM: Member[] = [
@@ -19,25 +18,22 @@ const TEAM: Member[] = [
     name: "Elkan Bruha",
     role: "Co-Founder · CEO",
     photo: "/assets/ElkanProfile.jpeg",
-    bio: "Spent the last decade running ops where computer vision was supposed to fix things, and watching it quietly stop working. Builds what he wishes he had had on call.",
+    bio: "Founded and ran CrowdCount, putting crowd-counting cameras into real venues. Watched the same model that worked in the demo quietly stop telling the truth on the camera nobody could clean, and got tired of running the patch loop by hand. Upstream is that loop, productized.",
     linkedin: "https://www.linkedin.com/in/elkanbruha",
-    initial: "E",
   },
   {
     name: "Josh D'Annunzio",
     role: "Co-Founder · CTO",
     photo: "/assets/JoshProfile.jpeg",
-    bio: "Vision systems and distributed infrastructure. Has a particular grudge against pipelines that pretend they're healthy when they're not.",
+    bio: "Ran the vision stack at CrowdCount: the model, the trackers, the inference pipeline that kept reporting healthy while quietly missing counts. Brought those lessons here, where the goal is to catch drift before the dashboard does, attributed to the exact component that failed.",
     linkedin: "https://www.linkedin.com/in/josh-d%E2%80%99annunzio-3b0171227/",
-    initial: "J",
   },
   {
     name: "Hayden Forbes",
     role: "Co-Founder · COO",
     photo: "/assets/HaydenProfile.jpeg",
-    bio: "Operations, deployment, and the unglamorous work of getting real cameras into real facilities. Believes the last 5% is the entire job.",
+    bio: "Ran ops at CrowdCount: install schedules, cable runs, cameras that had to work in places nobody designed for cameras. Spends his weeks on customer floors here too, reads a site survey the way most people read a spec sheet, and believes the last five percent is the whole job.",
     linkedin: "https://www.linkedin.com/in/hayden-forbes",
-    initial: "H",
   },
 ];
 
@@ -89,20 +85,6 @@ export function AboutTeam() {
                     "linear-gradient(140deg, rgba(75,129,108,0.4), transparent 60%)",
                 }}
               />
-
-              {/* Massive italic initial in the corner */}
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute -right-3 -bottom-6 select-none font-display italic"
-                style={{
-                  fontSize: "clamp(180px, 24vw, 320px)",
-                  fontWeight: 300,
-                  lineHeight: 0.85,
-                  color: "rgba(245,241,231,0.10)",
-                }}
-              >
-                {m.initial}
-              </div>
 
               <div className="absolute inset-x-6 bottom-6">
                 <div className="font-mono text-[10px] tracking-kicker uppercase text-accent-warm">

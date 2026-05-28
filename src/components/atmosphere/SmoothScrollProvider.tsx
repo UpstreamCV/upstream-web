@@ -78,23 +78,25 @@ export function SmoothScrollProvider({ children }: Props) {
     let snapAddTimeout: number | null = null;
     if (!reduced) {
       snap = new Snap(lenis, {
+        // `proximity` keeps the user from being yanked back past the last
+        // target — `mandatory` would bounce-back into Act 03 when entering
+        // the excluded Acts 04+. Short debounce so snap engages quickly
+        // after the wheel settles without competing against active input.
         type: "proximity",
         duration: 0.7,
         easing: (t: number) => 1 - Math.pow(1 - t, 3),
-        distanceThreshold: "30%",
-        debounce: 220,
+        distanceThreshold: "55%",
+        debounce: 140,
       });
-      // Wait one frame so the page tree is in the DOM, then register
-      // every direct <section> child of <main> EXCEPT Act 06 (the final
-      // CTA) — snapping into the CTA fold yanks the user out of the
-      // scroll-to-the-footer flow.
+      // Only the hero (Act 01) is a snap target. Every other section runs
+      // its own scroll choreography (Act 04 is GSAP-pinned, Act 05 stages
+      // its glass cards via whileInView, Act 06 flows into the footer),
+      // and snap was fighting those flows.
       snapAddTimeout = window.setTimeout(() => {
-        const sections = document.querySelectorAll<HTMLElement>(
-          "main > section:not(#act-current)",
+        const hero = document.querySelector<HTMLElement>(
+          "main > section#act-water",
         );
-        sections.forEach((section) => {
-          snap?.addElement(section, { align: "start" });
-        });
+        if (hero) snap?.addElement(hero, { align: "start" });
       }, 0);
     }
 

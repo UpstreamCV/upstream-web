@@ -306,11 +306,11 @@ export function WaitlistForm() {
                 <button
                   type="submit"
                   disabled={state === "submitting"}
-                  className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-creek-deep px-7 py-4 text-[14px] font-semibold text-ink transition-all duration-300 hover:translate-y-[-1px] hover:bg-[#3D5731] disabled:opacity-60"
+                  className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full border border-glass-stroke bg-glass-bg px-7 py-4 text-[14px] font-semibold text-ink-soft backdrop-blur-xl transition-all duration-300 hover:-translate-y-[1px] hover:border-glass-hi hover:bg-glass-hi hover:text-ink disabled:opacity-60"
                 >
                   <span
                     aria-hidden="true"
-                    className="absolute inset-0 -translate-x-full bg-creek-mid/30 transition-transform duration-700 group-hover:translate-x-0"
+                    className="absolute inset-0 -translate-x-full bg-creek-mid/25 transition-transform duration-700 group-hover:translate-x-0"
                   />
                   <span className="relative">
                     {state === "submitting" ? "Sending…" : "Request access"}

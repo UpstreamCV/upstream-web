@@ -3,103 +3,136 @@
 /**
  * Act 03 — The observation.
  *
- * Drenched River Mid. ONE big camera viewport on the left, drawing
- * detection overlays as the act scrolls into view. Glass marginalia
- * on the right with cam metadata + reliability finding. Below: three
- * inline ribbon labels (ingest · inference · rules) — the consolidated
- * pipeline summary that the old site spread across three separate
- * full-bleed dashboard sections.
+ * Drenched River Mid. ONE big camera viewport on the left, playing a
+ * real YOLO11L warehouse clip with bounding-box overlays driven by the
+ * sibling /upstream-demo project's frame-by-frame detections JSON. As
+ * the video plays, an rAF loop reads currentTime, snaps to the nearest
+ * source frame (6 fps), and updates the bbox state — boxes follow the
+ * tracked people exactly because they were produced from the same video.
  *
- * The viewport is NOT a white .dn-tile here. The dashboard quote stays
- * dark and drenched so the river-mid wash carries through. Only ONE
- * dashboard moment in the new sequence, and it has its own visual
- * language.
+ * Boxes and labels are rendered as HTML elements positioned by % of the
+ * native 640×360 coordinate space; nothing here uses SVG, so the boxes
+ * stay sharp at any viewport width.
  */
 
-import { useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "@/lib/motion";
 import { ActShell } from "./ActShell";
 import { MarginaliaPanel } from "./MarginaliaPanel";
 
-if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
+const VIDEO_URL = "/assets/demo-warehouse.mp4";
+const DETECTIONS_URL = "/assets/demo-warehouse-detections.json";
+const NATIVE_W = 640;
+const NATIVE_H = 360;
+// The source video has timecode burn-in on the top and bottom edges that
+// we don't want on the demo. The viewport container uses aspect-[16/7]
+// (wider than the source 16:9), so `object-cover` on the <video> scales
+// it to fill width and crops ~40 native px from top and bottom. The bbox
+// y-coordinates remap against the same visible band so the overlays stay
+// aligned with the people in the cropped video.
+const CROP_TOP_NATIVE_PX = 40;
+const CROP_BOTTOM_NATIVE_PX = 40;
+const VISIBLE_NATIVE_H = NATIVE_H - CROP_TOP_NATIVE_PX - CROP_BOTTOM_NATIVE_PX;
+// Detections below this confidence are rendered as "likely false positive"
+// — amber instead of cream, with an "audit?" suffix. The threshold is set
+// so that ≥ 25% of the source detections cross it (p25 of the JSON's
+// confidence distribution sits at 0.535), which is the visual story we
+// want: detection isn't perfect, and the audit layer is the thing that
+// catches the lies.
+const FP_CONF_THRESHOLD = 0.55;
 
-interface Box {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  label: string;
-  conf: number;
-  tone: "primary" | "warn";
+interface Bbox {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  width: number;
+  height: number;
 }
 
-const BOXES: Box[] = [
-  { x: 8, y: 38, w: 36, h: 26, label: "truck", conf: 0.97, tone: "primary" },
-  { x: 56, y: 64, w: 8, h: 22, label: "person", conf: 0.92, tone: "primary" },
-  { x: 71, y: 66, w: 7.5, h: 20, label: "person · no_vest", conf: 0.88, tone: "warn" },
-  { x: 36, y: 78, w: 16, h: 10, label: "pallet", conf: 0.84, tone: "primary" },
-  { x: 12, y: 12, w: 14, h: 8, label: "forklift", conf: 0.79, tone: "primary" },
-];
+interface Detection {
+  track_id: number;
+  class_name: string;
+  confidence: number;
+  bbox: Bbox;
+}
 
-const TONE = {
-  primary: "#F5F1E7", // Reed Cream — high-contrast box on River Mid drench
-  warn: "#E8C06B",    // Signal Amber — risk-flag callout
-} as const;
+interface Frame {
+  frame: number;
+  detections: Detection[];
+}
+
+interface DetectionsData {
+  video: {
+    width: number;
+    height: number;
+    fps: number;
+    total_frames: number;
+    duration_seconds: number;
+  };
+  frames: Frame[];
+}
 
 export function Act03Observation() {
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const svgRef = useRef<SVGSVGElement | null>(null);
   const reduced = useReducedMotion();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const lastFrameRef = useRef<number>(-1);
+  const dataRef = useRef<DetectionsData | null>(null);
+  const [detections, setDetections] = useState<Detection[]>([]);
 
-  useGSAP(
-    () => {
-      if (reduced) return;
-      const svg = svgRef.current;
-      if (!svg) return;
-
-      const paths = svg.querySelectorAll<SVGPathElement>(".obs-box");
-      paths.forEach((p) => {
-        const len = p.getTotalLength();
-        p.style.strokeDasharray = `${len}`;
-        p.style.strokeDashoffset = `${len}`;
+  // Fetch the detections JSON once on mount.
+  useEffect(() => {
+    let cancelled = false;
+    fetch(DETECTIONS_URL)
+      .then((r) => r.json())
+      .then((json: DetectionsData) => {
+        if (cancelled) return;
+        dataRef.current = json;
+        setDetections(json.frames[0]?.detections ?? []);
+      })
+      .catch(() => {
+        // Silent — the viewport stays as the bare video without boxes.
       });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-      gsap.to(paths, {
-        strokeDashoffset: 0,
-        duration: 1.5,
-        stagger: 0.22,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: rootRef.current,
-          start: "top 65%",
-          once: true,
-        },
-      });
+  // Per-frame sync: rAF watches the video's currentTime and pushes new
+  // detections to state ONLY when the source-frame index changes (6 fps),
+  // so React doesn't re-render 60× per second.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    let raf = 0;
+    const tick = () => {
+      const data = dataRef.current;
+      if (data) {
+        const fps = data.video.fps;
+        const total = data.video.total_frames;
+        const idx = Math.min(total - 1, Math.max(0, Math.floor(video.currentTime * fps)));
+        if (idx !== lastFrameRef.current) {
+          lastFrameRef.current = idx;
+          setDetections(data.frames[idx]?.detections ?? []);
+        }
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
-      gsap.fromTo(
-        ".obs-label",
-        { y: 6, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.55,
-          stagger: 0.22,
-          delay: 0.25,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: rootRef.current,
-            start: "top 65%",
-            once: true,
-          },
-        },
-      );
-    },
-    { dependencies: [reduced], scope: rootRef },
-  );
+  // Best-effort autoplay (browsers gate this until loadeddata sometimes).
+  useEffect(() => {
+    if (reduced) return;
+    const video = videoRef.current;
+    if (!video) return;
+    const tryPlay = () => {
+      void video.play().catch(() => {});
+    };
+    if (video.readyState >= 2) tryPlay();
+    else video.addEventListener("loadeddata", tryPlay, { once: true });
+  }, [reduced]);
 
   return (
     <ActShell
@@ -109,103 +142,89 @@ export function Act03Observation() {
       drench="mid"
       phase={1}
     >
-      <div ref={rootRef} className="shell relative z-10 pb-24 pt-12 md:pb-32 md:pt-16">
+      <div className="shell relative z-10 pb-24 pt-12 md:pb-32 md:pt-16">
         <div className="grid grid-cols-12 items-stretch gap-x-6 gap-y-8 md:gap-x-10">
-          {/* Big viewport */}
-          <div className="col-span-12 lg:col-span-8">
+          {/* Big viewport — real demo video + JSON-driven bbox overlays.
+              Spans the full width of the act so the demo is the visual
+              anchor; the two marginalia panels stack underneath. */}
+          <div className="col-span-12">
             <div
-              className="relative aspect-[16/10] w-full overflow-hidden rounded-3xl"
+              className="relative aspect-[16/7] w-full overflow-hidden rounded-3xl"
               style={{
-                background:
-                  "radial-gradient(70% 60% at 50% 30%, #2a3e23 0%, #0d1408 80%)",
+                background: "#060a03",
                 border: "1px solid rgba(245, 241, 231, 0.10)",
                 boxShadow:
                   "0 40px 90px -40px rgba(0, 0, 0, 0.85), 0 1px 0 rgba(255, 255, 255, 0.04) inset",
               }}
             >
-              {/* Scene backdrop (loading bay) */}
-              <svg
-                viewBox="0 0 100 100"
-                preserveAspectRatio="none"
-                className="absolute inset-0 h-full w-full"
-              >
-                <defs>
-                  <linearGradient id="obs-floor" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor="#1f3018" />
-                    <stop offset="100%" stopColor="#080d05" />
-                  </linearGradient>
-                </defs>
-                <rect width="100" height="42" fill="#142010" />
-                <rect y="42" width="100" height="58" fill="url(#obs-floor)" />
-                <line
-                  x1="0"
-                  y1="42"
-                  x2="100"
-                  y2="42"
-                  stroke="rgba(245,241,231,0.1)"
-                  strokeWidth="0.25"
-                />
-                {/* Truck silhouette */}
-                <rect x="8" y="38" width="36" height="26" fill="#2c3a22" />
-                <rect x="10" y="32" width="22" height="8" fill="#283518" />
-                <circle cx="16" cy="64" r="3" fill="#0a0f06" />
-                <circle cx="38" cy="64" r="3" fill="#0a0f06" />
-                {/* People */}
-                <rect x="56" y="64" width="8" height="22" fill="#2b3a22" rx="0.6" />
-                <rect x="71" y="66" width="7.5" height="20" fill="#2b3a22" rx="0.6" />
-                {/* Pallet */}
-                <rect x="36" y="78" width="16" height="10" fill="#4a3e2a" />
-                {/* Forklift roof */}
-                <rect x="12" y="12" width="14" height="8" fill="#2a3520" />
-              </svg>
+              {/* The actual demo footage from upstream-demo */}
+              <video
+                ref={videoRef}
+                src={VIDEO_URL}
+                autoPlay={!reduced}
+                loop
+                muted
+                playsInline
+                preload="metadata"
+                aria-hidden="true"
+                tabIndex={-1}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
 
-              {/* Overlay (scroll-drawn). Boxes stay in SVG so the
-                  stroke-dashoffset draw-in animation works; labels are
-                  rendered as HTML below so the text doesn't warp with
-                  the SVG's preserveAspectRatio="none". */}
-              <svg
-                ref={svgRef}
-                viewBox="0 0 100 100"
-                preserveAspectRatio="none"
-                className="absolute inset-0 h-full w-full"
-              >
-                {BOXES.map((b, i) => {
-                  const stroke = TONE[b.tone];
-                  return (
-                    <path
-                      key={i}
-                      className="obs-box"
-                      d={`M ${b.x} ${b.y} L ${b.x + b.w} ${b.y} L ${b.x + b.w} ${b.y + b.h} L ${b.x} ${b.y + b.h} Z`}
-                      fill="none"
-                      stroke={stroke}
-                      strokeWidth="0.35"
-                      vectorEffect="non-scaling-stroke"
-                    />
-                  );
-                })}
-              </svg>
-
-              {/* Detection labels — HTML overlay positioned by %; text
-                  renders at its native proportions instead of being
-                  stretched by the SVG viewBox. */}
+              {/* Bounding-box overlays — HTML positioned by % of the
+                  source 640×360 frame. Track id stays stable so React
+                  can keep the same DOM nodes across frames; the position
+                  values just change inline. Detections whose confidence
+                  falls below FP_CONF_THRESHOLD render amber instead of
+                  cream — Upstream's audit flagging them as likely false
+                  positive. About a quarter of the source detections sit
+                  in that band, so the reader sees amber boxes appearing
+                  and disappearing as the model gets less sure. */}
               <div className="pointer-events-none absolute inset-0">
-                {BOXES.map((b, i) => {
-                  const stroke = TONE[b.tone];
+                {detections.map((det) => {
+                  const left = (det.bbox.x1 / NATIVE_W) * 100;
+                  // Remap y to the visible band of the cropped video so the
+                  // boxes track the people, not the (now-hidden) full frame.
+                  const top =
+                    ((det.bbox.y1 - CROP_TOP_NATIVE_PX) / VISIBLE_NATIVE_H) * 100;
+                  const width = (det.bbox.width / NATIVE_W) * 100;
+                  const height = (det.bbox.height / VISIBLE_NATIVE_H) * 100;
+                  const isLikelyFP = det.confidence < FP_CONF_THRESHOLD;
+                  const borderColor = isLikelyFP
+                    ? "rgba(232, 192, 107, 0.95)"
+                    : "rgba(245, 241, 231, 0.95)";
+                  const labelBg = isLikelyFP ? "#E8C06B" : "#F5F1E7";
+                  const labelText = isLikelyFP ? "#1a1207" : "#0a0f06";
                   return (
                     <div
-                      key={i}
-                      className="obs-label absolute whitespace-nowrap font-mono text-[9px] leading-none opacity-0 motion-reduce:opacity-100 md:text-[10px]"
+                      key={det.track_id}
+                      className="absolute"
                       style={{
-                        left: `${b.x}%`,
-                        bottom: `${100 - b.y}%`,
-                        background: stroke,
-                        color: "#0a0f06",
-                        padding: "3px 5px 2px",
-                        fontWeight: 500,
-                        letterSpacing: "0.02em",
+                        left: `${left}%`,
+                        top: `${top}%`,
+                        width: `${width}%`,
+                        height: `${height}%`,
+                        border: `2px solid ${borderColor}`,
+                        borderRadius: "3px",
+                        boxShadow: isLikelyFP
+                          ? "0 0 0 1px rgba(10, 15, 6, 0.55), inset 0 0 0 1px rgba(10, 15, 6, 0.25), 0 0 16px rgba(232, 192, 107, 0.32)"
+                          : "0 0 0 1px rgba(10, 15, 6, 0.55), inset 0 0 0 1px rgba(10, 15, 6, 0.25)",
                       }}
                     >
-                      {b.label} · {b.conf.toFixed(2)}
+                      <div
+                        className="absolute left-0 whitespace-nowrap font-mono text-[9px] leading-none md:text-[10px]"
+                        style={{
+                          top: "-18px",
+                          background: labelBg,
+                          color: labelText,
+                          padding: "3px 5px 2px",
+                          fontWeight: 500,
+                          letterSpacing: "0.02em",
+                        }}
+                      >
+                        person · trk_{det.track_id.toString().padStart(2, "0")} · {det.confidence.toFixed(2)}
+                        {isLikelyFP ? " · audit?" : ""}
+                      </div>
                     </div>
                   );
                 })}
@@ -224,20 +243,47 @@ export function Act03Observation() {
                   aria-hidden="true"
                   className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-signal-ok"
                 />
-                live · cam_dock_03
+                live · yolo11l · cam_dock_03
               </div>
 
-              {/* ID strip — bottom */}
+              {/* ID strip — bottom; obs count + audit-flagged count come
+                  from the current frame so the reader sees the telemetry
+                  pair update as the boxes change color above. */}
               <div className="absolute inset-x-4 bottom-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-wider text-ink-soft">
-                <span>1920×1080 · h264 · 4000 kbps</span>
+                <span>
+                  640×360 · h264 · 6 fps
+                  <span className="text-ink-mute"> · </span>
+                  {detections.length} obs
+                  {(() => {
+                    const flagged = detections.filter(
+                      (d) => d.confidence < FP_CONF_THRESHOLD,
+                    ).length;
+                    if (flagged === 0) return null;
+                    return (
+                      <>
+                        <span className="text-ink-mute"> · </span>
+                        <span style={{ color: "var(--accent-amber)" }}>
+                          {flagged} flagged
+                        </span>
+                      </>
+                    );
+                  })()}
+                </span>
                 <span className="text-ink-mute">zone_a · loading_lane</span>
               </div>
             </div>
           </div>
 
-          {/* Marginalia + finding */}
-          <div className="col-span-12 flex flex-col gap-5 lg:col-span-4">
-            <MarginaliaPanel kicker="observation · just now" size="md">
+          {/* Marginalia — two panels side by side underneath the video
+              (stack on mobile). Both panels share the row height via
+              `h-full`; the shorter panel just gets extra bottom padding
+              instead of being padded with fabricated stats. */}
+          <div className="col-span-12 flex md:col-span-6">
+            <MarginaliaPanel
+              kicker="observation · live"
+              size="md"
+              className="flex h-full w-full flex-col"
+            >
               <p
                 className="font-display text-ink"
                 style={{
@@ -251,17 +297,25 @@ export function Act03Observation() {
                 track id.
               </p>
               <p className="mt-3 text-[13px] text-ink-soft" style={{ lineHeight: 1.55 }}>
-                Bring the detector you already trust. YOLO, SAM, DETR, anything
-                custom. We run it on the stream and timestamp every box, every
-                confidence, every track.
+                YOLO11L running on a real warehouse clip. Each box is a
+                tracked person; the trk_id and confidence are pulled from
+                the same JSON the model produced. Every observation is
+                timestamped and versioned end to end.
               </p>
             </MarginaliaPanel>
+          </div>
 
-            <MarginaliaPanel kicker="reliability finding · cam_dock_03" size="md">
+          <div className="col-span-12 flex md:col-span-6">
+            <MarginaliaPanel
+              kicker="reliability finding · cam_dock_03"
+              size="md"
+              tone="warn"
+              className="flex h-full w-full flex-col"
+            >
               <div className="flex items-baseline gap-2 font-mono text-[10px] tracking-mono uppercase">
                 <span className="text-signal-warn">at risk</span>
                 <span className="text-ink-faint">·</span>
-                <span className="text-ink-mute">ppe · low-light</span>
+                <span className="text-ink-mute">missed detections · jitter</span>
               </div>
               <p
                 className="mt-2 font-display text-ink"
@@ -272,24 +326,23 @@ export function Act03Observation() {
                   fontWeight: 400,
                 }}
               >
-                Two no-vest detections in five frames. Confidence p50 dropped
-                from 0.92 to 0.78 since 18:40.
+                Some people further from the camera aren&apos;t being detected
+                at all. Other tracks are jittering, bboxes flickering and
+                track ids flipping every few frames as bodies overlap.
               </p>
-              <div className="mt-3 grid grid-cols-3 gap-x-3 border-t border-glass-stroke-2 pt-3">
-                <Stat k="conf p50" v="0.78" />
-                <Stat k="alerts" v="2" />
-                <Stat k="dwell" v="11s" />
+              <div className="mt-auto grid grid-cols-3 gap-x-3 border-t border-glass-stroke-2 pt-3">
+                <Stat k="model" v="yolo11l" />
+                <Stat k="conf min" v="0.15" />
+                <Stat k="iou" v="0.5" />
               </div>
             </MarginaliaPanel>
           </div>
         </div>
 
-        {/* Three-stage inline ribbons — replaces the old ingest/inference/rules sections */}
-        <motion.div
-          initial={{ opacity: 0, y: 22 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "0px 0px -15% 0px" }}
-          transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: 0.25 }}
+        {/* Three-stage inline ribbons — rendered statically (no scroll-in
+            animation) so they appear with the video + marginalia instead
+            of waiting for the ribbon itself to scroll into view. */}
+        <div
           className="mt-14 grid grid-cols-1 gap-x-8 gap-y-10 border-t border-glass-stroke pt-12 md:mt-20 md:grid-cols-3 md:pt-14"
         >
           <Stage
@@ -310,7 +363,7 @@ export function Act03Observation() {
             body="Versioned files, not buttons. Backtest against thirty days of footage before deploy. See the alert diff per camera. Ship with a verdict on the false-positive budget."
             spec="versioned · backtested"
           />
-        </motion.div>
+        </div>
       </div>
     </ActShell>
   );

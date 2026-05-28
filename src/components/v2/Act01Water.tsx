@@ -122,8 +122,11 @@ export function Act01Water() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 1.0 }}
-            className="mt-7 max-w-[52ch] text-ink-soft md:text-lg"
-            style={{ lineHeight: 1.55 }}
+            className="mt-7 max-w-[52ch] md:text-lg"
+            // Hero keeps its prior 70% paragraph opacity even though the
+            // global --ink-soft token dropped to 60% — per the "secondary
+            // text 60% except hero" directive, the hero stays untouched.
+            style={{ lineHeight: 1.55, color: "rgba(245, 241, 231, 0.7)" }}
           >
             The pipeline behind your cameras, kept on the water.
             We tell you the moment a single one stops telling the truth.

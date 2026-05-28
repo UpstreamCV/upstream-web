@@ -66,7 +66,7 @@ export function Act06Current() {
           />
         </motion.div>
 
-        <div className="shell relative z-10 flex h-full flex-col justify-between pb-[max(env(safe-area-inset-bottom),28px)] pt-28 md:pt-32">
+        <div className="shell relative z-10 flex h-full flex-col pb-[max(env(safe-area-inset-bottom),28px)] pt-28 md:pt-32">
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -85,7 +85,10 @@ export function Act06Current() {
             </span>
           </motion.div>
 
-          <div>
+          {/* flex-1 wrapper centers the headline + CTA block in the
+              vertical space below the kicker (used to be balanced by the
+              footer strip below — now centered explicitly). */}
+          <div className="flex flex-1 flex-col justify-center">
             <motion.h2
               initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
               whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -137,18 +140,6 @@ export function Act06Current() {
             </motion.div>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-            transition={{ duration: 1, delay: 0.7 }}
-            className="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-glass-stroke-2 pt-6 font-mono text-[10px] tracking-kicker uppercase text-ink-mute"
-          >
-            <span>production launch · q4 2026</span>
-            <span className="text-ink-faint">/</span>
-            <span>upstream vision, inc.</span>
-            <span className="ml-auto text-ink-faint">we read every reply</span>
-          </motion.div>
         </div>
       </div>
     </ActShell>

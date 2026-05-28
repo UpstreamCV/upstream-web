@@ -42,21 +42,21 @@ const LANES: Lane[] = [
   {
     k: "exposure",
     color: "#F5F1E7", // Reed Cream
-    // Brief dip at D-9/D-8: backlight saturated the lens, quality bottomed
-    // out at 0.62 for two windows, then recovered.
-    data: [0.93, 0.92, 0.93, 0.92, 0.93, 0.62, 0.58, 0.92, 0.93, 0.92, 0.93, 0.92, 0.93, 0.92],
+    // Brief dip at D-11/D-10: backlight saturated the lens, quality
+    // bottomed at 0.58 for two windows, then recovered.
+    data: [0.93, 0.92, 0.93, 0.62, 0.58, 0.92, 0.93, 0.92, 0.93, 0.92, 0.93, 0.92, 0.93, 0.92],
   },
   {
     k: "focus",
     color: "#B6AE87", // Moss-bright
-    // Steady decline from D-7 onward: sharpness sags as the lens fouls.
-    data: [0.88, 0.87, 0.88, 0.87, 0.88, 0.87, 0.86, 0.78, 0.66, 0.54, 0.42, 0.32, 0.24, 0.18],
+    // Steady decline from D-10 onward: sharpness sags as the lens fouls.
+    data: [0.88, 0.87, 0.88, 0.86, 0.80, 0.70, 0.60, 0.50, 0.42, 0.36, 0.30, 0.24, 0.20, 0.16],
   },
   {
     k: "confidence p50",
     color: "#5FB869", // Signal Bright
-    // Drop from D-5: p50 collapses 0.88 → 0.22 in five days.
-    data: [0.92, 0.91, 0.92, 0.91, 0.90, 0.90, 0.89, 0.88, 0.84, 0.74, 0.58, 0.44, 0.32, 0.22],
+    // Drop from D-8: p50 collapses 0.92 → 0.12 over six days.
+    data: [0.92, 0.91, 0.92, 0.91, 0.90, 0.89, 0.82, 0.72, 0.60, 0.48, 0.36, 0.26, 0.18, 0.12],
   },
 ];
 
@@ -70,21 +70,21 @@ interface Event {
 const EVENTS: Event[] = [
   {
     laneIdx: 0,
-    day: 5,
+    day: 3,
     label: "exposure dipped",
-    body: "Backlight saturated the lens between 18:40 and 19:10. Quality bottomed at 0.62 for two windows.",
+    body: "Backlight saturated the lens between 18:40 and 19:10. Quality bottomed at 0.58 for two windows.",
   },
   {
     laneIdx: 1,
-    day: 8,
+    day: 5,
     label: "focus declining",
-    body: "Sharpness sagging since D-7. Likely lens fouling — schedule a clean before it hits zero.",
+    body: "Sharpness sagging since D-10. Likely lens fouling — schedule a clean before it hits zero.",
   },
   {
     laneIdx: 2,
-    day: 10,
+    day: 7,
     label: "confidence drop",
-    body: "p50 fell 0.88 → 0.58 in five days, still falling. Cause: sun-angle shift on the dock-facing lens.",
+    body: "p50 fell 0.92 → 0.72 in two days, still falling. Cause: sun-angle shift on the dock-facing lens.",
   },
 ];
 
@@ -186,7 +186,7 @@ export function Act04Drift() {
                   lineHeight: 1.0,
                   letterSpacing: "-0.035em",
                   fontWeight: 700,
-                  color: "rgba(245, 241, 231, 0.85)",
+                  color: "rgba(245, 241, 231, 0.6)",
                 }}
               >
                 The water level drops <em className="italic-accent">before</em>
@@ -194,7 +194,7 @@ export function Act04Drift() {
                 the pager goes off.
               </h2>
               <p
-                className="col-span-12 max-w-[44ch] text-ink md:col-span-3 md:justify-self-end md:text-right"
+                className="col-span-12 max-w-[44ch] text-ink-soft md:col-span-3 md:justify-self-end md:text-right"
                 style={{ lineHeight: 1.55 }}
               >
                 Three signals per camera. The same model that ran cleanly all
@@ -419,6 +419,9 @@ export function Act04Drift() {
               </div>
             </div>
 
+            <p className="mt-4 font-mono text-[10px] tracking-mono uppercase text-ink-soft md:mt-5">
+              scroll to scrub the window · each lane carries its own anomaly
+            </p>
           </div>
         </div>
       </div>
@@ -448,7 +451,10 @@ function EventCard({
           : "rgba(245, 241, 231, 0.10)",
         backdropFilter: "blur(18px) saturate(135%)",
         WebkitBackdropFilter: "blur(18px) saturate(135%)",
-        opacity: active ? 1 : 0.4,
+        // Fully hidden until the needle reaches its event day, then
+        // fades in. Pointer-events stay off either way (parent handles it).
+        opacity: active ? 1 : 0,
+        visibility: active ? "visible" : "hidden",
         transform: active ? "translateY(0)" : "translateY(6px)",
         boxShadow: active
           ? "0 20px 44px -22px rgba(232, 192, 107, 0.4), 0 1px 0 rgba(255,255,255,0.06) inset"
