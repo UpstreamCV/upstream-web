@@ -3,17 +3,16 @@
 /**
  * Act 04 — Drift, kept visible.
  *
- * Drenched Streambank Moss. Pinned for ~120% of scroll. Three water-level
- * lanes (exposure, focus, confidence p50) flow across a 14-day window.
- * Each lane carries its OWN anomaly visible in the data: an exposure dip
- * at D-9, a focus sag from D-7 onward, and the confidence drop from D-4.
- * As the needle scrubs past each event day, that lane's marker dot
- * appears, the lane line glows, and the matching alert card at top-right
- * of the chart lights up.
+ * Drenched moss (Streambank Moss color token). Pinned for ~120% of
+ * scroll. Three signal lanes (exposure, focus, confidence p50) span a
+ * 14-day window. Each lane carries its OWN anomaly visible in the data:
+ * an exposure dip at D-9, a focus sag from D-7 onward, and the
+ * confidence drop from D-4. As the needle scrubs past each event day,
+ * that lane's marker dot appears, the lane line glows, and the matching
+ * alert card at top-right of the chart lights up.
  *
  * Implementation notes:
- *   - Lane paths stay in SVG (so the water-shape stretches with viewport,
- *     which is the desired river-level feel).
+ *   - Lane paths stay in SVG so the curves stretch with viewport.
  *   - Dots — both event markers and the needle head — render as HTML
  *     elements positioned by %, so they stay circular instead of being
  *     stretched into ellipses by the SVG's preserveAspectRatio="none".
@@ -23,7 +22,8 @@ import { useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { useReducedMotion } from "@/lib/motion";
+import { motion, useMotionTemplate } from "framer-motion";
+import { useReducedMotion, useMagnetic } from "@/lib/motion";
 import { ActShell } from "./ActShell";
 
 if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
@@ -37,24 +37,26 @@ interface Lane {
 }
 
 // Each lane reads HIGH when healthy and DROPS during its anomaly window —
-// the chart shape literally is the alert.
+// the chart shape literally is the alert. Lane colors are picked for
+// hue separation (warm amber → sun yellow → signal green) so the three
+// curves remain legible when they cross.
 const LANES: Lane[] = [
   {
     k: "exposure",
-    color: "#F5F1E7", // Reed Cream
+    color: "#F4A847", // Striking amber/orange — light/sun association
     // Brief dip at D-11/D-10: backlight saturated the lens, quality
     // bottomed at 0.58 for two windows, then recovered.
     data: [0.93, 0.92, 0.93, 0.62, 0.58, 0.92, 0.93, 0.92, 0.93, 0.92, 0.93, 0.92, 0.93, 0.92],
   },
   {
     k: "focus",
-    color: "#B6AE87", // Moss-bright
+    color: "#F0D85B", // Sun yellow — distinct mid-hue between amber and green
     // Steady decline from D-10 onward: sharpness sags as the lens fouls.
     data: [0.88, 0.87, 0.88, 0.86, 0.80, 0.70, 0.60, 0.50, 0.42, 0.36, 0.30, 0.24, 0.20, 0.16],
   },
   {
     k: "confidence p50",
-    color: "#5FB869", // Signal Bright
+    color: "#5FB869", // Signal Bright — the brand's confident green
     // Drop from D-8: p50 collapses 0.92 → 0.12 over six days.
     data: [0.92, 0.91, 0.92, 0.91, 0.90, 0.89, 0.82, 0.72, 0.60, 0.48, 0.36, 0.26, 0.18, 0.12],
   },
@@ -189,7 +191,7 @@ export function Act04Drift() {
                   color: "rgba(245, 241, 231, 0.6)",
                 }}
               >
-                The water level drops <em className="italic-accent">before</em>
+                Confidence slips <em className="italic-accent">before</em>
                 <br />
                 the pager goes off.
               </h2>
@@ -202,7 +204,7 @@ export function Act04Drift() {
               </p>
             </div>
 
-            {/* The water-level chart */}
+            {/* The signal-lane chart */}
             <div className="relative mt-8 flex-1 md:mt-10">
               <div className="relative h-full w-full overflow-visible">
                 <svg
@@ -438,59 +440,83 @@ function EventCard({
   lane: Lane;
   active: boolean;
 }) {
+  // Same quiet magnetic recipe MarginaliaPanel uses — small outer pull,
+  // smaller inner pull for parallax, amber cursor blob so the warn
+  // semantic carries into the hover affordance. When the card is hidden
+  // the magnetic still binds, but pointer-events handled below ensure
+  // the cursor can't grab an invisible card.
+  const { ref, sx, sy, slx, sly, gx, gy, hovered, handlers } =
+    useMagnetic<HTMLDivElement>({ outer: 0.025, inner: 0.01 });
+  const blob = useMotionTemplate`radial-gradient(280px circle at ${gx}% ${gy}%, rgba(232, 192, 107, 0.14), transparent 70%)`;
+
   return (
-    <div
-      className="rounded-2xl border p-4 transition-all duration-700 md:p-5"
+    <motion.div
+      ref={ref}
+      className="relative overflow-hidden rounded-2xl border p-4 transition-[opacity,border-color,box-shadow] duration-700 md:p-5"
       style={{
-        // Same Reed-Cream-tinted glass recipe the original single divergence
-        // callout used (MarginaliaPanel size="md"): low-alpha cream wash,
-        // 1px hairline that tints amber when the event is active, 18px blur.
         background: "rgba(245, 241, 231, 0.05)",
         borderColor: active
           ? "rgba(232, 192, 107, 0.5)"
           : "rgba(245, 241, 231, 0.10)",
         backdropFilter: "blur(18px) saturate(135%)",
         WebkitBackdropFilter: "blur(18px) saturate(135%)",
-        // Fully hidden until the needle reaches its event day, then
-        // fades in. Pointer-events stay off either way (parent handles it).
         opacity: active ? 1 : 0,
         visibility: active ? "visible" : "hidden",
-        transform: active ? "translateY(0)" : "translateY(6px)",
+        // Magnetic transforms compose with the inactive-state lift via
+        // translateY done in motion.div's style.y below.
+        x: sx,
+        y: sy,
+        pointerEvents: active ? "auto" : "none",
         boxShadow: active
           ? "0 20px 44px -22px rgba(232, 192, 107, 0.4), 0 1px 0 rgba(255,255,255,0.06) inset"
           : "0 1px 0 rgba(255,255,255,0.04) inset",
       }}
+      {...handlers}
     >
-      <div className="mb-2 flex items-baseline justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span
-            aria-hidden="true"
-            className="inline-block h-1.5 w-1.5 rounded-full transition-colors duration-500"
-            style={{
-              background: active ? AMBER : "rgba(245, 241, 231, 0.3)",
-              boxShadow: active ? "0 0 0 3px rgba(232, 192, 107, 0.20)" : "none",
-            }}
-          />
-          <span
-            className="font-mono text-[10px] tracking-kicker uppercase"
-            style={{
-              color: active ? AMBER : "rgba(245, 241, 231, 0.5)",
-            }}
-          >
-            {event.label}
+      <motion.span
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: blob,
+          opacity: hovered && active ? 1 : 0,
+          transition: "opacity 280ms cubic-bezier(0.22, 1, 0.36, 1)",
+        }}
+      />
+      <motion.div
+        className="relative z-10"
+        style={{ x: slx, y: sly }}
+      >
+        <div className="mb-2 flex items-baseline justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span
+              aria-hidden="true"
+              className="inline-block h-1.5 w-1.5 rounded-full transition-colors duration-500"
+              style={{
+                background: active ? AMBER : "rgba(245, 241, 231, 0.3)",
+                boxShadow: active ? "0 0 0 3px rgba(232, 192, 107, 0.20)" : "none",
+              }}
+            />
+            <span
+              className="font-mono text-[10px] tracking-kicker uppercase"
+              style={{
+                color: active ? AMBER : "rgba(245, 241, 231, 0.5)",
+              }}
+            >
+              {event.label}
+            </span>
+          </div>
+          <span className="font-mono text-[9px] tracking-mono uppercase text-ink-faint">
+            D-{14 - event.day} · {lane.k}
           </span>
         </div>
-        <span className="font-mono text-[9px] tracking-mono uppercase text-ink-faint">
-          D-{14 - event.day} · {lane.k}
-        </span>
-      </div>
-      <p
-        className="text-[12px] text-ink md:text-[12.5px]"
-        style={{ lineHeight: 1.55, opacity: active ? 1 : 0.75 }}
-      >
-        {event.body}
-      </p>
-    </div>
+        <p
+          className="text-[12px] text-ink md:text-[12.5px]"
+          style={{ lineHeight: 1.55, opacity: active ? 1 : 0.75 }}
+        >
+          {event.body}
+        </p>
+      </motion.div>
+    </motion.div>
   );
 }
 

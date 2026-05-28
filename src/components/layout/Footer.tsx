@@ -26,7 +26,7 @@ export function Footer() {
             </div>
             <p className="mt-6 max-w-[42ch] text-ink-soft" style={{ lineHeight: 1.6 }}>
               Reliability-native infrastructure for live computer vision.
-              Built in Boulder, Colorado.
+              Built by people who experienced the problem first hand.
             </p>
           </div>
 

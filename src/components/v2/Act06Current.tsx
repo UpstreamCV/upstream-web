@@ -3,12 +3,13 @@
 /**
  * Act 06 — The current.
  *
- * The CTA fold. Full viewport drenched in riverbed base with a deep
- * creek-mid pool. Fish anchored at the bottom-right corner of the act
- * (not centered behind the type, as the previous DeltaCta did). The
- * headline carries the italic accent on "current." and the CTA pair is
- * offset to the left — asymmetric on purpose. Mono metadata strip
- * pinned to the very bottom.
+ * The CTA fold. Uses the "river" drench so the fixed Act 01 river video
+ * shows through a translucent dark overlay, softened by a backdrop-blur
+ * applied to the section. The headline + CTA stay legible because the
+ * overlay densifies toward the bottom. Fish anchored at the bottom-
+ * right corner of the act (not centered behind the type). The headline
+ * carries the italic accent on "current." and the CTA pair is offset
+ * to the left — asymmetric on purpose.
  */
 
 import Image from "next/image";
@@ -22,7 +23,7 @@ export function Act06Current() {
       id="act-current"
       index="06"
       kicker="step into the current"
-      drench="base"
+      drench="river"
       hideKicker
       phase={4}
     >
@@ -60,9 +61,11 @@ export function Act06Current() {
             fill
             sizes="(max-width: 768px) 80vw, 720px"
             className="object-contain"
-            // brightness(0) invert(1) flattens the source to a pure white
-            // silhouette; opacity 0.6 holds it back from being too bright.
-            style={{ filter: "brightness(0) invert(1)", opacity: 0.6 }}
+            // Render the fish as a semi-transparent overlay of the
+            // source artwork rather than a flat white silhouette. The
+            // river video + drench show through so the fish reads as
+            // part of the scene instead of a gray sticker.
+            style={{ opacity: 0.45 }}
           />
         </motion.div>
 

@@ -11,6 +11,7 @@
 import { useRef, useState, type FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { EASE } from "@/lib/motion";
+import { MagneticButton } from "@/components/atmosphere/MagneticButton";
 
 interface Payload {
   name: string;
@@ -155,7 +156,7 @@ export function WaitlistForm() {
         : "var(--ink-faint)";
 
   return (
-    <div className="glass-pane relative overflow-hidden rounded-3xl p-8 md:p-12">
+    <div className="glass-pane is-static relative overflow-hidden rounded-3xl p-8 md:p-12">
       {/* edge wash */}
       <div
         aria-hidden="true"
@@ -303,22 +304,20 @@ export function WaitlistForm() {
                 <div className="font-mono text-[10px] tracking-mono uppercase text-ink-mute">
                   we read every reply · usually back to you in 48h
                 </div>
-                <button
+                <MagneticButton
                   type="submit"
+                  variant="ghost"
                   disabled={state === "submitting"}
-                  className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full border border-glass-stroke bg-glass-bg px-7 py-4 text-[14px] font-semibold text-ink-soft backdrop-blur-xl transition-all duration-300 hover:-translate-y-[1px] hover:border-glass-hi hover:bg-glass-hi hover:text-ink disabled:opacity-60"
+                  ariaLabel="Request access"
+                  className="text-[14px] font-semibold !px-9 !py-[18px] border-ink/45 hover:border-ink/75"
                 >
-                  <span
-                    aria-hidden="true"
-                    className="absolute inset-0 -translate-x-full bg-creek-mid/25 transition-transform duration-700 group-hover:translate-x-0"
-                  />
-                  <span className="relative">
+                  <span>
                     {state === "submitting" ? "Sending…" : "Request access"}
                   </span>
-                  <span aria-hidden="true" className="relative font-mono text-sm">
+                  <span aria-hidden="true" className="font-mono text-sm">
                     →
                   </span>
-                </button>
+                </MagneticButton>
               </div>
             )}
           </motion.form>
@@ -462,6 +461,7 @@ function SelectField({
             "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 4 l4 4 4-4' fill='none' stroke='rgba(245,241,231,0.5)' stroke-width='1.2'/></svg>\")",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "right 0.25rem center",
+          backgroundSize: "9px",
           paddingRight: "1.5rem",
         }}
       >

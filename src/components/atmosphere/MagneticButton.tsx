@@ -18,6 +18,8 @@ interface Props {
   variant?: "primary" | "ghost";
   className?: string;
   ariaLabel?: string;
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
 }
 
 export function MagneticButton({
@@ -27,6 +29,8 @@ export function MagneticButton({
   variant = "primary",
   className = "",
   ariaLabel,
+  type = "button",
+  disabled = false,
 }: Props) {
   const { ref, sx, sy, slx, sly, gx, gy, hovered, handlers } = useMagnetic();
 
@@ -45,7 +49,7 @@ export function MagneticButton({
   const variantClass =
     variant === "primary"
       ? "bg-creek-deep text-ink px-7 py-4 rounded-full font-semibold transition-colors duration-300 hover:bg-[#3D5731]"
-      : "border border-glass-stroke text-ink px-7 py-4 rounded-full backdrop-blur-sm";
+      : "border border-glass-stroke bg-glass-bg text-ink-soft px-7 py-4 rounded-full backdrop-blur-xl transition-colors duration-200 hover:border-glass-hi hover:bg-glass-hi hover:text-ink";
 
   const composed = `${baseClass} ${variantClass} ${className}`;
 
@@ -85,8 +89,10 @@ export function MagneticButton({
     <motion.button
       ref={ref as React.RefObject<HTMLButtonElement>}
       onClick={onClick}
+      type={type}
+      disabled={disabled}
       aria-label={ariaLabel}
-      className={composed}
+      className={`${composed} disabled:opacity-60 disabled:cursor-not-allowed`}
       style={{ x: sx, y: sy }}
       {...handlers}
     >
