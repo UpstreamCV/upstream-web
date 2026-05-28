@@ -123,16 +123,8 @@ body {
      driven by --o1x/y / --o2x/y; size and alpha multiply through --o1s/a
      and --o2s/a so the orbs drift, breathe, and fade. */
   background:
-    radial-gradient(
-      calc(900px * var(--o1s)) calc(600px * var(--o1s)) at var(--o1x) var(--o1y),
-      rgb(95 184 134 / calc(0.07 * var(--o1a))),
-      transparent 60%
-    ),
-    radial-gradient(
-      calc(900px * var(--o2s)) calc(700px * var(--o2s)) at var(--o2x) var(--o2y),
-      rgb(75 129 108 / calc(0.10 * var(--o2a))),
-      transparent 60%
-    ),
+    /* radial-gradient(900px 600px at var(--o1x) var(--o1y), rgba(95, 184, 134, 0.07), rgba(95, 184, 134, 0) 60%), */
+    /* radial-gradient(900px 700px at var(--o2x) var(--o2y), rgba(75, 129, 108, 0.10), rgba(75, 129, 108, 0) 60%), */
     var(--base-2);
   background-attachment: fixed;
   animation: orb-drift 38s ease-in-out infinite;
@@ -144,6 +136,14 @@ body {
   overflow-x: clip;
   min-height: 100dvh;
 }
+
+/* =====================================================================
+   Scroll-snap.
+   CSS scroll-snap is intentionally NOT used here — Lenis sets scrollTop
+   continuously, so the browser never sees the "at rest" state needed to
+   fire CSS snap. Soft per-section snapping is driven by the Lenis Snap
+   plugin in SmoothScrollProvider instead, which honors Lenis's velocity.
+   ===================================================================== */
 
 /* =====================================================================
    Animated orbs.
