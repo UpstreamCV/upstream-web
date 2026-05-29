@@ -55,7 +55,7 @@ export function Act02Promise() {
               transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
               className="font-display"
               style={{
-                fontSize: "clamp(28px, 3.6vw, 56px)",
+                fontSize: "clamp(24px, 5vw, 56px)",
                 lineHeight: 1.14,
                 letterSpacing: "-0.02em",
                 fontWeight: 700,
@@ -73,7 +73,7 @@ export function Act02Promise() {
               transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1], delay: 0.28 }}
               className="mt-5 font-display md:mt-6"
               style={{
-                fontSize: "clamp(28px, 3.6vw, 56px)",
+                fontSize: "clamp(24px, 5vw, 56px)",
                 lineHeight: 1.14,
                 letterSpacing: "-0.02em",
                 fontWeight: 700,
@@ -464,9 +464,9 @@ function StreamStrip({ lane, callsCount, caughtCount = 0 }: StreamStripProps) {
         className="act02-marquee-mask relative overflow-hidden"
         style={{ ["--marquee-duration" as string]: "80s" }}
       >
-        <div className="act02-marquee-track flex w-max gap-3 md:gap-4">
+        <div className="act02-marquee-track flex w-max gap-2.5 md:gap-4">
           {[0, 1].map((copyIdx) => (
-            <div key={copyIdx} className="flex shrink-0 gap-3 md:gap-4">
+            <div key={copyIdx} className="flex shrink-0 gap-2.5 md:gap-4">
               {STREAM.map((call, i) => (
                 <StreamCard
                   key={`${copyIdx}-${i}`}
@@ -511,7 +511,7 @@ function StreamCard({ call, lane }: StreamCardProps) {
 
   return (
     <div
-      className="flex w-[238px] shrink-0 flex-col gap-3 rounded-xl px-4 py-3.5 md:w-[268px] md:px-5 md:py-4"
+      className="flex w-[clamp(220px,72vw,260px)] shrink-0 flex-col gap-3 rounded-xl px-4 py-3.5 md:w-[268px] md:px-5 md:py-4"
       style={{
         background,
         border: `1px solid ${borderColor}`,

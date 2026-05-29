@@ -106,13 +106,16 @@ export function CameraIngestRibbon() {
         breadcrumb={["cameras"]}
         rightLabel={`fleet · ${TILES.length} cameras`}
       >
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4 lg:grid-cols-6">
-          {TILES.map((t) => (
-            <CameraTile key={t.id} {...t} />
-          ))}
+        <div className="@container">
+          <div className="grid grid-cols-2 gap-3 @sm:grid-cols-3 @md:grid-cols-4 @md:gap-4 @2xl:grid-cols-6">
+            {TILES.map((t) => (
+              <CameraTile key={t.id} {...t} />
+            ))}
+          </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-2 font-mono text-[10px] uppercase tracking-wider text-white/80 md:mt-8 md:grid-cols-4">
+        <div className="@container mt-6 md:mt-8">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-2 font-mono text-[10px] uppercase tracking-wider text-white/80 @md:grid-cols-4">
           <LegendDot
             color={STATUS_COLOR.streaming}
             hint="Camera is actively pushing frames to the agent."
@@ -137,6 +140,7 @@ export function CameraIngestRibbon() {
           >
             error
           </LegendDot>
+          </div>
         </div>
       </DashboardPanel>
 

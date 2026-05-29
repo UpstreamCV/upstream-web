@@ -189,6 +189,16 @@ body {
   }
 }
 
+/* Mobile — the 38s background orb drift is a paint cost the user can't
+   actually perceive on a small viewport; pause it under 768px to free
+   GPU time for the scroll choreography that matters. */
+@media (max-width: 767px) {
+  body,
+  .drift-orbs {
+    animation: none;
+  }
+}
+
 /* Element resets wrapped in @layer base so Tailwind utilities (which live
    in @layer utilities, a later layer) can override them — without this,
    `button { border: 0 }` as unlayered CSS beat every `.border` utility. */
@@ -294,6 +304,26 @@ body {
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.14) inset,
     0 36px 72px -32px rgba(0, 0, 0, 0.7);
+}
+
+/* Mobile — backdrop-filter is the heaviest paint cost on phones; cut
+   the blur radius roughly in half across all glass surfaces. Stacked
+   blurs (frosted nav over hero gradient over fixed video) compound on
+   iPhones; the smaller radius is visually negligible at the scale of
+   a phone screen and saves a real amount of GPU time per frame. */
+@media (max-width: 767px) {
+  .glass-pane {
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+  }
+  .glass-pane-2 {
+    backdrop-filter: blur(8px) saturate(130%);
+    -webkit-backdrop-filter: blur(8px) saturate(130%);
+  }
+  .marginalia-pane {
+    backdrop-filter: blur(10px) saturate(135%);
+    -webkit-backdrop-filter: blur(10px) saturate(135%);
+  }
 }
 
 .glass-pane.is-static:hover {

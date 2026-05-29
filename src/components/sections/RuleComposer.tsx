@@ -110,13 +110,15 @@ export function RuleComposer() {
         rightLabel="v4 · git diff +12 −3"
         preview
       >
-        <div className="grid grid-cols-12 gap-4 md:gap-6">
-          <div className="col-span-12 lg:col-span-7">
-            <EditorTile linesVisible={linesVisible} />
+        <div className="@container">
+          <div className="grid grid-cols-12 gap-4 md:gap-6">
+            <div className="col-span-12 @4xl:col-span-7">
+              <EditorTile linesVisible={linesVisible} />
+            </div>
+            <aside className="col-span-12 @4xl:col-span-5">
+              <PreviewTile polygonProgress={polygonProgress} />
+            </aside>
           </div>
-          <aside className="col-span-12 lg:col-span-5">
-            <PreviewTile polygonProgress={polygonProgress} />
-          </aside>
         </div>
       </DashboardPanel>
 
@@ -156,7 +158,8 @@ function EditorTile({ linesVisible }: { linesVisible: number }) {
       </div>
 
       {/* Code body — light bg, syntax-tinted monospace */}
-      <pre className="m-0 overflow-x-auto bg-white px-5 py-5 font-mono text-[12.5px] leading-[1.85] md:px-6">
+      <pre className="m-0 max-h-[58vh] overflow-x-auto overflow-y-auto whitespace-pre bg-white px-3 py-5 font-mono text-[11px] leading-[1.85] md:max-h-none md:px-6 md:text-[12.5px]"
+        style={{ touchAction: "pan-x pan-y" }}>
         {RULE_LINES.map((line, idx) => (
           <span
             key={idx}

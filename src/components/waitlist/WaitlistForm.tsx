@@ -114,18 +114,17 @@ export function WaitlistForm() {
     setState("submitting");
 
     try {
-      // No backend yet — simulate a network call so the UI feels real. The
-      // `?fail=1` URL param forces the error path so the recovery UI can be
-      // tested without a real backend.
-      const shouldFail =
-        typeof window !== "undefined" &&
-        new URLSearchParams(window.location.search).get("fail") === "1";
-      await new Promise<void>((resolve, reject) => {
-        setTimeout(() => {
-          if (shouldFail) reject(new Error("Simulated failure"));
-          else resolve();
-        }, 900);
+      const hp =
+        formRef.current?.elements.namedItem("_hp") instanceof
+        HTMLInputElement
+          ? (formRef.current.elements.namedItem("_hp") as HTMLInputElement).value
+          : "";
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...v, _hp: hp }),
       });
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
       setState("done");
     } catch {
       setState("error");
@@ -134,11 +133,12 @@ export function WaitlistForm() {
 
   const retry = () => setState("idle");
 
-  const mailtoHref = `mailto:hello@upstream.vision?subject=${encodeURIComponent(
+  const mailtoHref = `mailto:elkan@upstreamcv.com?subject=${encodeURIComponent(
     `Waitlist · ${v.company || "no company"}`,
   )}&body=${encodeURIComponent(
     [
       `Name: ${v.name}`,
+      `Email: ${v.email}`,
       `Company: ${v.company}`,
       `Cameras in production: ${v.cameras}`,
       `Current stack: ${v.stack}`,
@@ -180,6 +180,21 @@ export function WaitlistForm() {
             transition={{ duration: 0.6, ease: EASE.outQuint }}
             className="relative grid grid-cols-12 gap-x-5 gap-y-7"
           >
+            {/* Honeypot — visually hidden, off the tab order. Bots that
+                fill every input fill this too; humans never see it. The
+                /api/waitlist handler silently 200s when this is non-empty
+                so bots don't learn the trap. */}
+            <div aria-hidden="true" className="pointer-events-none absolute h-0 w-0 overflow-hidden opacity-0">
+              <label htmlFor="wf-_hp">Leave this empty</label>
+              <input
+                id="wf-_hp"
+                name="_hp"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                defaultValue=""
+              />
+            </div>
             <Field
               name="name"
               className="col-span-12 md:col-span-6"
@@ -422,7 +437,7 @@ function Field({
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         {...rest}
-        className="mt-2 w-full border-b bg-transparent py-2.5 text-ink placeholder:text-ink-mute focus:outline-none transition-colors"
+        className="mt-2 w-full border-b bg-transparent py-3.5 text-base text-ink placeholder:text-ink-mute focus:outline-none transition-colors md:py-2.5"
         style={{
           borderColor: error ? ERROR_RED : "var(--glass-stroke-2)",
         }}
@@ -454,7 +469,7 @@ function SelectField({
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         {...rest}
-        className="mt-2 w-full appearance-none border-b bg-transparent py-2.5 text-ink focus:outline-none transition-colors"
+        className="mt-2 w-full appearance-none border-b bg-transparent py-3.5 text-base text-ink focus:outline-none transition-colors md:py-2.5"
         style={{
           borderColor: error ? ERROR_RED : "var(--glass-stroke-2)",
           backgroundImage:
@@ -494,7 +509,7 @@ function TextField({
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         {...rest}
-        className="mt-2 w-full resize-none border-b bg-transparent py-2.5 text-ink placeholder:text-ink-mute focus:outline-none transition-colors"
+        className="mt-2 w-full resize-none border-b bg-transparent py-3.5 text-base text-ink placeholder:text-ink-mute focus:outline-none transition-colors md:py-2.5"
         style={{
           borderColor: error ? ERROR_RED : "var(--glass-stroke-2)",
         }}

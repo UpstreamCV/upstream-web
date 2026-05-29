@@ -129,13 +129,15 @@ export function InferenceLens() {
         breadcrumb={["cameras", "cam_dock_03"]}
         rightLabel="live · 30 fps"
       >
-        <div className="grid grid-cols-12 gap-4 md:gap-6">
-          <div className="col-span-12 lg:col-span-8">
-            <ViewportTile lensRef={lensRef} />
+        <div className="@container">
+          <div className="grid grid-cols-12 gap-4 md:gap-6">
+            <div className="col-span-12 @4xl:col-span-8">
+              <ViewportTile lensRef={lensRef} />
+            </div>
+            <aside className="col-span-12 @4xl:col-span-4">
+              <ObservationsTile activeIdx={streamIdx} reduced={reduced} />
+            </aside>
           </div>
-          <aside className="col-span-12 lg:col-span-4">
-            <ObservationsTile activeIdx={streamIdx} reduced={reduced} />
-          </aside>
         </div>
       </DashboardPanel>
 
@@ -321,13 +323,13 @@ function ObservationsTile({
       </div>
 
       <div className="mt-4 flex-1 overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full min-w-[420px] text-sm">
           <thead>
             <tr className="border-b border-black/10 text-left font-mono text-[10px] uppercase tracking-wider text-[var(--dn-text-50)]">
-              <th className="py-2 pr-3 font-normal" title="Frame offset from the start of the window.">Time</th>
-              <th className="py-2 pr-3 font-normal">Class</th>
-              <th className="py-2 pr-3 font-normal" title="Detector confidence (0 to 1). Higher is more certain.">Conf</th>
-              <th className="py-2 font-normal" title="Stable identifier assigned to one object across frames.">Track</th>
+              <th className="py-3 pr-3 font-normal md:py-2" title="Frame offset from the start of the window.">Time</th>
+              <th className="py-3 pr-3 font-normal md:py-2">Class</th>
+              <th className="py-3 pr-3 font-normal md:py-2" title="Detector confidence (0 to 1). Higher is more certain.">Conf</th>
+              <th className="py-3 font-normal md:py-2" title="Stable identifier assigned to one object across frames.">Track</th>
             </tr>
           </thead>
           <tbody>
@@ -340,16 +342,16 @@ function ObservationsTile({
                     active ? "opacity-100" : "opacity-65"
                   }`}
                 >
-                  <td className="whitespace-nowrap py-2 pr-3 align-top font-mono text-[11px] text-[var(--dn-text-50)]">
+                  <td className="whitespace-nowrap py-3 pr-3 align-top font-mono text-[11px] text-[var(--dn-text-50)] md:py-2">
                     +{i * 38}ms
                   </td>
-                  <td className="py-2 pr-3 align-top font-mono text-[13px] font-bold text-[var(--dn-text)]">
+                  <td className="py-3 pr-3 align-top font-mono text-[13px] font-bold text-[var(--dn-text)] md:py-2">
                     {b.label}
                   </td>
-                  <td className="py-2 pr-3 align-top font-mono text-[13px] tabular-nums text-[var(--dn-text)]">
+                  <td className="py-3 pr-3 align-top font-mono text-[13px] tabular-nums text-[var(--dn-text)] md:py-2">
                     <CountUp value={b.conf} active={active} />
                   </td>
-                  <td className="py-2 align-top font-mono text-[11px] text-[var(--dn-text-50)]">
+                  <td className="py-3 align-top font-mono text-[11px] text-[var(--dn-text-50)] md:py-2">
                     trk_{Math.floor(700 + i * 37)}
                   </td>
                 </tr>

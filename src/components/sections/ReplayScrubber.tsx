@@ -103,13 +103,15 @@ export function ReplayScrubber() {
         rightLabel="cam_dock_03 · 30d window · v3 → v4"
         preview
       >
-        <div className="grid grid-cols-12 gap-4 md:gap-6">
-          <div className="col-span-12 lg:col-span-8">
-            <ViewportTile playhead={playhead} />
+        <div className="@container">
+          <div className="grid grid-cols-12 gap-4 md:gap-6">
+            <div className="col-span-12 @4xl:col-span-8">
+              <ViewportTile playhead={playhead} />
+            </div>
+            <aside className="col-span-12 @4xl:col-span-4">
+              <DiffTile />
+            </aside>
           </div>
-          <aside className="col-span-12 lg:col-span-4">
-            <DiffTile />
-          </aside>
         </div>
       </DashboardPanel>
 
