@@ -274,11 +274,10 @@ function ChartTile({
 
           {/* divergence callout — light card on white chart */}
           <div
-            className={`pointer-events-none absolute top-12 max-w-[240px] rounded-lg border bg-white p-3.5 shadow-md transition-all duration-700 ${
+            className={`pointer-events-none absolute top-12 left-1/2 max-w-[min(240px,calc(100vw-32px))] -translate-x-1/2 rounded-lg border bg-white p-3.5 shadow-md transition-all duration-700 md:left-[62%] md:translate-x-0 ${
               calloutOn ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
             }`}
             style={{
-              left: "62%",
               borderColor: "rgba(232, 192, 107, 0.5)",
               boxShadow:
                 "0 18px 40px -20px rgba(232,192,107,0.45), 0 1px 0 rgba(0,0,0,0.04)",

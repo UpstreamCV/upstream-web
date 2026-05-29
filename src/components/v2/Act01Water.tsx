@@ -162,7 +162,7 @@ function HeadlineLine({
   const style =
     size === "hero"
       ? {
-          fontSize: "clamp(80px, 18vw, 280px)",
+          fontSize: "clamp(56px, 16vw, 280px)",
           letterSpacing: "-0.05em",
           fontWeight: 700,
           paddingBottom: "0.06em",

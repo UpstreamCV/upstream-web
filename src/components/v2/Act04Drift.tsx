@@ -293,8 +293,24 @@ export function Act04Drift() {
               </p>
             </div>
 
+            {/* Mobile lane legend — replaces the absolute lane labels at <md
+                because the in-chart labels collide with the curves on
+                narrow viewports. */}
+            <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-1.5 font-mono text-[9.5px] tracking-mono uppercase text-ink-soft md:hidden">
+              {LANES.map((lane) => (
+                <span key={lane.k} className="inline-flex items-center gap-1.5">
+                  <span
+                    aria-hidden="true"
+                    className="inline-block h-1.5 w-1.5 rounded-full"
+                    style={{ background: lane.color }}
+                  />
+                  {lane.k}
+                </span>
+              ))}
+            </div>
+
             {/* The signal-lane chart */}
-            <div className="relative mt-8 flex-1 md:mt-10">
+            <div className="relative mt-4 h-[44vh] min-h-[260px] md:mt-10 md:h-auto md:flex-1">
               <div ref={chartRef} className="relative h-full w-full overflow-visible">
                 <svg
                   viewBox="0 0 100 60"
@@ -424,8 +440,10 @@ export function Act04Drift() {
 
                 {/* Lane labels — HTML overlay positioned by %; text renders
                     at native proportions instead of being stretched by the
-                    SVG viewBox. */}
-                <div className="pointer-events-none absolute inset-0">
+                    SVG viewBox. Hidden on mobile where a legend strip above
+                    the chart replaces them (the in-chart labels collide
+                    with the curves at narrow widths). */}
+                <div className="pointer-events-none absolute inset-0 hidden md:block">
                   {LANES.map((lane, li) => {
                     const baseY = 14 + li * 15;
                     const labelY = baseY - 2;
@@ -500,7 +518,7 @@ export function Act04Drift() {
                       the affordance; the handle is a slider for a11y
                       and supports keyboard nav (←/→/Home/End). */}
                   <div
-                    className={`absolute flex select-none touch-none items-center gap-1.5 whitespace-nowrap rounded-full border border-ink/35 bg-glass-bg px-2.5 py-1 backdrop-blur-md transition-[border-color,box-shadow] duration-200 hover:border-ink/55 focus-visible:border-ink/70 focus-visible:outline-none ${
+                    className={`absolute flex select-none touch-none items-center gap-1.5 whitespace-nowrap rounded-full border border-ink/35 bg-glass-bg px-2.5 py-1 backdrop-blur-md transition-[border-color,box-shadow] duration-200 hover:border-ink/55 focus-visible:border-ink/70 focus-visible:outline-none before:absolute before:-inset-3 before:rounded-full before:content-[''] ${
                       dragging ? "cursor-grabbing" : "cursor-grab"
                     }`}
                     style={{
@@ -563,7 +581,7 @@ export function Act04Drift() {
                   return (
                     <div
                       key={i}
-                      className="pointer-events-none absolute z-10 w-[min(70vw,240px)]"
+                      className="pointer-events-none absolute z-10 hidden w-[min(70vw,240px)] md:block"
                       style={{
                         left: `${dotX}%`,
                         top: `${dotY}%`,
@@ -589,8 +607,34 @@ export function Act04Drift() {
               </div>
             </div>
 
+            {/* Mobile event strip — replaces the absolute event cards at
+                <md. Always-visible so the user gets the alert content
+                without having to grab the small needle handle; the on-chart
+                marker dots still glow as the needle passes their day. */}
+            <div className="mt-6 grid grid-cols-1 gap-3 md:hidden">
+              {EVENTS.map((event, i) => {
+                const lane = LANES[event.laneIdx];
+                return (
+                  <div key={i}>
+                    <div className="mb-1.5 flex items-center gap-2 font-mono text-[10px] tracking-kicker uppercase text-ink-soft">
+                      <span
+                        aria-hidden="true"
+                        className="inline-block h-1.5 w-1.5 rounded-full"
+                        style={{ background: lane.color }}
+                      />
+                      <span>D-{13 - event.day}</span>
+                      <span aria-hidden="true" className="text-ink-faint">·</span>
+                      <span>{lane.k}</span>
+                    </div>
+                    <EventCard event={event} lane={lane} active />
+                  </div>
+                );
+              })}
+            </div>
+
             <p className="mt-4 font-mono text-[10px] tracking-mono uppercase text-ink-soft md:mt-5">
-              drag the marker to scrub the window · each lane carries its own anomaly
+              <span className="hidden md:inline">drag the marker to scrub the window · each lane carries its own anomaly</span>
+              <span className="md:hidden">scrub the marker · each lane carries its own anomaly</span>
             </p>
           </div>
         </div>

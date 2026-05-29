@@ -43,6 +43,27 @@ export function useReducedMotion(): boolean {
   return reduced;
 }
 
+/**
+ * Coarse-pointer awareness — true on touch devices (phones, most
+ * tablets). Used by useMagnetic to no-op cursor-tracking on devices
+ * where there is no hover cursor anyway; the listeners do nothing on
+ * touch and cost paint every frame, so skipping them removes idle work.
+ */
+export function useCoarsePointer(): boolean {
+  const [coarse, setCoarse] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mql = window.matchMedia("(pointer: coarse)");
+    setCoarse(mql.matches);
+    const onChange = (e: MediaQueryListEvent) => setCoarse(e.matches);
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
+
+  return coarse;
+}
+
 /** Stagger helper for masked reveals. */
 export function stagger(children: number, base = 0.06): number[] {
   return Array.from({ length: children }, (_, i) => i * base);
@@ -79,6 +100,7 @@ export function useMagnetic<T extends HTMLElement = HTMLElement>(
   const { outer = 0.08, inner = 0.03 } = options;
   const ref = useRef<T | null>(null);
   const reduced = useReducedMotion();
+  const coarse = useCoarsePointer();
   const [focused, setFocused] = useState(false);
   const [hovered, setHovered] = useState(false);
 
@@ -96,7 +118,7 @@ export function useMagnetic<T extends HTMLElement = HTMLElement>(
   const gy = useMotionValue(50);
 
   const onMouseMove = (e: MouseEvent) => {
-    if (reduced || focused) return;
+    if (reduced || coarse || focused) return;
     const node = ref.current;
     if (!node) return;
     const rect = node.getBoundingClientRect();
