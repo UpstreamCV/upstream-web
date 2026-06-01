@@ -128,7 +128,7 @@ export function Act01Water() {
             // text 60% except hero" directive, the hero stays untouched.
             style={{ lineHeight: 1.55, color: "rgba(245, 241, 231, 0.7)" }}
           >
-            The pipeline behind your cameras, kept on the water.
+            The pipeline behind your cameras, kept honest.
             We tell you the moment a single one stops telling the truth.
           </motion.p>
         </div>
