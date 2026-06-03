@@ -243,15 +243,20 @@ body {
 }
 
 /* =====================================================================
-   Glass surfaces — exact dashboard recipe
+   Glass surfaces — exact dashboard recipe.
+   NOTE: backdrop-filter values are wrapped in var(…, fallback) on purpose.
+   Lightning CSS (Tailwind v4's compiler) collapses a *literal*
+   backdrop-filter down to -webkit- only, which Chrome rejects (it needs the
+   unprefixed property). A var() value is opaque to that pass, so both the
+   -webkit- (Safari) and unprefixed (Chrome) declarations survive.
    ===================================================================== */
 
 .glass-pane {
   position: relative;
   background: var(--glass-bg);
   border: 1px solid var(--glass-stroke);
-  backdrop-filter: blur(22px) saturate(140%);
-  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: var(--bf-glass, blur(22px) saturate(140%));
+  backdrop-filter: var(--bf-glass, blur(22px) saturate(140%));
   box-shadow: var(--shadow-soft);
 }
 
@@ -259,8 +264,8 @@ body {
   position: relative;
   background: var(--glass-bg-2);
   border: 1px solid var(--glass-stroke-2);
-  backdrop-filter: blur(14px) saturate(130%);
-  -webkit-backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: var(--bf-glass-2, blur(14px) saturate(130%));
+  backdrop-filter: var(--bf-glass-2, blur(14px) saturate(130%));
 }
 
 /* Marginalia pane — specific glass recipe used by MarginaliaPanel.
@@ -272,8 +277,8 @@ body {
   position: relative;
   background: rgba(245, 241, 231, 0.05);
   border: 1px solid rgba(245, 241, 231, 0.10);
-  backdrop-filter: blur(18px) saturate(135%);
-  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: var(--bf-marginalia, blur(18px) saturate(135%));
+  backdrop-filter: var(--bf-marginalia, blur(18px) saturate(135%));
 }
 
 .marginalia-pane-warn {
@@ -313,16 +318,16 @@ body {
    a phone screen and saves a real amount of GPU time per frame. */
 @media (max-width: 767px) {
   .glass-pane {
-    backdrop-filter: blur(12px) saturate(140%);
-    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: var(--bf-glass-sm, blur(12px) saturate(140%));
+    backdrop-filter: var(--bf-glass-sm, blur(12px) saturate(140%));
   }
   .glass-pane-2 {
-    backdrop-filter: blur(8px) saturate(130%);
-    -webkit-backdrop-filter: blur(8px) saturate(130%);
+    -webkit-backdrop-filter: var(--bf-glass-2-sm, blur(8px) saturate(130%));
+    backdrop-filter: var(--bf-glass-2-sm, blur(8px) saturate(130%));
   }
   .marginalia-pane {
-    backdrop-filter: blur(10px) saturate(135%);
-    -webkit-backdrop-filter: blur(10px) saturate(135%);
+    -webkit-backdrop-filter: var(--bf-marginalia-sm, blur(10px) saturate(135%));
+    backdrop-filter: var(--bf-marginalia-sm, blur(10px) saturate(135%));
   }
 }
 
@@ -485,8 +490,8 @@ body {
 .dn-demo .dn-panel {
   background: rgba(255, 255, 255, 0.10);
   border: 1px solid rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(28px) saturate(140%);
-  -webkit-backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: var(--bf-dn-panel, blur(28px) saturate(140%));
+  backdrop-filter: var(--bf-dn-panel, blur(28px) saturate(140%));
   border-radius: var(--dn-radius-panel);
 }
 
