@@ -47,7 +47,7 @@ export function AboutContact() {
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <MagneticButton href="/waitlist" variant="primary">
-                Request access
+                Waitlist Now
                 <span aria-hidden="true" className="font-mono text-sm">→</span>
               </MagneticButton>
               <MagneticButton

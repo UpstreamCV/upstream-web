@@ -22,7 +22,7 @@ export default function WaitlistPage() {
     <>
       <Nav />
       <WaitlistScene />
-      <main className="relative z-10">
+      <main className="relative">
         <section className="pt-32 pb-32 md:pt-40 md:pb-48">
           <div className="shell">
             <div className="grid grid-cols-12 gap-x-8 gap-y-12">
@@ -44,18 +44,10 @@ export default function WaitlistPage() {
                 </p>
 
                 {/* The deal, pulled out of prose so all three perks read at a
-                    glance. Nested glass + a warm streambank corner-wash lets it
-                    sit a notch louder than the surrounding copy without leaning
-                    on Signal Bright (reserved for italic display accents). */}
+                    glance. Nested glass sits a notch louder than the surrounding
+                    copy without leaning on Signal Bright (reserved for italic
+                    display accents). */}
                 <div className="glass-pane is-static relative mt-9 overflow-hidden rounded-2xl p-6">
-                  <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 opacity-70"
-                    style={{
-                      background:
-                        "radial-gradient(circle, rgba(214,193,137,0.18), transparent 68%)",
-                    }}
-                  />
                   <p className="font-mono text-[10px] tracking-kicker uppercase text-accent-warm">
                     <span className="text-ink-mute">/ </span>on joining
                   </p>

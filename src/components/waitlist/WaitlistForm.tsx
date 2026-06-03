@@ -198,16 +198,6 @@ export function WaitlistForm() {
 
   return (
     <div className="glass-pane is-static relative overflow-hidden rounded-3xl p-8 md:p-12">
-      {/* edge wash */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 opacity-50"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(200,217,182,0.18), transparent 65%)",
-        }}
-      />
-
       <AnimatePresence mode="wait" initial={false}>
         {state !== "done" ? (
           <motion.form
