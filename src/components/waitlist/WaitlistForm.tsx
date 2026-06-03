@@ -17,8 +17,9 @@ interface Payload {
   name: string;
   email: string;
   company: string;
+  companyType: string;
+  companyTypeOther: string;
   cameras: string;
-  stack: string;
   context: string;
 }
 
@@ -31,21 +32,46 @@ const EMPTY: Payload = {
   name: "",
   email: "",
   company: "",
+  companyType: "",
+  companyTypeOther: "",
   cameras: "",
-  stack: "",
   context: "",
 };
 
-const REQUIRED: FieldKey[] = ["name", "email", "company"];
+const REQUIRED: FieldKey[] = ["name", "email", "company", "companyType"];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CONTEXT_MAX = 2000;
 const CONTEXT_WARN = 1900;
 const ERROR_RED = "#c0473b";
 
-function validateField(k: FieldKey, value: string): string | undefined {
+// Company types skew to the verticals that actually run production computer
+// vision. "Other" reveals a freeform field (see the form body) and makes that
+// freeform value required, so we never force a respondent into a bad fit.
+const COMPANY_TYPES = [
+  "Manufacturing & industrial",
+  "Logistics & warehousing",
+  "Retail",
+  "Security & surveillance",
+  "Agriculture",
+  "Healthcare & medical imaging",
+  "Autonomous vehicles & ADAS",
+  "Robotics",
+  "Drones & geospatial",
+  "Smart cities & transportation",
+  "Construction",
+  "CV platform / tooling",
+  "Research & academia",
+  "Other",
+];
+
+function validateField(k: FieldKey, all: Payload): string | undefined {
+  const value = all[k];
   if (REQUIRED.includes(k) && !value.trim()) return "Required.";
   if (k === "email" && value.trim() && !EMAIL_RE.test(value.trim())) {
     return "Email needs an @ and a domain.";
+  }
+  if (k === "companyTypeOther" && all.companyType === "Other" && !value.trim()) {
+    return "Required.";
   }
   if (k === "context" && value.length > CONTEXT_MAX) {
     return `Keep it under ${CONTEXT_MAX} characters.`;
@@ -56,7 +82,7 @@ function validateField(k: FieldKey, value: string): string | undefined {
 function validateAll(v: Payload): FieldErrors {
   const errs: FieldErrors = {};
   (Object.keys(v) as FieldKey[]).forEach((k) => {
-    const e = validateField(k, v[k]);
+    const e = validateField(k, v);
     if (e) errs[k] = e;
   });
   return errs;
@@ -77,17 +103,28 @@ export function WaitlistForm() {
       >,
     ) => {
       const next = e.target.value;
-      setV((prev) => ({ ...prev, [k]: next }));
+      // Build the would-be next payload so cross-field rules (the "Other"
+      // company type) validate against fresh state. Leaving "Other" clears the
+      // freeform value so a stale custom type never ships.
+      const nextV: Payload = { ...v, [k]: next };
+      if (k === "companyType" && next !== "Other") nextV.companyTypeOther = "";
+      setV(nextV);
       // Re-validate live only after the user has already left the field once,
       // so errors clear as they fix the problem without nagging mid-typing.
       if (touched[k]) {
-        setErrors((prev) => ({ ...prev, [k]: validateField(k, next) }));
+        setErrors((prev) => {
+          const ne: FieldErrors = { ...prev, [k]: validateField(k, nextV) };
+          if (k === "companyType" && next !== "Other") {
+            ne.companyTypeOther = undefined;
+          }
+          return ne;
+        });
       }
     };
 
   const handleBlur = (k: FieldKey) => () => {
     setTouched((prev) => ({ ...prev, [k]: true }));
-    setErrors((prev) => ({ ...prev, [k]: validateField(k, v[k]) }));
+    setErrors((prev) => ({ ...prev, [k]: validateField(k, v) }));
   };
 
   const onSubmit = async (e: FormEvent) => {
@@ -133,15 +170,19 @@ export function WaitlistForm() {
 
   const retry = () => setState("idle");
 
-  const mailtoHref = `mailto:elkan@upstreamcv.com?subject=${encodeURIComponent(
+  const mailtoHref = `mailto:hello@upstreamcv.com?subject=${encodeURIComponent(
     `Waitlist · ${v.company || "no company"}`,
   )}&body=${encodeURIComponent(
     [
       `Name: ${v.name}`,
       `Email: ${v.email}`,
       `Company: ${v.company}`,
-      `Cameras in production: ${v.cameras}`,
-      `Current stack: ${v.stack}`,
+      `Company type: ${
+        v.companyType === "Other"
+          ? `Other: ${v.companyTypeOther}`
+          : v.companyType
+      }`,
+      `Cameras in production: ${v.cameras || "(not given)"}`,
       ``,
       v.context,
     ].join("\n"),
@@ -222,8 +263,8 @@ export function WaitlistForm() {
             />
             <Field
               name="company"
-              className="col-span-12 md:col-span-7"
-              label="Company"
+              className="col-span-12 md:col-span-6"
+              label="Company name"
               value={v.company}
               onChange={update("company")}
               onBlur={handleBlur("company")}
@@ -233,39 +274,74 @@ export function WaitlistForm() {
               autoComplete="organization"
             />
             <SelectField
+              name="companyType"
+              className="col-span-12 md:col-span-6"
+              label="Company type"
+              value={v.companyType}
+              onChange={update("companyType")}
+              onBlur={handleBlur("companyType")}
+              error={touched.companyType ? errors.companyType : undefined}
+              required
+            >
+              <option value="">Select the closest fit</option>
+              {COMPANY_TYPES.map((t) => (
+                <option key={t}>{t}</option>
+              ))}
+            </SelectField>
+
+            <AnimatePresence initial={false}>
+              {v.companyType === "Other" ? (
+                <motion.div
+                  key="companyTypeOther"
+                  className="col-span-12"
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.35, ease: EASE.outQuint }}
+                >
+                  <Field
+                    name="companyTypeOther"
+                    label="Your company type"
+                    value={v.companyTypeOther}
+                    onChange={update("companyTypeOther")}
+                    onBlur={handleBlur("companyTypeOther")}
+                    error={
+                      touched.companyTypeOther
+                        ? errors.companyTypeOther
+                        : undefined
+                    }
+                    required
+                    placeholder="e.g. wildlife monitoring"
+                  />
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+
+            <SelectField
               name="cameras"
-              className="col-span-12 md:col-span-5"
+              className="col-span-12"
               label="Cameras in production"
               value={v.cameras}
               onChange={update("cameras")}
               onBlur={handleBlur("cameras")}
             >
-              <option value="">Pick a range</option>
+              <option value="">Pick a range (optional)</option>
               <option>1–10</option>
               <option>10–50</option>
               <option>50–200</option>
               <option>200–1000</option>
               <option>1000+</option>
             </SelectField>
-            <Field
-              name="stack"
-              className="col-span-12"
-              label="Current stack"
-              value={v.stack}
-              onChange={update("stack")}
-              onBlur={handleBlur("stack")}
-              placeholder="YOLOv8 on Triton · RTSP · k8s edge · Datadog"
-            />
 
             <TextField
               name="context"
               className="col-span-12"
-              label="What is one camera silently lying to you about?"
+              label="Any additional info we should know"
               value={v.context}
               onChange={update("context")}
               onBlur={handleBlur("context")}
               error={touched.context ? errors.context : undefined}
-              placeholder="Something specific. The camera that misfires every Tuesday at 3pm. The lens that's been wrapped since November. The rule that fires twenty times a shift…"
+              placeholder="Anything that helps us understand your setup: deployment scale, timeline, the problem you most want solved."
               rows={4}
               maxLength={CONTEXT_MAX}
               footer={
@@ -310,24 +386,24 @@ export function WaitlistForm() {
                     href={mailtoHref}
                     className="font-mono text-[11px] tracking-mono uppercase text-ink-soft underline underline-offset-4 hover:text-ink"
                   >
-                    hello@upstream.vision
+                    hello@upstreamcv.com
                   </a>
                 </div>
               </div>
             ) : (
               <div className="col-span-12 mt-2 flex flex-wrap items-center justify-between gap-4">
                 <div className="font-mono text-[10px] tracking-mono uppercase text-ink-mute">
-                  we read every reply · usually back to you in 48h
+                  we&apos;ll take it from here
                 </div>
                 <MagneticButton
                   type="submit"
                   variant="ghost"
                   disabled={state === "submitting"}
-                  ariaLabel="Request access"
+                  ariaLabel="Waitlist"
                   className="text-[14px] font-semibold !px-9 !py-[18px] border-ink/45 hover:border-ink/75"
                 >
                   <span>
-                    {state === "submitting" ? "Sending…" : "Request access"}
+                    {state === "submitting" ? "Sending…" : "Waitlist"}
                   </span>
                   <span aria-hidden="true" className="font-mono text-sm">
                     →
@@ -356,13 +432,12 @@ export function WaitlistForm() {
                 fontWeight: 400,
               }}
             >
-              We&apos;ll be in touch soon.
+              You&apos;re on the list.
             </h3>
             <p className="mt-6 max-w-[50ch] text-ink-soft" style={{ lineHeight: 1.65 }}>
-              Thanks, {v.name.split(" ")[0] || "friend"}. Someone on the team
-              will follow up within 48 hours, usually with specific
-              questions about the camera you mentioned. If you&apos;d like to
-              share a sample RTSP stream in advance, reply to that thread.
+              Thanks, {v.name.split(" ")[0] || "friend"}. We&apos;ll reach out
+              the moment we&apos;re ready to onboard you, your $100 in credits
+              and early access waiting. Nothing from us before then.
             </p>
           </motion.div>
         )}
@@ -437,10 +512,7 @@ function Field({
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         {...rest}
-        className="mt-2 w-full border-b bg-transparent py-3.5 text-base text-ink placeholder:text-ink-mute focus:outline-none transition-colors md:py-2.5"
-        style={{
-          borderColor: error ? ERROR_RED : "var(--glass-stroke-2)",
-        }}
+        className="wf-field mt-2 w-full text-base text-ink placeholder:text-ink-mute"
       />
       <FieldError id={errorId} error={error} />
     </div>
@@ -453,6 +525,7 @@ function SelectField({
   children,
   error,
   name,
+  required,
   ...rest
 }: FieldBaseProps & {
   children: React.ReactNode;
@@ -462,22 +535,21 @@ function SelectField({
   const errorId = `${id}-error`;
   return (
     <div className={`block ${className}`}>
-      <FieldLabel label={label} htmlFor={id} />
+      <FieldLabel label={label} required={required} htmlFor={id} />
       <select
         id={id}
         name={name}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         {...rest}
-        className="mt-2 w-full appearance-none border-b bg-transparent py-3.5 text-base text-ink focus:outline-none transition-colors md:py-2.5"
+        className="wf-field mt-2 w-full appearance-none text-base text-ink"
         style={{
-          borderColor: error ? ERROR_RED : "var(--glass-stroke-2)",
           backgroundImage:
-            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 4 l4 4 4-4' fill='none' stroke='rgba(245,241,231,0.5)' stroke-width='1.2'/></svg>\")",
+            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 4 l4 4 4-4' fill='none' stroke='rgba(245,241,231,0.6)' stroke-width='1.2'/></svg>\")",
           backgroundRepeat: "no-repeat",
-          backgroundPosition: "right 0.25rem center",
-          backgroundSize: "9px",
-          paddingRight: "1.5rem",
+          backgroundPosition: "right 0.9rem center",
+          backgroundSize: "10px",
+          paddingRight: "2.25rem",
         }}
       >
         {children}
@@ -509,10 +581,7 @@ function TextField({
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         {...rest}
-        className="mt-2 w-full resize-none border-b bg-transparent py-3.5 text-base text-ink placeholder:text-ink-mute focus:outline-none transition-colors md:py-2.5"
-        style={{
-          borderColor: error ? ERROR_RED : "var(--glass-stroke-2)",
-        }}
+        className="wf-field mt-2 w-full resize-none text-base text-ink placeholder:text-ink-mute"
       />
       <div className="mt-2 flex items-baseline justify-between gap-3">
         <FieldError id={errorId} error={error} />

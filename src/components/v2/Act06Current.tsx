@@ -130,7 +130,7 @@ export function Act06Current() {
               className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-4 md:mt-12"
             >
               <MagneticButton href="/waitlist" variant="primary">
-                Bring your worst camera
+                Waitlist Now
                 <span aria-hidden="true" className="font-mono text-sm">
                   →
                 </span>
