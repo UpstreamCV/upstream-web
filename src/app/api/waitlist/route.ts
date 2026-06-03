@@ -3,15 +3,16 @@ import { Resend } from "resend";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const FROM = "Upstream Waitlist <elkan@upstreamcv.com>";
-const TO = "elkan@upstreamcv.com";
+const FROM = "Upstream Waitlist <hello@upstreamcv.com>";
+const TO = "hello@upstreamcv.com";
 
 const MAX = {
   name: 200,
   email: 200,
   company: 200,
+  companyType: 120,
+  companyTypeOther: 120,
   cameras: 80,
-  stack: 400,
   context: 2000,
 } as const;
 
@@ -56,8 +57,9 @@ interface Submission {
   name: string;
   email: string;
   company: string;
+  companyType: string;
+  companyTypeOther: string;
   cameras: string;
-  stack: string;
   context: string;
 }
 
@@ -85,8 +87,9 @@ export async function POST(req: Request) {
     name: String(raw.name ?? "").trim(),
     email: String(raw.email ?? "").trim(),
     company: String(raw.company ?? "").trim(),
+    companyType: String(raw.companyType ?? "").trim(),
+    companyTypeOther: String(raw.companyTypeOther ?? "").trim(),
     cameras: String(raw.cameras ?? "").trim(),
-    stack: String(raw.stack ?? "").trim(),
     context: String(raw.context ?? "").trim(),
   };
 
@@ -99,11 +102,20 @@ export async function POST(req: Request) {
   if (!s.company || s.company.length > MAX.company) {
     return Response.json({ error: "Company required." }, { status: 400 });
   }
+  if (!s.companyType || s.companyType.length > MAX.companyType) {
+    return Response.json({ error: "Company type required." }, { status: 400 });
+  }
+  if (s.companyTypeOther.length > MAX.companyTypeOther) {
+    return Response.json({ error: "Company type too long." }, { status: 400 });
+  }
+  if (s.companyType === "Other" && !s.companyTypeOther) {
+    return Response.json(
+      { error: "Tell us your company type." },
+      { status: 400 },
+    );
+  }
   if (s.cameras.length > MAX.cameras) {
     return Response.json({ error: "Cameras too long." }, { status: 400 });
-  }
-  if (s.stack.length > MAX.stack) {
-    return Response.json({ error: "Stack too long." }, { status: 400 });
   }
   if (s.context.length > MAX.context) {
     return Response.json({ error: "Context too long." }, { status: 400 });
@@ -125,6 +137,10 @@ export async function POST(req: Request) {
 
   const userAgent = req.headers.get("user-agent") ?? "unknown";
   const subject = `Waitlist · ${s.company} · ${s.name}`;
+  const companyTypeDisplay =
+    s.companyType === "Other" && s.companyTypeOther
+      ? `Other: ${s.companyTypeOther}`
+      : s.companyType;
 
   const html = `<!doctype html>
 <html><body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#111;max-width:640px;margin:0 auto;padding:24px;">
@@ -134,8 +150,8 @@ export async function POST(req: Request) {
     <tr><td style="padding:6px 12px 6px 0;color:#888;width:140px;vertical-align:top;">Name</td><td style="padding:6px 0;"><strong>${escapeHtml(s.name)}</strong></td></tr>
     <tr><td style="padding:6px 12px 6px 0;color:#888;vertical-align:top;">Email</td><td style="padding:6px 0;"><a href="mailto:${escapeHtml(s.email)}">${escapeHtml(s.email)}</a></td></tr>
     <tr><td style="padding:6px 12px 6px 0;color:#888;vertical-align:top;">Company</td><td style="padding:6px 0;">${escapeHtml(s.company)}</td></tr>
+    <tr><td style="padding:6px 12px 6px 0;color:#888;vertical-align:top;">Company type</td><td style="padding:6px 0;">${escapeHtml(companyTypeDisplay) || "<em>not given</em>"}</td></tr>
     <tr><td style="padding:6px 12px 6px 0;color:#888;vertical-align:top;">Cameras</td><td style="padding:6px 0;">${escapeHtml(s.cameras) || "<em>not given</em>"}</td></tr>
-    <tr><td style="padding:6px 12px 6px 0;color:#888;vertical-align:top;">Stack</td><td style="padding:6px 0;">${escapeHtml(s.stack) || "<em>not given</em>"}</td></tr>
   </table>
   ${
     s.context
@@ -154,8 +170,8 @@ export async function POST(req: Request) {
     `Name:     ${s.name}`,
     `Email:    ${s.email}`,
     `Company:  ${s.company}`,
+    `Type:     ${companyTypeDisplay || "(not given)"}`,
     `Cameras:  ${s.cameras || "(not given)"}`,
-    `Stack:    ${s.stack || "(not given)"}`,
     ``,
     s.context ? `Context:\n${s.context}` : "(no context)",
     ``,

@@ -135,7 +135,7 @@ function NavCta({ href }: { href: string }) {
         style={{ x: slx, y: sly }}
         className="relative z-10 inline-flex items-center gap-2"
       >
-        Request access
+        Waitlist
         <span
           aria-hidden="true"
           className="font-mono opacity-60 transition-transform duration-300 group-hover:translate-x-0.5"
@@ -309,7 +309,7 @@ function MobileMenu({
                   onClick={handleLinkClick}
                   className="group relative flex w-full items-center justify-between rounded-full border border-glass-stroke bg-glass-bg px-6 py-4 text-ink"
                 >
-                  <span className="font-display text-base">Request access</span>
+                  <span className="font-display text-base">Waitlist</span>
                   <span
                     aria-hidden="true"
                     className="font-mono text-sm text-ink-soft transition-transform duration-300 group-hover:translate-x-0.5"
