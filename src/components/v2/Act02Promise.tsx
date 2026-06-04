@@ -22,8 +22,8 @@ import { MarginaliaPanel } from "./MarginaliaPanel";
 
 export function Act02Promise() {
   return (
-    <ActShell id="act-promise" index="02" kicker="the promise" drench="deep" phase={0}>
-      <div className="shell relative z-10 flex min-h-[calc(100svh-160px)] flex-col justify-center pb-24 pt-12 md:pt-16">
+    <ActShell id="act-promise" index="02" kicker="the promise" drench="deep" hideKicker phase={0}>
+      <div className="shell relative z-10 flex min-h-[calc(100svh-160px)] flex-col justify-center pb-24 pt-28 md:pt-32">
         <div className="grid grid-cols-12 gap-x-8 gap-y-12">
           {/* Left rail — kicker echo for the act */}
           <div className="col-span-12 md:col-span-3 xl:col-span-2">

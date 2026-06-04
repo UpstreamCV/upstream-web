@@ -180,8 +180,8 @@ const GLYPHS: Record<
 
 export function Act05Reports() {
   return (
-    <ActShell id="act-reports" index="05" kicker="field reports" drench="base" phase={3}>
-      <div className="shell relative z-10 pb-24 pt-12 md:pb-32 md:pt-16">
+    <ActShell id="act-reports" index="05" kicker="field reports" drench="base" hideKicker phase={3}>
+      <div className="shell relative z-10 pb-24 pt-28 md:pb-32 md:pt-32">
         {/* Section voice strip. Honest framing: the three reports below
             are illustrative scenarios, not actual production incidents.
             The "illustrative" pill makes that explicit so the operator
