@@ -140,9 +140,10 @@ export function Act03Observation() {
       index="03"
       kicker="the observation"
       drench="mid"
+      hideKicker
       phase={1}
     >
-      <div className="shell relative z-10 pb-24 pt-12 md:pb-32 md:pt-16">
+      <div className="shell relative z-10 pb-24 pt-28 md:pb-32 md:pt-32">
         <div className="grid grid-cols-12 items-stretch gap-x-6 gap-y-8 md:gap-x-10">
           {/* Big viewport — real demo video + JSON-driven bbox overlays.
               Spans the full width of the act so the demo is the visual

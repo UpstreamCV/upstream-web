@@ -77,13 +77,7 @@ export function Act06Current() {
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
             className="flex items-baseline gap-3"
           >
-            <span className="font-mono text-[11px] tracking-kicker uppercase text-ink">
-              <span className="text-ink-faint">/ </span>06
-            </span>
-            <span className="font-mono text-[11px] tracking-kicker uppercase text-ink-soft">
-              the current
-            </span>
-            <span className="ml-auto font-mono text-[11px] tracking-mono uppercase text-ink-mute">
+            <span className="font-mono text-[11px] tracking-mono uppercase text-ink-mute">
               onboarding through 2026
             </span>
           </motion.div>

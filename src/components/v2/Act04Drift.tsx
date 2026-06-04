@@ -258,13 +258,7 @@ export function Act04Drift() {
         <div className="relative h-screen w-full overflow-hidden">
           <div className="shell relative z-10 flex h-full flex-col pt-28 pb-10 md:pt-32 md:pb-14">
             <div className="flex items-baseline gap-3">
-              <span className="font-mono text-[11px] tracking-kicker uppercase text-ink">
-                <span className="text-ink-faint">/ </span>04
-              </span>
-              <span className="font-mono text-[11px] tracking-kicker uppercase text-ink-soft">
-                drift, kept visible
-              </span>
-              <span className="ml-auto font-mono text-[11px] tracking-mono uppercase text-ink-mute">
+              <span className="font-mono text-[11px] tracking-mono uppercase text-ink-mute">
                 cam_bay_07 · 14d · {dayLabel}
               </span>
             </div>

@@ -28,6 +28,15 @@ export function Footer() {
               Reliability-native infrastructure for live computer vision.
               Built by people who experienced the problem first hand.
             </p>
+            <p className="mt-5 text-sm text-ink-soft" style={{ lineHeight: 1.6 }}>
+              Questions? Email us at{" "}
+              <a
+                href="mailto:hello@upstreamcv.com"
+                className="text-ink"
+              >
+                hello@upstreamcv.com
+              </a>
+            </p>
           </div>
 
           <div className="col-span-6 md:col-span-3">
