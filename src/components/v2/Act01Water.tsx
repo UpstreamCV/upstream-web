@@ -16,6 +16,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useReducedMotion } from "@/lib/motion";
+import { MagneticButton } from "@/components/atmosphere/MagneticButton";
 
 const POSTER = "/assets/river-splash-blur.jpg";
 const VIDEO = "/assets/river.mp4";
@@ -131,6 +132,19 @@ export function Act01Water() {
             The pipeline behind your cameras, kept honest.
             We tell you the moment a single one stops telling the truth.
           </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 1.3 }}
+            className="mt-9 md:mt-10"
+          >
+            <MagneticButton href="/waitlist" variant="primary">
+              Join the waitlist
+              <span aria-hidden="true" className="font-mono text-sm">
+                →
+              </span>
+            </MagneticButton>
+          </motion.div>
         </div>
       </div>
 
