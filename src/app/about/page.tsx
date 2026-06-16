@@ -1,3 +1,4 @@
+import { Atmosphere } from "@/components/atmosphere/Atmosphere";
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { AboutHero } from "@/components/about/AboutHero";
@@ -14,6 +15,7 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <>
+      <Atmosphere />
       <Nav />
       <main className="relative">
         <AboutHero />

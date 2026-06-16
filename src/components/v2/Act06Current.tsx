@@ -3,13 +3,12 @@
 /**
  * Act 06 — The current.
  *
- * The CTA fold. Uses the "river" drench so the fixed Act 01 river video
- * shows through a translucent dark overlay, softened by a backdrop-blur
- * applied to the section. The headline + CTA stay legible because the
- * overlay densifies toward the bottom. Fish anchored at the bottom-
- * right corner of the act (not centered behind the type). The headline
- * carries the italic accent on "current." and the CTA pair is offset
- * to the left — asymmetric on purpose.
+ * The CTA fold. The pinned hero river video (fixed, z-index:-10) shows through
+ * here too; this fold adds film grain over it and a dark scrim that densifies
+ * toward the bottom so the headline + CTA stay legible. Fish anchored at the
+ * bottom-right corner of the act (not centered behind the type). The headline
+ * carries the italic accent on "current." and the CTA pair is offset to the
+ * left — asymmetric on purpose.
  */
 
 import Image from "next/image";
@@ -28,19 +27,25 @@ export function Act06Current() {
       phase={4}
     >
       <div className="relative h-[100svh] min-h-[680px] w-full overflow-hidden">
-        {/* Deep creek-mid pool blobs removed — Act 06 now reads against
-            the base drench's linear gradient only. */}
-        {/*
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(60% 70% at 80% 90%, rgba(75, 129, 108, 0.35), transparent 65%), " +
-              "radial-gradient(70% 60% at 0% 0%, rgba(52, 76, 44, 0.40), transparent 70%)",
-          }}
-        />
-        */}
+        {/* The pinned hero river video (fixed, z-index:-10) shows through here.
+            The ActShell "river" drench above already darkens toward the bottom
+            for legibility; this fold adds a slight backdrop blur to soften the
+            footage, with film grain crisp on top (no second scrim — that was
+            double-darkening the river). */}
+        <div className="pointer-events-none absolute inset-0" style={{ zIndex: 0 }}>
+          {/* Slight blur over the river footage. backdrop-filter softens only
+              what shows through this fold (the fixed video behind it), not the
+              hero. The grain layer below paints on top and stays crisp. */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              backdropFilter: "blur(3px)",
+              WebkitBackdropFilter: "blur(3px)",
+            }}
+          />
+          <div className="film-grain absolute inset-0" aria-hidden="true" />
+        </div>
 
         {/* Fish, anchored bottom-right and rotated into the corner */}
         <motion.div
@@ -63,28 +68,15 @@ export function Act06Current() {
             className="object-contain"
             // Render the fish as a semi-transparent overlay of the
             // source artwork rather than a flat white silhouette. The
-            // river video + drench show through so the fish reads as
+            // river video + grain show through so the fish reads as
             // part of the scene instead of a gray sticker.
             style={{ opacity: 0.45 }}
           />
         </motion.div>
 
         <div className="shell relative z-10 flex h-full flex-col pb-[max(env(safe-area-inset-bottom),28px)] pt-28 md:pt-32">
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="flex items-baseline gap-3"
-          >
-            <span className="font-mono text-[11px] tracking-mono uppercase text-ink-mute">
-              onboarding through 2026
-            </span>
-          </motion.div>
-
           {/* flex-1 wrapper centers the headline + CTA block in the
-              vertical space below the kicker (used to be balanced by the
-              footer strip below — now centered explicitly). */}
+              vertical space. */}
           <div className="flex flex-1 flex-col justify-center">
             <motion.h2
               initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
@@ -111,9 +103,8 @@ export function Act06Current() {
               className="mt-8 max-w-[52ch] text-ink-soft md:mt-10 md:text-lg"
               style={{ lineHeight: 1.6 }}
             >
-              We&apos;re onboarding a small group of facilities through 2026.
-              If you run live CV and have a camera that&apos;s been silently
-              lying to you, we&apos;d like to hear about it.
+              We&apos;re onboarding a few facilities through 2026. If a camera
+              has been lying to you, we want to hear about it.
             </motion.p>
 
             <motion.div

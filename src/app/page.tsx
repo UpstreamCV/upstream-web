@@ -1,3 +1,4 @@
+import { Atmosphere } from "@/components/atmosphere/Atmosphere";
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { Act01Water } from "@/components/v2/Act01Water";
@@ -20,10 +21,16 @@ export default function HomePage() {
       <Nav />
       <main className="relative">
         <Act01Water />
-        <Act02Promise />
-        <Act03Observation />
-        <Act04Drift />
-        <Act05Reports />
+        {/* The grey/grainy/orb layer covers ONLY the middle acts — pinned over
+            the fixed river, from the end of the hero to before the current
+            fold. No fade. */}
+        <div className="atmo-zone relative">
+          <Atmosphere variant="zone" />
+          <Act02Promise />
+          <Act03Observation />
+          <Act04Drift />
+          <Act05Reports />
+        </div>
         <Act06Current />
       </main>
       <Footer />

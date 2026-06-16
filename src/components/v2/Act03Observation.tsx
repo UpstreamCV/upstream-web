@@ -288,20 +288,18 @@ export function Act03Observation() {
               <p
                 className="font-display text-ink"
                 style={{
-                  fontSize: "clamp(20px, 2vw, 28px)",
-                  lineHeight: 1.18,
-                  letterSpacing: "-0.018em",
+                  fontSize: "clamp(15px, 1.4vw, 19px)",
+                  lineHeight: 1.25,
+                  letterSpacing: "-0.014em",
                   fontWeight: 500,
                 }}
               >
                 One frame becomes one observation: class, box, confidence,
                 track id.
               </p>
-              <p className="mt-3 text-[13px] text-ink-soft" style={{ lineHeight: 1.55 }}>
-                YOLO11L running on a real warehouse clip. Each box is a
-                tracked person; the trk_id and confidence are pulled from
-                the same JSON the model produced. Every observation is
-                timestamped and versioned end to end.
+              <p className="mt-2 text-[12px] text-ink-soft" style={{ lineHeight: 1.5 }}>
+                YOLO11L on real warehouse footage. Each box is a tracked
+                person, straight from the model&apos;s output.
               </p>
             </MarginaliaPanel>
           </div>
@@ -321,15 +319,14 @@ export function Act03Observation() {
               <p
                 className="mt-2 font-display text-ink"
                 style={{
-                  fontSize: "clamp(15px, 1.4vw, 19px)",
-                  lineHeight: 1.4,
-                  letterSpacing: "-0.012em",
+                  fontSize: "clamp(13px, 1.1vw, 15px)",
+                  lineHeight: 1.45,
+                  letterSpacing: "-0.01em",
                   fontWeight: 400,
                 }}
               >
-                Some people further from the camera aren&apos;t being detected
-                at all. Other tracks are jittering, bboxes flickering and
-                track ids flipping every few frames as bodies overlap.
+                People further from the camera go undetected. Other tracks
+                jitter — boxes flicker, ids flip as bodies overlap.
               </p>
               <div className="mt-auto grid grid-cols-3 gap-x-3 border-t border-glass-stroke-2 pt-3">
                 <Stat k="model" v="yolo11l" />
@@ -340,30 +337,29 @@ export function Act03Observation() {
           </div>
         </div>
 
-        {/* Three-stage inline ribbons — rendered statically (no scroll-in
-            animation) so they appear with the video + marginalia instead
-            of waiting for the ribbon itself to scroll into view. */}
-        <div
-          className="mt-14 grid grid-cols-1 gap-x-8 gap-y-10 border-t border-glass-stroke pt-12 md:mt-20 md:grid-cols-3 md:pt-14"
-        >
-          <Stage
-            n="01"
-            title="ingest"
-            body="RTSP, WebRTC, ONVIF. We meet the camera where it lives and validate every session against expected codec, resolution, FPS, and bitrate."
-            spec="srt · h264 / h265 · 30 fps"
-          />
-          <Stage
-            n="02"
-            title="inference"
-            body="Your model on our runtime. Every detection carries a track id, a confidence, and the exact model version that produced it. Versioned end to end."
-            spec="yolo · sam · detr · custom"
-          />
-          <Stage
-            n="03"
-            title="rules"
-            body="Versioned files, not buttons. Backtest against thirty days of footage before deploy. See the alert diff per camera. Ship with a verdict on the false-positive budget."
-            spec="versioned · backtested"
-          />
+        {/* The pipeline a frame moves through — three connected stages. The
+            dark tiles + arrows make the ingest → inference → rules flow the
+            focus of the section. */}
+        <div className="mt-14 border-t border-glass-stroke pt-12 md:mt-20 md:pt-14">
+          <div className="flex flex-col items-stretch gap-3 md:flex-row md:gap-0">
+            <StageTile
+              n="01"
+              title="ingest"
+              body="RTSP, WebRTC, ONVIF — whatever your camera speaks. Every session checked for the right codec, resolution, and FPS."
+            />
+            <StageArrow />
+            <StageTile
+              n="02"
+              title="inference"
+              body="Your model on our runtime. Every detection tagged with its track id, confidence, and model version."
+            />
+            <StageArrow />
+            <StageTile
+              n="03"
+              title="rules"
+              body="Rules are versioned files, not buttons. Test a change against thirty days of footage before you ship it."
+            />
+          </div>
         </div>
       </div>
     </ActShell>
@@ -384,23 +380,43 @@ function Stat({ k, v }: { k: string; v: string }) {
   );
 }
 
-function Stage({ n, title, body, spec }: { n: string; title: string; body: string; spec: string }) {
+function StageTile({ n, title, body }: { n: string; title: string; body: string }) {
   return (
-    <div>
+    <div
+      className="flex flex-1 flex-col rounded-2xl border p-6 md:p-7"
+      style={{
+        // Solid dark tile (#161616), matching the Act 02 stream cards.
+        background: "#161616",
+        borderColor: "rgba(255, 255, 255, 0.06)",
+        boxShadow:
+          "inset 0 1px 0 rgba(255,255,255,0.04), 0 24px 60px -30px rgba(0,0,0,0.7)",
+      }}
+    >
       <div className="flex items-baseline gap-3 font-mono text-[10px] tracking-kicker uppercase">
-        <span className="text-ink">{n}</span>
+        <span className="text-ink-soft">{n}</span>
         <span className="text-ink-faint">/</span>
-        <span className="text-ink-soft">{title}</span>
+        <span className="text-ink">{title}</span>
       </div>
       <p
-        className="mt-5 text-ink-soft"
-        style={{ fontSize: "15px", lineHeight: 1.6, maxWidth: "38ch" }}
+        className="mt-4 text-ink-soft"
+        style={{ fontSize: "13.5px", lineHeight: 1.55 }}
       >
         {body}
       </p>
-      <div className="mt-5 font-mono text-[10px] tracking-mono uppercase text-ink-mute">
-        {spec}
-      </div>
+    </div>
+  );
+}
+
+// Connector between pipeline stages — a right arrow on desktop (row layout),
+// a down arrow on mobile (stacked).
+function StageArrow() {
+  return (
+    <div
+      aria-hidden
+      className="flex shrink-0 items-center justify-center self-center py-1 text-lg text-ink-mute md:px-4 md:py-0"
+    >
+      <span className="md:hidden">↓</span>
+      <span className="hidden md:inline">→</span>
     </div>
   );
 }

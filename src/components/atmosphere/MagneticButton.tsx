@@ -37,19 +37,20 @@ export function MagneticButton({
   // mouse-tracked glow (liquid hover diffusion). useMotionTemplate keeps
   // the gradient string reactive to gx/gy so the glow follows the cursor
   // instead of freezing at its render-time position.
-  const primaryGlow = useMotionTemplate`radial-gradient(180px circle at ${gx}% ${gy}%, rgba(245, 241, 231, 0.18), transparent 65%)`;
-  const ghostGlow = useMotionTemplate`radial-gradient(220px circle at ${gx}% ${gy}%, rgba(200, 217, 182, 0.18), transparent 65%)`;
+  const primaryGlow = useMotionTemplate`radial-gradient(150px circle at ${gx}% ${gy}%, rgba(245, 241, 231, 0.32), transparent 70%)`;
+  const ghostGlow = useMotionTemplate`radial-gradient(140px circle at ${gx}% ${gy}%, rgba(245, 241, 231, 0.22), transparent 70%)`;
 
   const baseClass =
     "relative inline-flex items-center gap-3 overflow-hidden font-medium tracking-wide";
-  // Primary: Deep Creek fill with Reed Cream text. Stays in the earth-tone
-  // palette (no SaaS-green flip on hover, no stark-white pill at rest).
-  // Hover lightens the fill to the brighter creek step from the drench
-  // gradient, and the magnetic glow tinted Reed Cream provides extra lift.
+  // Ported from the dashboard. Primary: the creek gradient pill (.dn-grad-btn,
+  // moss → mid → deep) with a faint cream rim + Reed Cream label; hover lifts
+  // it with a soft creek glow shadow. Ghost: frosted translucent glass
+  // (.dn-glow-soft) — backdrop blur + cream hairline, brightening on hover.
+  // Both gain the cursor sheen + magnetic lean from the motion layer below.
   const variantClass =
     variant === "primary"
-      ? "bg-creek-deep text-ink px-7 py-4 rounded-full font-semibold transition-colors duration-300 hover:bg-[#3D5731]"
-      : "border border-glass-stroke bg-glass-bg text-ink-soft px-7 py-4 rounded-full backdrop-blur-xl transition-colors duration-200 hover:border-glass-hi hover:bg-glass-hi hover:text-ink";
+      ? "btn-dark text-ink px-7 py-4 rounded-full font-semibold transition-colors duration-200"
+      : "btn-frost text-ink-soft px-7 py-4 rounded-full transition-colors duration-200 hover:text-ink";
 
   const composed = `${baseClass} ${variantClass} ${className}`;
 

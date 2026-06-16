@@ -3,241 +3,106 @@
 /**
  * Act 04 — Drift, kept visible.
  *
- * Drenched moss (Streambank Moss color token). The section scrolls
- * normally; the needle auto-sweeps once (0 → 1) when the section enters
- * the viewport, then stops. After that the handle is manual-only: users
- * grab it to scrub (cursor + touch + keyboard ←/→/Home/End). If the user
- * grabs the handle DURING the first sweep, the sweep pauses and resumes
- * from where they left off — but only until it reaches 1, after which
- * the chart stays where the user puts it.
+ * Mirrors the dashboard home: a "Fleet Overview" tile (every camera sorted
+ * Healthy / Review / Critical, charted over the last 24h) spanning the left
+ * half, and a "Triage" tile on the right listing the few alerts that actually
+ * need attention. The divergence is visible here before it reaches a pager.
  *
- * Three signal lanes (exposure, focus, confidence p50) span a 14-day
- * window. Each lane carries its OWN anomaly visible in the data: an
- * exposure dip at D-11, a focus sag from D-10 onward, and the confidence
- * drop from D-7. As the needle passes each event day, that lane's marker
- * dot appears, the lane line glows, and the matching alert card lights
- * up.
- *
- * Implementation notes:
- *   - Lane paths stay in SVG so the curves stretch with viewport.
- *   - Dots — both event markers and the needle head — render as HTML
- *     elements positioned by %, so they stay circular instead of being
- *     stretched into ellipses by the SVG's preserveAspectRatio="none".
+ * Illustrative sample data — there is no fleet-health / alerts endpoint wired
+ * to the marketing site, so the series + rows are deterministic fakes (pure +
+ * seedless, identical SSR + client) and the chart is labelled "Illustrative".
  */
 
-import { useEffect, useRef, useState } from "react";
-import { motion, useMotionTemplate } from "framer-motion";
-import { useReducedMotion, useMagnetic } from "@/lib/motion";
+import { motion } from "framer-motion";
 import { ActShell } from "./ActShell";
 
-interface Lane {
-  k: string;
-  /** Hex color of the surface line. */
+// Status triad — matches the dashboard Fleet Overview / Triage (red / orange /
+// green) so the graph reads as the same product surface.
+const RED = "#f94b4b"; // critical
+const ORANGE = "#ff8f57"; // needs review
+const GREEN = "#48c84a"; // healthy
+
+const HOURS = 24; // 24h of hourly points (+ the current point)
+
+// Deterministic fake series: a smooth wave around `base` (peak deviation
+// `amp`), clamped ≥ 0. Pure + seedless (no Math.random / no Date) so SSR and
+// client render identically — no hydration mismatch.
+function fakeSeries(base: number, amp: number, phase: number): number[] {
+  const n = HOURS + 1;
+  return Array.from({ length: n }, (_, i) => {
+    const wave =
+      Math.sin(i * 0.55 + phase) * 0.6 + Math.sin(i * 0.23 + phase * 1.7) * 0.4;
+    return Math.max(0, Math.round(base + wave * amp));
+  });
+}
+
+function niceMax(v: number): number {
+  if (v <= 5) return 5;
+  if (v <= 10) return 10;
+  const step = v <= 50 ? 5 : v <= 100 ? 10 : 25;
+  return Math.ceil(v / step) * step;
+}
+
+const Y_DIVISIONS = 5;
+function yTicks(maxY: number): number[] {
+  const step = maxY / Y_DIVISIONS;
+  return Array.from({ length: Y_DIVISIONS + 1 }, (_, i) => maxY - i * step);
+}
+
+interface Series {
+  key: string;
   color: string;
-  /** 14 daily readings, normalized 0..1 (1 = surface, 0 = bed). */
-  data: number[];
+  count: number;
+  points: number[];
 }
 
-// Each lane reads HIGH when healthy and DROPS during its anomaly window —
-// the chart shape literally is the alert. Lane colors are picked for
-// hue separation (warm amber → sun yellow → signal green) so the three
-// curves remain legible when they cross.
-const LANES: Lane[] = [
-  {
-    k: "exposure",
-    color: "#F4A847", // Striking amber/orange — light/sun association
-    // Brief dip at D-11/D-10: backlight saturated the lens, quality
-    // bottomed at 0.58 for two windows, then recovered.
-    data: [0.93, 0.92, 0.93, 0.62, 0.58, 0.92, 0.93, 0.92, 0.93, 0.92, 0.93, 0.92, 0.93, 0.92],
-  },
-  {
-    k: "focus",
-    color: "#F0D85B", // Sun yellow — distinct mid-hue between amber and green
-    // Steady decline from D-10 onward: sharpness sags as the lens fouls.
-    data: [0.88, 0.87, 0.88, 0.86, 0.80, 0.70, 0.60, 0.50, 0.42, 0.36, 0.30, 0.24, 0.20, 0.16],
-  },
-  {
-    k: "confidence p50",
-    color: "#5FB869", // Signal Bright — the brand's confident green
-    // Drop from D-8: p50 collapses 0.92 → 0.12 over six days.
-    data: [0.92, 0.91, 0.92, 0.91, 0.90, 0.89, 0.82, 0.72, 0.60, 0.48, 0.36, 0.26, 0.18, 0.12],
-  },
+const SERIES: Series[] = [
+  { key: "Critical", color: RED, count: 2, points: fakeSeries(2, 1.5, 0.4) },
+  { key: "Review", color: ORANGE, count: 6, points: fakeSeries(6, 2.6, 2.1) },
+  { key: "Healthy", color: GREEN, count: 28, points: fakeSeries(28, 4, 3.7) },
 ];
 
-interface Event {
-  laneIdx: number;
-  day: number;
-  label: string;
-  body: string;
+interface TriageItem {
+  sev: "Critical" | "Review";
+  color: string;
+  title: string;
+  time: string;
+  message: string;
+  cam: string;
+  loc: string;
 }
 
-const EVENTS: Event[] = [
+const TRIAGE: TriageItem[] = [
   {
-    laneIdx: 0,
-    day: 3,
-    label: "exposure dipped",
-    body: "Backlight saturated the lens between 18:40 and 19:10. Quality bottomed at 0.58 for two windows.",
+    sev: "Critical",
+    color: RED,
+    title: "Blocked lens",
+    time: "14m",
+    message: "Online, but returning a flat, empty image.",
+    cam: "dock_cam_03",
+    loc: "cold-storage · Dock B",
   },
   {
-    laneIdx: 1,
-    day: 5,
-    label: "focus declining",
-    body: "Sharpness sagging since D-10. Likely lens fouling — schedule a clean before it hits zero.",
+    sev: "Review",
+    color: ORANGE,
+    title: "Confidence drift",
+    time: "2h",
+    message: "Confidence drifted 0.92 → 0.68 over six hours.",
+    cam: "gate_cam_07",
+    loc: "logistics hub · North Gate",
   },
   {
-    laneIdx: 2,
-    day: 7,
-    label: "confidence drop",
-    body: "p50 fell 0.92 → 0.72 in two days, still falling. Cause: sun-angle shift on the dock-facing lens.",
+    sev: "Review",
+    color: ORANGE,
+    title: "Exposure spike",
+    time: "20m",
+    message: "Golden-hour backlight saturating the lens; quality at 0.58.",
+    cam: "yard_cam_11",
+    loc: "industrial yard · Yard 2",
   },
 ];
-
-const AMBER = "#E8C06B";
-// Vertical amp used by lanePath. Higher = more dramatic drops on screen.
-// 9 keeps the three lanes from colliding inside the viewBox 0..60.
-const AMP = 9;
-
-// Seconds for the one-shot auto-sweep to traverse 0 → 1, eased.
-const SWEEP_SECONDS = 5;
-
-// easeInOutCubic — slow start, fast middle, slow end. The same curve
-// scroll-driven animations use to feel "physical" rather than mechanical.
-function easeInOutCubic(t: number): number {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-}
 
 export function Act04Drift() {
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const chartRef = useRef<HTMLDivElement | null>(null);
-  // Starts at 0; auto-sweeps to 1 once when the section enters the
-  // viewport, then becomes manual-only.
-  const [progress, setProgress] = useState(0);
-  const [dragging, setDragging] = useState(false);
-  const [inView, setInView] = useState(false);
-  const playedRef = useRef(false);
-  const reduced = useReducedMotion();
-
-  const updateFromX = (clientX: number) => {
-    const el = chartRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const p = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-    setProgress(p);
-  };
-
-  const onHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    // Any user interaction aborts the auto-sweep permanently — the
-    // handle becomes manual-only from this point on.
-    playedRef.current = true;
-    setDragging(true);
-    e.currentTarget.setPointerCapture?.(e.pointerId);
-    updateFromX(e.clientX);
-  };
-  const onHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!dragging) return;
-    updateFromX(e.clientX);
-  };
-  const onHandleUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    setDragging(false);
-    e.currentTarget.releasePointerCapture?.(e.pointerId);
-  };
-
-  const onHandleKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    const step = 1 / 13;
-    if (e.key === "ArrowLeft") {
-      setProgress((p) => Math.max(0, p - step));
-      e.preventDefault();
-    } else if (e.key === "ArrowRight") {
-      setProgress((p) => Math.min(1, p + step));
-      e.preventDefault();
-    } else if (e.key === "Home") {
-      setProgress(0);
-      e.preventDefault();
-    } else if (e.key === "End") {
-      setProgress(1);
-      e.preventDefault();
-    }
-  };
-
-  // While dragging, pin cursor + suppress text selection on the body.
-  // Both persist even when the pointer leaves the small handle target
-  // during a fast drag, and both restore cleanly on release.
-  useEffect(() => {
-    if (!dragging) return;
-    const prevCursor = document.body.style.cursor;
-    const prevUserSelect = document.body.style.userSelect;
-    const prevWebkitUserSelect = document.body.style.webkitUserSelect;
-    document.body.style.cursor = "grabbing";
-    document.body.style.userSelect = "none";
-    document.body.style.webkitUserSelect = "none";
-    return () => {
-      document.body.style.cursor = prevCursor;
-      document.body.style.userSelect = prevUserSelect;
-      document.body.style.webkitUserSelect = prevWebkitUserSelect;
-    };
-  }, [dragging]);
-
-  // Reduced-motion users see the fully-scrubbed end state immediately
-  // and skip the sweep entirely.
-  useEffect(() => {
-    if (reduced) {
-      playedRef.current = true;
-      setProgress(1);
-    }
-  }, [reduced]);
-
-  // Trigger the one-shot sweep when the section comes into view. We
-  // disconnect after the first hit so re-entering doesn't replay it.
-  useEffect(() => {
-    const el = rootRef.current;
-    if (!el || playedRef.current) return;
-    const obs = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setInView(true);
-          obs.disconnect();
-        }
-      },
-      { threshold: 0.35 },
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
-  // Auto-sweep loop — runs once when the section first enters view.
-  // Time-based easing means progress = ease(elapsed / SWEEP_SECONDS), so
-  // the needle accelerates into the middle of the window and decelerates
-  // into "today". Any drag interaction sets playedRef.current = true,
-  // which causes this effect (re-run on dragging-change) to bail.
-  useEffect(() => {
-    if (!inView || dragging || reduced || playedRef.current) return;
-    let raf = 0;
-    const start = performance.now();
-    const tick = (now: number) => {
-      const t = Math.min(1, (now - start) / 1000 / SWEEP_SECONDS);
-      setProgress(easeInOutCubic(t));
-      if (t >= 1) {
-        playedRef.current = true;
-        return;
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [inView, dragging, reduced]);
-
-  const dayIdx = Math.min(13, Math.floor(progress * 14));
-  const dayLabel = `D-${14 - dayIdx}`;
-  const needleX = 4 + progress * 92;
-
-  // Each event activates when the needle has passed its day. Lanes glow
-  // independently based on their own event status.
-  const eventsActive = EVENTS.map((e) => progress > e.day / 13);
-  const laneActiveByIdx = LANES.map((_, li) => {
-    const idx = EVENTS.findIndex((e) => e.laneIdx === li);
-    return idx >= 0 ? eventsActive[idx] : false;
-  });
-
   return (
     <ActShell
       id="act-drift"
@@ -245,497 +110,374 @@ export function Act04Drift() {
       kicker="drift, kept visible"
       drench="moss"
       hideKicker
-      tall
-      fixedBg={false}
       phase={2}
-      className="!min-h-[100svh]"
     >
-      <div
-        ref={rootRef}
-        className="relative"
-        style={{ minHeight: "100vh" }}
-      >
-        <div className="relative h-screen w-full overflow-hidden">
-          <div className="shell relative z-10 flex h-full flex-col pt-28 pb-10 md:pt-32 md:pb-14">
-            <div className="flex items-baseline gap-3">
-              <span className="font-mono text-[11px] tracking-mono uppercase text-ink-mute">
-                cam_bay_07 · 14d · {dayLabel}
-              </span>
-            </div>
+      <div className="shell relative z-10 flex min-h-[100svh] flex-col justify-center pb-16 pt-28 md:pb-20 md:pt-32">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          className="grid grid-cols-12 items-end gap-x-8 gap-y-6"
+        >
+          <h2
+            className="col-span-12 font-display md:col-span-8"
+            style={{
+              fontSize: "clamp(32px, 5vw, 72px)",
+              lineHeight: 1.0,
+              letterSpacing: "-0.035em",
+              fontWeight: 700,
+              color: "rgba(245, 241, 231, 0.6)",
+            }}
+          >
+            Your fleet&apos;s health, <em className="italic-accent">hour by hour.</em>
+          </h2>
+          <p
+            className="col-span-12 max-w-[46ch] text-ink-soft md:col-span-4 md:justify-self-end md:text-right"
+            style={{ lineHeight: 1.55 }}
+          >
+            Every camera sorted healthy, needs-review, or critical. You see
+            drift start here — before it reaches your pager.
+          </p>
+        </motion.div>
 
-            <div className="mt-8 grid grid-cols-12 items-end gap-x-8 gap-y-6 md:mt-10">
-              <h2
-                className="col-span-12 font-display md:col-span-9"
-                style={{
-                  fontSize: "clamp(32px, 5.4vw, 80px)",
-                  lineHeight: 1.0,
-                  letterSpacing: "-0.035em",
-                  fontWeight: 700,
-                  color: "rgba(245, 241, 231, 0.6)",
-                }}
-              >
-                Confidence slips <em className="italic-accent">before</em>
-                <br />
-                the pager goes off.
-              </h2>
-              <p
-                className="col-span-12 max-w-[44ch] text-ink-soft md:col-span-3 md:justify-self-end md:text-right"
-                style={{ lineHeight: 1.55 }}
-              >
-                Three signals per camera. The same model that ran cleanly all
-                summer can fall off a cliff the day the sun moves.
-              </p>
-            </div>
-
-            {/* Mobile lane legend — replaces the absolute lane labels at <md
-                because the in-chart labels collide with the curves on
-                narrow viewports. */}
-            <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-1.5 font-mono text-[9.5px] tracking-mono uppercase text-ink-soft md:hidden">
-              {LANES.map((lane) => (
-                <span key={lane.k} className="inline-flex items-center gap-1.5">
-                  <span
-                    aria-hidden="true"
-                    className="inline-block h-1.5 w-1.5 rounded-full"
-                    style={{ background: lane.color }}
-                  />
-                  {lane.k}
-                </span>
-              ))}
-            </div>
-
-            {/* The signal-lane chart */}
-            <div className="relative mt-4 h-[44vh] min-h-[260px] md:mt-10 md:h-auto md:flex-1">
-              <div ref={chartRef} className="relative h-full w-full overflow-visible">
-                <svg
-                  viewBox="0 0 100 60"
-                  preserveAspectRatio="none"
-                  className="absolute inset-0 h-full w-full"
-                >
-                  <defs>
-                    {LANES.map((lane, li) => (
-                      <linearGradient
-                        key={lane.k}
-                        id={`drift-fill-${li}`}
-                        x1="0"
-                        x2="0"
-                        y1="0"
-                        y2="1"
-                      >
-                        <stop offset="0%" stopColor={lane.color} stopOpacity="0.32" />
-                        <stop offset="100%" stopColor={lane.color} stopOpacity="0" />
-                      </linearGradient>
-                    ))}
-                  </defs>
-
-                  {/* horizontal hairlines for tone */}
-                  {[0, 1, 2, 3].map((i) => (
-                    <line
-                      key={i}
-                      x1="0"
-                      y1={5 + i * 17}
-                      x2="100"
-                      y2={5 + i * 17}
-                      stroke="rgba(245,241,231,0.10)"
-                      strokeWidth="0.12"
-                      vectorEffect="non-scaling-stroke"
-                    />
-                  ))}
-
-                  {/* lanes — paths only; dots and labels are HTML below so
-                      they don't warp with preserveAspectRatio="none". */}
-                  {LANES.map((lane, li) => {
-                    const baseY = 14 + li * 15;
-                    const surface = lanePath(lane.data, baseY, AMP);
-                    const reflection = `${surface} L 100 ${baseY + AMP + 1} L 0 ${baseY + AMP + 1} Z`;
-                    const active = laneActiveByIdx[li];
-                    return (
-                      <g key={lane.k}>
-                        <path d={reflection} fill={`url(#drift-fill-${li})`} />
-                        <path
-                          d={surface}
-                          fill="none"
-                          stroke={lane.color}
-                          strokeWidth={active ? "0.55" : "0.35"}
-                          strokeLinejoin="round"
-                          vectorEffect="non-scaling-stroke"
-                          style={{
-                            filter: active
-                              ? "drop-shadow(0 0 4px rgba(232,192,107,0.7))"
-                              : "none",
-                            transition:
-                              "filter 600ms ease, stroke-width 600ms ease",
-                          }}
-                        />
-                      </g>
-                    );
-                  })}
-
-                  {/* Per-event vertical guide lines, scoped to each lane.
-                      Stretching is in the line's own direction (vertical),
-                      so visible warping is minimal — these stay in SVG. */}
-                  {EVENTS.map((event, i) => {
-                    const x = 4 + (event.day / 13) * 92;
-                    const baseY = 14 + event.laneIdx * 15;
-                    return (
-                      <line
-                        key={i}
-                        x1={x}
-                        x2={x}
-                        y1={baseY - 1.5}
-                        y2={baseY + AMP + 1}
-                        stroke="rgba(232,192,107,0.6)"
-                        strokeWidth="0.18"
-                        strokeDasharray="1.2 1.4"
-                        vectorEffect="non-scaling-stroke"
-                        style={{
-                          opacity: eventsActive[i] ? 1 : 0,
-                          transition: "opacity 600ms ease",
-                        }}
-                      />
-                    );
-                  })}
-
-                  {/* Needle line is rendered in the transform-locked
-                      group below alongside the handle — so the two can
-                      never desync (see NeedleGroup wrapper). */}
-                </svg>
-
-                {/* HTML overlays — anything circular goes here so the
-                    chart's preserveAspectRatio="none" doesn't squash dots
-                    into ellipses. */}
-                <div className="pointer-events-none absolute inset-0">
-                  {/* Per-event data-point dots */}
-                  {EVENTS.map((event, i) => {
-                    const x = 4 + (event.day / 13) * 92;
-                    const baseY = 14 + event.laneIdx * 15;
-                    const dataPointY =
-                      baseY + (1 - LANES[event.laneIdx].data[event.day]) * AMP;
-                    return (
-                      <div
-                        key={i}
-                        className="absolute h-2.5 w-2.5 rounded-full transition-opacity duration-700 md:h-3 md:w-3"
-                        style={{
-                          left: `${x}%`,
-                          top: `${(dataPointY / 60) * 100}%`,
-                          transform: "translate(-50%, -50%)",
-                          background: AMBER,
-                          opacity: eventsActive[i] ? 1 : 0,
-                          boxShadow:
-                            "0 0 0 4px rgba(232, 192, 107, 0.22), 0 0 12px rgba(232, 192, 107, 0.4)",
-                        }}
-                      />
-                    );
-                  })}
-
-                  {/* Static needle head dot removed — the draggable
-                      handle below now sits at the top of the needle and
-                      serves as the visible "head". */}
-                </div>
-
-                {/* Lane labels — HTML overlay positioned by %; text renders
-                    at native proportions instead of being stretched by the
-                    SVG viewBox. Hidden on mobile where a legend strip above
-                    the chart replaces them (the in-chart labels collide
-                    with the curves at narrow widths). */}
-                <div className="pointer-events-none absolute inset-0 hidden md:block">
-                  {LANES.map((lane, li) => {
-                    const baseY = 14 + li * 15;
-                    const labelY = baseY - 2;
-                    return (
-                      <div
-                        key={lane.k}
-                        className="absolute font-mono text-[9px] uppercase tracking-[0.18em] md:text-[10px]"
-                        style={{
-                          left: "0.5%",
-                          bottom: `${((60 - labelY) / 60) * 100}%`,
-                          color: "rgba(245, 241, 231, 0.88)",
-                        }}
-                      >
-                        {lane.k.toUpperCase()}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* NeedleGroup — vertical line + draggable handle live
-                    inside this wrapper as siblings. Only the wrapper
-                    moves (one translate3d on a GPU layer); the line
-                    and handle have static positions inside it, so they
-                    are rigidly locked together no matter how often
-                    `needleX` updates.
-
-                    `inset: 0` makes the wrapper reliably span the full
-                    chart area (more robust than `height: 100%` through
-                    a flex-1 chain); `translate3d(${needleX}%, …)`
-                    translates by a percentage of the wrapper's own
-                    width, which equals the chart width — so the bar
-                    lands at needleX% of the chart with no JS-measured
-                    sizes. */}
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 z-20"
-                  style={{
-                    transform: `translate3d(${needleX}%, 0, 0)`,
-                    willChange: "transform",
-                  }}
-                >
-                  {/* Needle line — kept as a sub-SVG so the stroke
-                      preserves the same hairline look it had inside
-                      the main chart SVG. Static content; only the
-                      wrapper transforms. */}
-                  <svg
-                    preserveAspectRatio="none"
-                    viewBox="0 0 1 60"
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "1px",
-                      height: "100%",
-                      overflow: "visible",
-                      transform: "translateX(-0.5px)",
-                    }}
-                  >
-                    <line
-                      x1="0.5"
-                      x2="0.5"
-                      y1="2"
-                      y2="58"
-                      stroke="rgba(245,241,231,0.9)"
-                      strokeWidth="0.22"
-                      vectorEffect="non-scaling-stroke"
-                    />
-                  </svg>
-
-                  {/* Draggable handle — sits at the top of the needle
-                      line and serves as its visible head. Arrows hint
-                      the affordance; the handle is a slider for a11y
-                      and supports keyboard nav (←/→/Home/End). */}
-                  <div
-                    className={`absolute flex select-none touch-none items-center gap-1.5 whitespace-nowrap rounded-full border border-ink/35 bg-glass-bg px-2.5 py-1 backdrop-blur-md transition-[border-color,box-shadow] duration-200 hover:border-ink/55 focus-visible:border-ink/70 focus-visible:outline-none before:absolute before:-inset-3 before:rounded-full before:content-[''] ${
-                      dragging ? "cursor-grabbing" : "cursor-grab"
-                    }`}
-                    style={{
-                      top: `${(2 / 60) * 100}%`,
-                      left: 0,
-                      transform: "translate(-50%, -50%)",
-                      pointerEvents: "auto",
-                      boxShadow: dragging
-                        ? "0 0 0 3px rgba(245,241,231,0.10), 0 6px 18px -8px rgba(0,0,0,0.6)"
-                        : "0 4px 12px -8px rgba(0,0,0,0.5)",
-                    }}
-                    role="slider"
-                    aria-label="Scrub the 14-day drift window"
-                    aria-valuemin={0}
-                    aria-valuemax={13}
-                    aria-valuenow={dayIdx}
-                    aria-valuetext={dayLabel}
-                    tabIndex={0}
-                    onPointerDown={onHandleDown}
-                    onPointerMove={onHandleMove}
-                    onPointerUp={onHandleUp}
-                    onPointerCancel={onHandleUp}
-                    onKeyDown={onHandleKey}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="font-mono text-[11px] leading-none text-ink-soft"
-                    >
-                      ‹
-                    </span>
-                    <span
-                      className="inline-block text-center font-mono text-[10px] tracking-kicker uppercase text-ink"
-                      style={{ minWidth: "3.6ch" }}
-                    >
-                      {dayLabel}
-                    </span>
-                    <span
-                      aria-hidden="true"
-                      className="font-mono text-[11px] leading-none text-ink-soft"
-                    >
-                      ›
-                    </span>
-                  </div>
-                </div>
-
-                {/* Per-event alert cards positioned next to their dots.
-                    Each card hugs its event's data-point with a small
-                    horizontal offset; cards whose dot sits in the right
-                    half of the chart flip to the left so they don't
-                    overflow the chart container. */}
-                {EVENTS.map((event, i) => {
-                  const dotX = 4 + (event.day / 13) * 92;
-                  const baseY = 14 + event.laneIdx * 15;
-                  const dotY =
-                    ((baseY +
-                      (1 - LANES[event.laneIdx].data[event.day]) * AMP) /
-                      60) *
-                    100;
-                  const placeRight = dotX < 60;
-                  return (
-                    <div
-                      key={i}
-                      className="pointer-events-none absolute z-10 hidden w-[min(70vw,240px)] md:block"
-                      style={{
-                        left: `${dotX}%`,
-                        top: `${dotY}%`,
-                        transform: placeRight
-                          ? "translate(14px, -80%)"
-                          : "translate(calc(-100% - 14px), -80%)",
-                      }}
-                    >
-                      <EventCard
-                        event={event}
-                        lane={LANES[event.laneIdx]}
-                        active={eventsActive[i]}
-                      />
-                    </div>
-                  );
-                })}
-
-                {/* Time axis */}
-                <div className="absolute inset-x-0 bottom-0 flex justify-between pt-2 font-mono text-[10px] tracking-mono uppercase text-ink-soft">
-                  <span>14 days ago</span>
-                  <span>today</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Mobile event strip — replaces the absolute event cards at
-                <md. Always-visible so the user gets the alert content
-                without having to grab the small needle handle; the on-chart
-                marker dots still glow as the needle passes their day. */}
-            <div className="mt-6 grid grid-cols-1 gap-3 md:hidden">
-              {EVENTS.map((event, i) => {
-                const lane = LANES[event.laneIdx];
-                return (
-                  <div key={i}>
-                    <div className="mb-1.5 flex items-center gap-2 font-mono text-[10px] tracking-kicker uppercase text-ink-soft">
-                      <span
-                        aria-hidden="true"
-                        className="inline-block h-1.5 w-1.5 rounded-full"
-                        style={{ background: lane.color }}
-                      />
-                      <span>D-{13 - event.day}</span>
-                      <span aria-hidden="true" className="text-ink-faint">·</span>
-                      <span>{lane.k}</span>
-                    </div>
-                    <EventCard event={event} lane={lane} active />
-                  </div>
-                );
-              })}
-            </div>
-
-            <p className="mt-4 font-mono text-[10px] tracking-mono uppercase text-ink-soft md:mt-5">
-              <span className="hidden md:inline">drag the marker to scrub the window · each lane carries its own anomaly</span>
-              <span className="md:hidden">scrub the marker · each lane carries its own anomaly</span>
-            </p>
-          </div>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+          className="mt-10 grid grid-cols-1 items-stretch gap-6 md:mt-12 lg:grid-cols-2"
+        >
+          <FleetTile />
+          <TriageTile />
+        </motion.div>
       </div>
     </ActShell>
   );
 }
 
-function EventCard({
-  event,
-  lane,
-  active,
-}: {
-  event: Event;
-  lane: Lane;
-  active: boolean;
-}) {
-  // Same quiet magnetic recipe MarginaliaPanel uses — small outer pull,
-  // smaller inner pull for parallax, amber cursor blob so the warn
-  // semantic carries into the hover affordance. When the card is hidden
-  // the magnetic still binds, but pointer-events handled below ensure
-  // the cursor can't grab an invisible card.
-  const { ref, sx, sy, slx, sly, gx, gy, hovered, handlers } =
-    useMagnetic<HTMLDivElement>({ outer: 0.025, inner: 0.01 });
-  const blob = useMotionTemplate`radial-gradient(280px circle at ${gx}% ${gy}%, rgba(232, 192, 107, 0.14), transparent 70%)`;
+/* ── Fleet Overview ─────────────────────────────────────────────────── */
 
+function FleetTile() {
   return (
-    <motion.div
-      ref={ref}
-      className="relative overflow-hidden rounded-2xl border p-4 transition-[opacity,border-color,box-shadow] duration-700 md:p-5"
-      style={{
-        background: "rgba(245, 241, 231, 0.05)",
-        borderColor: active
-          ? "rgba(232, 192, 107, 0.5)"
-          : "rgba(245, 241, 231, 0.10)",
-        backdropFilter: "blur(18px) saturate(135%)",
-        WebkitBackdropFilter: "blur(18px) saturate(135%)",
-        opacity: active ? 1 : 0,
-        // Magnetic transforms compose with the inactive-state lift via
-        // translateY done in motion.div's style.y below.
-        x: sx,
-        y: sy,
-        pointerEvents: active ? "auto" : "none",
-        boxShadow: active
-          ? "0 20px 44px -22px rgba(232, 192, 107, 0.4), 0 1px 0 rgba(255,255,255,0.06) inset"
-          : "0 1px 0 rgba(255,255,255,0.04) inset",
-      }}
-      {...handlers}
-    >
-      <motion.span
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background: blob,
-          opacity: hovered && active ? 1 : 0,
-          transition: "opacity 280ms cubic-bezier(0.22, 1, 0.36, 1)",
-        }}
-      />
-      <motion.div
-        className="relative z-10"
-        style={{ x: slx, y: sly }}
-      >
-        <div className="mb-2 flex items-baseline justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span
-              aria-hidden="true"
-              className="inline-block h-1.5 w-1.5 rounded-full transition-colors duration-500"
-              style={{
-                background: active ? AMBER : "rgba(245, 241, 231, 0.3)",
-                boxShadow: active ? "0 0 0 3px rgba(232, 192, 107, 0.20)" : "none",
-              }}
-            />
-            <span
-              className="font-mono text-[10px] tracking-kicker uppercase"
-              style={{
-                color: active ? AMBER : "rgba(245, 241, 231, 0.5)",
-              }}
-            >
-              {event.label}
-            </span>
-          </div>
-          <span className="font-mono text-[9px] tracking-mono uppercase text-ink-faint">
-            D-{14 - event.day} · {lane.k}
-          </span>
-        </div>
-        <p
-          className="text-[12px] text-ink md:text-[12.5px]"
-          style={{ lineHeight: 1.55, opacity: active ? 1 : 0.75 }}
+    <div className="tile-dark flex flex-col rounded-3xl p-6 md:p-8">
+      <header className="flex items-baseline justify-between gap-3">
+        <h3
+          className="font-display text-ink"
+          style={{ fontSize: "clamp(18px, 1.5vw, 24px)", fontWeight: 700, letterSpacing: "-0.02em" }}
         >
-          {event.body}
-        </p>
-      </motion.div>
-    </motion.div>
+          Fleet Overview
+        </h3>
+        <span className="font-mono text-[10px] tracking-mono uppercase text-ink-mute">
+          Last 24 hours
+        </span>
+      </header>
+
+      <div
+        className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-full px-5 py-3"
+        style={{ background: "rgba(245, 241, 231, 0.04)" }}
+      >
+        <LegendItem color={RED} count={2} label="Critical" kind="alert" />
+        <LegendItem color={ORANGE} count={6} label="Review" kind="alert" />
+        <LegendItem color={GREEN} count={28} label="Healthy" kind="check" />
+      </div>
+
+      <FleetHealthChart lines={SERIES} />
+    </div>
   );
 }
 
-function lanePath(data: number[], baseY: number, amp: number) {
-  const n = data.length;
-  const stepX = 100 / (n - 1);
-  return data
-    .map((v, i) => {
-      const x = i * stepX;
-      const y = baseY + (1 - v) * amp;
-      if (i === 0) return `M ${x.toFixed(2)} ${y.toFixed(2)}`;
-      const prevX = (i - 1) * stepX;
-      const cx = (prevX + x) / 2;
-      return `C ${cx.toFixed(2)} ${(baseY + (1 - data[i - 1]) * amp).toFixed(2)}, ${cx.toFixed(2)} ${y.toFixed(2)}, ${x.toFixed(2)} ${y.toFixed(2)}`;
-    })
-    .join(" ");
+function LegendItem({
+  color,
+  count,
+  label,
+  kind,
+}: {
+  color: string;
+  count: number;
+  label: string;
+  kind: "alert" | "check";
+}) {
+  return (
+    <span className="inline-flex items-center gap-2.5">
+      <span
+        aria-hidden
+        className="grid h-6 w-6 shrink-0 place-items-center rounded-full"
+        style={{ background: color }}
+      >
+        {kind === "check" ? <CheckGlyph /> : <AlertGlyph />}
+      </span>
+      <span className="font-display text-[15px] font-semibold text-ink">
+        {count} <span className="font-medium text-ink-soft">{label}</span>
+      </span>
+    </span>
+  );
+}
+
+function AlertGlyph() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M12 7v6" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" />
+      <circle cx="12" cy="17" r="1.5" fill="#fff" />
+    </svg>
+  );
+}
+
+function CheckGlyph() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M5 12.5l4.5 4.5L19 7.5"
+        stroke="#fff"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+// Hand-rolled SVG line+area chart (no chart library) — the viewBox is stretched
+// to the plot box (preserveAspectRatio="none"); vector-effect="non-scaling-stroke"
+// keeps line/grid widths constant despite the non-uniform scale.
+function FleetHealthChart({ lines }: { lines: Series[] }) {
+  const n = lines[0]?.points.length ?? 0;
+  const maxY = niceMax(Math.max(1, ...lines.flatMap((l) => l.points)));
+  const ticks = yTicks(maxY);
+  const VW = 100;
+  const VH = 100;
+  const PAD = 6;
+  const x = (i: number) => (n <= 1 ? 0 : (i / (n - 1)) * VW);
+  const y = (v: number) => PAD + (1 - v / maxY) * (VH - PAD * 2);
+  const areaD = (pts: number[]) =>
+    pts.map((v, i) => `${i === 0 ? "M" : "L"}${x(i)},${y(v)}`).join("") +
+    `L${x(n - 1)},${y(0)}L${x(0)},${y(0)}Z`;
+
+  return (
+    <div
+      className="relative mt-5 flex flex-1 flex-col gap-2 rounded-2xl p-4 md:p-5"
+      style={{ background: "rgba(245, 241, 231, 0.03)" }}
+    >
+      <span className="pointer-events-none absolute right-4 top-3 z-10 font-mono text-[9px] uppercase tracking-[0.2em] text-ink-faint">
+        Illustrative
+      </span>
+
+      <div className="flex flex-1 gap-2" style={{ minHeight: "clamp(190px, 26vh, 300px)" }}>
+        {/* y scale — evenly spaced ticks, each aligned to its gridline */}
+        <div className="relative w-7 shrink-0 text-right font-mono text-[10px] tabular-nums text-ink-faint">
+          {ticks.map((t) => (
+            <span
+              key={t}
+              className="absolute right-0 -translate-y-1/2 leading-none"
+              style={{ top: `${y(t)}%` }}
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+
+        {/* plot */}
+        <div className="relative min-w-0 flex-1">
+          <svg
+            viewBox={`0 0 ${VW} ${VH}`}
+            preserveAspectRatio="none"
+            className="absolute inset-0 h-full w-full overflow-visible"
+            aria-hidden
+          >
+            <defs>
+              {lines.map((l, idx) => (
+                <linearGradient key={idx} id={`fleet-grad-${idx}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" style={{ stopColor: l.color, stopOpacity: 0.28 }} />
+                  <stop offset="100%" style={{ stopColor: l.color, stopOpacity: 0 }} />
+                </linearGradient>
+              ))}
+            </defs>
+
+            {ticks.map((t) => (
+              <line
+                key={t}
+                x1={0}
+                x2={VW}
+                y1={y(t)}
+                y2={y(t)}
+                stroke="rgba(245,241,231,0.08)"
+                strokeWidth={1}
+                vectorEffect="non-scaling-stroke"
+              />
+            ))}
+
+            {[...lines.keys()].reverse().map((idx) => (
+              <path key={`area-${idx}`} d={areaD(lines[idx].points)} fill={`url(#fleet-grad-${idx})`} />
+            ))}
+
+            {lines.map((l, idx) => (
+              <polyline
+                key={idx}
+                points={l.points.map((v, i) => `${x(i)},${y(v)}`).join(" ")}
+                fill="none"
+                stroke={l.color}
+                strokeWidth={2.25}
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+              />
+            ))}
+          </svg>
+        </div>
+      </div>
+
+      <div className="flex justify-between pl-9 font-mono text-[10px] uppercase tracking-mono text-ink-faint">
+        <span>24h ago</span>
+        <span>18h</span>
+        <span>12h</span>
+        <span>6h</span>
+        <span>Now</span>
+      </div>
+    </div>
+  );
+}
+
+/* ── Triage ─────────────────────────────────────────────────────────── */
+
+function TriageTile() {
+  return (
+    <div className="tile-dark flex flex-col rounded-3xl p-6 md:p-8">
+      <header className="flex items-baseline justify-between gap-3">
+        <h3
+          className="font-display text-ink"
+          style={{ fontSize: "clamp(18px, 1.5vw, 24px)", fontWeight: 700, letterSpacing: "-0.02em" }}
+        >
+          Triage{" "}
+          <span className="font-mono text-[11px] tracking-mono uppercase text-ink-mute">
+            what needs attention
+          </span>
+        </h3>
+        <span className="font-mono text-[10px] tracking-mono uppercase text-ink-mute">
+          {TRIAGE.length} open
+        </span>
+      </header>
+
+      <ul className="mt-2 flex flex-col divide-y divide-glass-stroke-2">
+        {TRIAGE.map((item) => (
+          <TriageRow key={item.cam} item={item} />
+        ))}
+      </ul>
+
+      <TriageBanner />
+    </div>
+  );
+}
+
+function TriageRow({ item }: { item: TriageItem }) {
+  const glow = `color-mix(in srgb, ${item.color} 55%, transparent)`;
+  return (
+    <li className="flex items-center gap-4 py-4">
+      {/* Camera snapshot — severity-bordered + glowing; image-icon placeholder
+          (no fleet-level snapshot endpoint on the marketing site). */}
+      <div
+        className="relative grid aspect-[16/10] w-20 shrink-0 place-items-center overflow-hidden rounded-lg md:w-24"
+        style={{
+          border: `2px solid ${item.color}`,
+          boxShadow: `0 0 16px ${glow}`,
+          background: "rgba(245, 241, 231, 0.06)",
+        }}
+      >
+        <ImageGlyph className="h-6 w-6 text-ink-faint" />
+      </div>
+
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span
+            className="shrink-0 rounded px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-mono"
+            style={{
+              background: `color-mix(in srgb, ${item.color} 20%, transparent)`,
+              color: item.color,
+            }}
+          >
+            {item.sev}
+          </span>
+          <span className="min-w-0 truncate font-display text-[14px] font-semibold text-ink">
+            {item.title}
+          </span>
+          <span className="shrink-0 text-[11px] text-ink-faint">· {item.time}</span>
+        </div>
+        <p className="line-clamp-2 text-[12px] text-ink-mute" style={{ lineHeight: 1.5 }}>
+          {item.message}
+        </p>
+        <div className="font-mono text-[9px] tracking-mono uppercase text-ink-faint">
+          {item.cam} · {item.loc}
+        </div>
+      </div>
+
+      <span className="shrink-0 self-center rounded-full border border-glass-stroke bg-glass-bg px-3.5 py-1.5 font-mono text-[10px] tracking-mono uppercase text-ink-soft">
+        Review
+      </span>
+    </li>
+  );
+}
+
+function TriageBanner() {
+  return (
+    <div
+      className="mt-4 flex items-center gap-3 rounded-2xl px-5 py-3.5"
+      style={{
+        background: "rgba(245, 241, 231, 0.04)",
+        border: `1px solid color-mix(in srgb, ${GREEN} 45%, transparent)`,
+      }}
+    >
+      <ShieldGlyph className="h-7 w-7 shrink-0" style={{ color: GREEN }} />
+      <div className="min-w-0">
+        <p className="text-[13px] font-semibold text-ink">
+          We&rsquo;re only showing what needs your attention.
+        </p>
+        <p className="text-[12px] text-ink-mute">
+          The rest were handled automatically.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function ImageGlyph({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden
+    >
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <circle cx="8.5" cy="9.5" r="1.5" />
+      <path d="M3 17l5-4 4 3 3-2 6 5" />
+    </svg>
+  );
+}
+
+function ShieldGlyph({
+  className = "",
+  style,
+}: {
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      style={style}
+      aria-hidden
+    >
+      <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z" />
+      <path d="M9 12l2 2 4-4" />
+    </svg>
+  );
 }
