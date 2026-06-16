@@ -16,9 +16,15 @@
   --creek-mid:     #4b816c;
   --creek-moss:    #81764b;
   --creek-dark:    #1c2a17;
-  --base:          #1a2613;
-  --base-2:        #0f1809;
-  --base-3:        #060a03;
+
+  /* base ramp — CHARCOAL. The dark-reskin (2026-06) ports the upstream-
+     dashboard #161616 surface; this deliberately overrides the former
+     Riverbed green base (#0f1809) and DESIGN.md's no-near-black rule. The
+     creek primaries above are now used only for the atmosphere orbs +
+     accents, exactly like the dashboard's --dn-creek-* tokens. */
+  --base:          #1d1d1d;
+  --base-2:        #161616;
+  --base-3:        #0d0d0d;
 
   /* ink — secondary copy sits at 60% so the contrast between body/sub-
      headlines and the italic-accent highlights reads harder. Hero (Act 01)
@@ -60,6 +66,13 @@
                    0 30px 60px -30px rgba(0, 0, 0, 0.6);
   --shadow-deep:   0 40px 90px -40px rgba(0, 0, 0, 0.85),
                    0 1px 0 rgba(255, 255, 255, 0.04) inset;
+
+  /* atmosphere — the global fixed backdrop (drifting creek orbs + film
+     grain), ported from upstream-dashboard's ShellBackdrop. Orbs are the
+     creek primaries over the charcoal base; tune opacity to taste. */
+  --atmo-orb-opacity:   0.28;
+  --atmo-orb-blur:      blur(clamp(60px, 8vw, 130px));
+  --atmo-grain-opacity: 0.2;
 
   /* type stacks — Satoshi everywhere except code */
   --font-display:  var(--font-satoshi), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -121,15 +134,11 @@ html {
 body {
   font-family: var(--font-body);
   color: var(--ink);
-  /* dashboard-style radial creek glows behind everything; positions are
-     driven by --o1x/y / --o2x/y; size and alpha multiply through --o1s/a
-     and --o2s/a so the orbs drift, breathe, and fade. */
-  background:
-    /* radial-gradient(900px 600px at var(--o1x) var(--o1y), rgba(95, 184, 134, 0.07), rgba(95, 184, 134, 0) 60%), */
-    /* radial-gradient(900px 700px at var(--o2x) var(--o2y), rgba(75, 129, 108, 0.10), rgba(75, 129, 108, 0) 60%), */
-    var(--base-2);
-  background-attachment: fixed;
-  animation: orb-drift 38s ease-in-out infinite;
+  /* TRANSPARENT on purpose: the charcoal base comes from `html` (the canvas)
+     + the fixed <Atmosphere/> layer behind everything. An opaque body
+     background is an in-flow block that paints OVER a z-index:-1 fixed layer,
+     which would hide the orbs + grain entirely. Keep this transparent. */
+  background: transparent;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -197,6 +206,94 @@ body {
   .drift-orbs {
     animation: none;
   }
+}
+
+/* =====================================================================
+   Atmosphere — the global fixed backdrop: drifting creek orbs + real film
+   grain, ported from upstream-dashboard's ShellBackdrop / theme.css.
+   Mounted once in layout.tsx as the backmost layer (z-index: -1); page
+   content sits above it, and the translucent Act drenches let it read
+   through so the whole site shares one dark dashboard atmosphere.
+   ===================================================================== */
+
+.atmo-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--base-2);
+}
+
+/* Zone variant — a STICKY layer pinned to the viewport (the homepage wraps Acts
+   02-05 in .atmo-zone). Sticky + margin-bottom:-100lvh → it pins to the viewport
+   like the fixed river (orbs drift in place, not scrolling up with the content)
+   while taking NO net flow space, so Act 02 starts flush at the zone top (no
+   gap). It releases over the final viewport of the zone, revealing the river
+   again for the current fold (Act 06). bottom:auto cancels the inherited
+   inset:0 bottom so it sticks to the top only. Orbs reuse the base anchors
+   (edge-hung), matching upstream-dashboard's .dn-backdrop / .dn-orb. */
+.atmo-layer-zone {
+  position: sticky;
+  top: 0;
+  bottom: auto;
+  height: 100lvh;
+  margin-bottom: -100lvh;
+  z-index: 0;
+}
+
+
+/* Grayscale fractal-noise film grain, tiled, low opacity (dashboard recipe:
+   feTurbulence baseFrequency 0.85, numOctaves 2, desaturated, 140px tile). */
+.atmo-layer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+  opacity: var(--atmo-grain-opacity);
+  pointer-events: none;
+}
+
+.atmo-orb {
+  position: absolute;
+  width: clamp(420px, 46vw, 1000px);
+  height: clamp(380px, 40vw, 920px);
+  border-radius: 50%;
+  filter: var(--atmo-orb-blur);
+  opacity: var(--atmo-orb-opacity);
+  will-change: transform;
+  /* Movement is JS-driven (Atmosphere.tsx): each orb is handed a fresh
+     random target every 14-26s, eased by this long transition so they
+     roam organically. The anchors below are the resting/reduced-motion
+     positions. */
+  transition: transform 20s cubic-bezier(0.45, 0, 0.55, 1);
+}
+.atmo-orb-1 { background: var(--creek-deep); bottom: -20%; left: -14%; }
+.atmo-orb-2 { background: var(--creek-deep); bottom: -24%; left: 2%; }
+.atmo-orb-3 { background: var(--creek-mid);  top: -16%; left: -6%; }
+.atmo-orb-4 { background: var(--creek-moss); top: -24%; right: -12%; }
+.atmo-orb-5 { background: var(--creek-moss); top: -26%; right: 3%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .atmo-orb { transition: none; }
+}
+
+/* Phones: drop to 3 orbs — the huge blurred layers are the heaviest paint
+   cost, and the difference is imperceptible at that scale. */
+@media (max-width: 767px) {
+  .atmo-orb-4,
+  .atmo-orb-5 { display: none; }
+}
+
+/* Reusable film-grain overlay — the same grayscale feTurbulence recipe as the
+   atmosphere layer, exposed as a class so it can sit over the hero/CTA video
+   (the dashboard texture, over footage). */
+.film-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+  opacity: var(--atmo-grain-opacity);
+  pointer-events: none;
 }
 
 /* Element resets wrapped in @layer base so Tailwind utilities (which live
@@ -360,6 +457,48 @@ body {
     0 1px 0 rgba(255, 255, 255, 0.10) inset,
     0 26px 54px -22px rgba(232, 192, 107, 0.55),
     0 0 0 1px rgba(232, 192, 107, 0.22);
+}
+
+/* =====================================================================
+   Solid dark tile — ports the dashboard .dn-tile: near-black fill (the page
+   base), a faint inset top rim + ambient shadow. Reads as a solid dark/gray
+   surface over the atmosphere rather than the frosted cream .glass-pane.
+   ===================================================================== */
+.tile-dark {
+  position: relative;
+  background: var(--base-2);
+  border: 1px solid rgba(245, 241, 231, 0.07);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 24px 60px -30px rgba(0, 0, 0, 0.7);
+}
+
+/* =====================================================================
+   Buttons. Primary is a dark solid pill (charcoal fill, faint cream rim,
+   Reed Cream label). Ghost is frosted translucent glass (.dn-glow-soft, from
+   the dashboard). The cursor sheen + magnetic lean are layered on by
+   MagneticButton (Framer Motion). backdrop-filter is var()-wrapped so Tailwind
+   v4's Lightning CSS keeps the unprefixed property.
+   ===================================================================== */
+
+.btn-dark {
+  background: #1e1e1e;
+  border: 1px solid rgba(245, 241, 231, 0.18);
+}
+.btn-dark:hover {
+  background: #262626;
+  border-color: rgba(245, 241, 231, 0.3);
+}
+
+.btn-frost {
+  background: rgba(245, 241, 231, 0.06);
+  border: 1px solid rgba(245, 241, 231, 0.18);
+  -webkit-backdrop-filter: var(--bf-btn, blur(10px) saturate(125%));
+  backdrop-filter: var(--bf-btn, blur(10px) saturate(125%));
+}
+.btn-frost:hover {
+  background: rgba(245, 241, 231, 0.12);
+  border-color: rgba(245, 241, 231, 0.32);
 }
 
 /* =====================================================================

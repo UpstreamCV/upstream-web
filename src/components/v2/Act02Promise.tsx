@@ -84,60 +84,65 @@ export function Act02Promise() {
               Upstream helps teams{" "}
               <em className="italic-accent">trust</em>{" "}it once it&apos;s running.
             </motion.p>
+          </div>
 
+          {/* Call-stream comparison — pulled out of the text column and broken
+              out FULL-BLEED so the two scrolling lanes take up most of the
+              screen width. It's a col-span-12 grid item (centered in the shell),
+              so `left:50% / translateX(-50%) / w-screen` recenters it on the
+              viewport. */}
+          <div className="relative left-1/2 col-span-12 w-screen -translate-x-1/2 px-[clamp(20px,4vw,56px)]">
             <StreamComparison />
+          </div>
 
+          {/* Closing — the question, centered, with the competitor-contrast
+              note beneath it. */}
+          <div className="col-span-12 mt-2 flex flex-col items-center text-center md:mt-4">
             <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.7 }}
-              className="mt-14 max-w-[58ch] text-ink-soft md:mt-20 md:text-lg"
-              style={{ lineHeight: 1.65 }}
-            >
-              The hard problem in CV isn&apos;t running a model. Countless
-              platforms already do that. The hard problem is the day the model
-              quietly stops working: a lens fogs, exposure shifts at golden
-              hour, a tracker fragments in crowded scenes, a rule starts firing
-              on shadows. Standard stacks treat those failures as someone
-              else&apos;s problem. We treat them as the problem.
-            </motion.p>
-
-            <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-              transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: 0.9 }}
-              className="mt-12 grid grid-cols-12 items-end gap-x-8 gap-y-6 md:mt-16"
+              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+              className="font-display"
+              style={{ maxWidth: "min(92vw, 760px)" }}
             >
-              <div className="col-span-12 md:col-span-7">
+              <span
+                className="block text-ink-soft"
+                style={{ fontSize: "clamp(14px, 1.2vw, 17px)", letterSpacing: "0.01em" }}
+              >
+                The question we answer:
+              </span>
+              <span
+                className="mt-4 block italic text-ink"
+                style={{
+                  fontSize: "clamp(26px, 3.6vw, 50px)",
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.02em",
+                  fontWeight: 700,
+                }}
+              >
+                does it still work next Tuesday at 7 PM in February rain, on the
+                camera you actually have?
+              </span>
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+              className="mt-12 w-full max-w-[440px] text-left"
+            >
+              <MarginaliaPanel kicker="competitor contrast" size="md">
                 <p
-                  className="font-display text-ink-soft"
-                  style={{
-                    fontSize: "clamp(17px, 1.4vw, 22px)",
-                    lineHeight: 1.45,
-                    letterSpacing: "-0.012em",
-                  }}
+                  className="font-display text-[14.5px] text-ink-soft md:text-[15px]"
+                  style={{ lineHeight: 1.5, letterSpacing: "-0.008em" }}
                 >
-                  The question Upstream is built to answer:
-                  <span className="block mt-3 text-ink italic">
-                    does it still work next Tuesday at 7 PM in February rain,
-                    on the camera you actually have?
-                  </span>
+                  Datadog watches infrastructure. Sentry catches software
+                  errors. Upstream watches whether your computer vision still
+                  tells the truth.
                 </p>
-              </div>
-              <div className="col-span-12 md:col-span-5 md:justify-self-end md:max-w-[320px]">
-                <MarginaliaPanel kicker="competitor contrast" size="md">
-                  <p
-                    className="font-display text-[14.5px] text-ink-soft md:text-[15px]"
-                    style={{ lineHeight: 1.5, letterSpacing: "-0.008em" }}
-                  >
-                    Datadog watches infrastructure. Sentry catches software
-                    errors. Upstream watches whether your computer vision is
-                    still telling the truth.
-                  </p>
-                </MarginaliaPanel>
-              </div>
+              </MarginaliaPanel>
             </motion.div>
           </div>
         </div>
@@ -392,7 +397,6 @@ function StreamComparison() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px -8% 0px" }}
       transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
-      className="mt-12 md:mt-14"
       aria-label="Two-lane call-stream comparison: most platforms vs. Upstream observing the same calls"
     >
       <style>{MARQUEE_CSS}</style>
@@ -494,13 +498,14 @@ function StreamCard({ call, lane }: StreamCardProps) {
   const view = lane === "trust" && call.trust ? call.trust : call.launch;
   const Icon = TYPE_ICONS[view.type];
 
-  // Tone tokens
+  // Tone tokens. The card fill is the dashboard's solid near-black tile
+  // (.dn-tile = #161616) — an opaque dark-gray tile that reads cleanly over the
+  // drifting orbs, matching the Triage / Fleet Overview tiles. Because it's
+  // opaque there's no backdrop-filter (nothing shows through to blur). Caught
+  // cards keep the amber border + glow as the "held for review" signal.
   const borderColor = isCaught
     ? "rgba(232, 192, 107, 0.55)"
-    : "rgba(245, 241, 231, 0.10)";
-  const background = isCaught
-    ? "rgba(232, 192, 107, 0.05)"
-    : "rgba(245, 241, 231, 0.045)";
+    : "rgba(255, 255, 255, 0.06)";
   const iconStroke = isCaught
     ? "rgba(232, 192, 107, 0.42)"
     : "rgba(75, 129, 108, 0.28)";
@@ -513,13 +518,14 @@ function StreamCard({ call, lane }: StreamCardProps) {
     <div
       className="flex w-[clamp(220px,72vw,260px)] shrink-0 flex-col gap-3 rounded-xl px-4 py-3.5 md:w-[268px] md:px-5 md:py-4"
       style={{
-        background,
+        // Solid dark-gray dashboard tile fill (.dn-tile) + the tile's shadow
+        // (inset top highlight + soft drop shadow). Caught cards layer the amber
+        // ring/glow over the same shadow.
+        background: "#161616",
         border: `1px solid ${borderColor}`,
-        backdropFilter: "blur(18px) saturate(135%)",
-        WebkitBackdropFilter: "blur(18px) saturate(135%)",
         boxShadow: isCaught
-          ? "0 0 0 1px rgba(232, 192, 107, 0.08), 0 20px 40px -22px rgba(232, 192, 107, 0.35)"
-          : undefined,
+          ? "inset 0 1px 0 rgba(255,255,255,0.04), 0 0 0 1px rgba(232,192,107,0.08), 0 20px 40px -22px rgba(232,192,107,0.35)"
+          : "inset 0 1px 0 rgba(255,255,255,0.04), 0 24px 60px -30px rgba(0,0,0,0.7)",
       }}
     >
       <div className="flex items-start gap-3 md:gap-3.5">

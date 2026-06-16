@@ -3,14 +3,11 @@
 /**
  * Act 01 — The water arrives.
  *
- * Full viewport. River footage edge-to-edge, FIXED to the viewport so
- * subsequent acts sweep over it as the page scrolls. No colored wash
- * on top of the video; only a minimal bottom-fade for type legibility.
- * The headline is vertically centered, "streams." carries the
- * italic-accent at maximum scale.
- *
- * Mobile (<768px) swaps the video for the poster image to avoid the
- * 19MB tax. Reduced-motion does the same.
+ * Full viewport. River footage edge-to-edge, FIXED to the viewport (z-index:-10)
+ * so it stays pinned while the page scrolls; the middle acts' grey/orb zone
+ * covers it and the current fold shows it again. No orbs/grain on the hero —
+ * just the river, with a minimal bottom-fade for type legibility. Mobile /
+ * reduced-motion swap the video for the poster still.
  */
 
 import { useEffect, useRef, useState } from "react";
@@ -29,6 +26,7 @@ export function Act01Water() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const mq = window.matchMedia("(max-width: 767px)");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setEnabled(!mq.matches);
     const onChange = (e: MediaQueryListEvent) => setEnabled(!e.matches);
     mq.addEventListener("change", onChange);
@@ -49,14 +47,8 @@ export function Act01Water() {
       id="act-water"
       className="relative isolate flex h-[100svh] min-h-[680px] w-full overflow-hidden"
     >
-      {/* Video / poster base — fixed to the viewport so subsequent acts
-          sweep over it as the page scrolls. The video stays put visually
-          while Act 02+'s opaque drench covers it from the bottom up. */}
-      <div
-        className="pointer-events-none fixed inset-0"
-        style={{ zIndex: -10 }}
-      >
-        {/* Poster always renders; it's the LCP candidate. */}
+      {/* River video / poster base — FIXED to the viewport (z-index:-10). */}
+      <div className="pointer-events-none fixed inset-0" style={{ zIndex: -10 }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={POSTER}
@@ -83,10 +75,8 @@ export function Act01Water() {
         ) : null}
       </div>
 
-      {/* No colored wash on top of the video. Type legibility comes from the
-          video's own brightness filter and a minimal bottom-only dark fade
-          (1/4 of viewport) so the headline area sits on a readable surface
-          without tinting the river. */}
+      {/* Type legibility comes from the video's brightness filter plus a
+          minimal bottom-only dark fade (1/4 of viewport). */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 bottom-0 h-[28%]"
@@ -129,8 +119,8 @@ export function Act01Water() {
             // text 60% except hero" directive, the hero stays untouched.
             style={{ lineHeight: 1.55, color: "rgba(245, 241, 231, 0.7)" }}
           >
-            The pipeline behind your cameras, kept honest.
-            We tell you the moment a single one stops telling the truth.
+            The pipeline behind your cameras — we catch the moment one
+            stops telling the truth.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 14 }}

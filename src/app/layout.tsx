@@ -12,7 +12,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   // Must match --base-2 in globals.css. Next requires a static color here.
-  themeColor: "#0f1809",
+  themeColor: "#161616",
 };
 
 const satoshi = localFont({

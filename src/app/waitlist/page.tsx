@@ -1,3 +1,4 @@
+import { Atmosphere } from "@/components/atmosphere/Atmosphere";
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { WaitlistScene } from "@/components/waitlist/WaitlistScene";
@@ -20,6 +21,7 @@ export const metadata = {
 export default function WaitlistPage() {
   return (
     <>
+      <Atmosphere />
       <Nav />
       <WaitlistScene />
       <main className="relative">

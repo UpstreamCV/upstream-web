@@ -1,3 +1,4 @@
+import { Atmosphere } from "@/components/atmosphere/Atmosphere";
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { MagneticButton } from "@/components/atmosphere/MagneticButton";
@@ -11,6 +12,7 @@ export const metadata = {
 export default function NotFound() {
   return (
     <>
+      <Atmosphere />
       <Nav />
       <main className="relative grid min-h-[80vh] place-items-center pt-40 pb-32">
         <div className="shell text-center">
