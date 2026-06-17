@@ -43,7 +43,7 @@ export function Nav() {
         initial={{ y: -16, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-        className="pointer-events-none fixed inset-x-0 top-0 z-[40]"
+        className="pointer-events-none fixed inset-x-0 top-0 z-[60]"
       >
         <div className="shell">
           <div
@@ -118,7 +118,7 @@ function NavCta({ href }: { href: string }) {
     <motion.a
       ref={ref as React.RefObject<HTMLAnchorElement>}
       href={href}
-      className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-glass-stroke bg-glass-bg px-4 py-1.5 text-[12px] text-ink-soft backdrop-blur-xl transition-colors duration-200 hover:border-glass-hi hover:bg-glass-hi hover:text-ink"
+      className="group relative inline-flex h-9 items-center gap-2 overflow-hidden whitespace-nowrap rounded-full border border-glass-stroke bg-glass-bg px-4 text-[12px] text-ink-soft backdrop-blur-xl transition-colors duration-200 hover:border-glass-hi hover:bg-glass-hi hover:text-ink"
       style={{ x: sx, y: sy }}
       {...handlers}
     >
@@ -251,7 +251,7 @@ function MobileMenu({
             if (e.target === e.currentTarget) onClose();
           }}
         >
-          <div className="shell flex h-full flex-col pt-28 pb-[max(env(safe-area-inset-bottom),32px)]">
+          <div className="shell flex h-full flex-col pt-20 pb-[max(env(safe-area-inset-bottom),32px)] md:pt-28">
             <motion.span
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}

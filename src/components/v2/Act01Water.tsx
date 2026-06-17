@@ -10,7 +10,7 @@
  * reduced-motion swap the video for the poster still.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useReducedMotion } from "@/lib/motion";
 import { MagneticButton } from "@/components/atmosphere/MagneticButton";
@@ -20,27 +20,19 @@ const VIDEO = "/assets/river.mp4";
 
 export function Act01Water() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [enabled, setEnabled] = useState(true);
   const reduced = useReducedMotion();
 
+  // The river video plays on every viewport, including mobile — `muted` +
+  // `playsInline` satisfy mobile autoplay policies. Only reduced-motion falls
+  // back to the poster still.
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(max-width: 767px)");
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setEnabled(!mq.matches);
-    const onChange = (e: MediaQueryListEvent) => setEnabled(!e.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-
-  useEffect(() => {
-    if (!enabled || reduced) return;
+    if (reduced) return;
     const v = videoRef.current;
     if (!v) return;
     const tryPlay = () => v.play().catch(() => {});
     if (v.readyState >= 2) tryPlay();
     else v.addEventListener("loadeddata", tryPlay, { once: true });
-  }, [enabled, reduced]);
+  }, [reduced]);
 
   return (
     <section
@@ -57,7 +49,7 @@ export function Act01Water() {
           className="absolute inset-0 h-full w-full object-cover scale-[1.05]"
           style={{ filter: "saturate(0.7) contrast(1.05) brightness(0.78)" }}
         />
-        {enabled && !reduced ? (
+        {!reduced ? (
           <video
             ref={videoRef}
             src={VIDEO}

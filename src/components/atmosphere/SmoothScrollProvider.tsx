@@ -76,17 +76,25 @@ export function SmoothScrollProvider({ children }: Props) {
     // scrolling past a section without being yanked back into it.
     let snap: Snap | null = null;
     let snapAddTimeout: number | null = null;
-    if (!reduced) {
+    // The hero snap is desktop-only and intentionally gentle. On a coarse
+    // pointer or a narrow viewport we skip snapping entirely — it fought touch
+    // flicks and read as a "scroll lock" on phones; mobile gets plain native
+    // scrolling (Lenis already leaves touch scroll alone via syncTouch:false).
+    const noSnap =
+      reduced ||
+      window.matchMedia("(max-width: 767px)").matches ||
+      window.matchMedia("(pointer: coarse)").matches;
+    if (!noSnap) {
       snap = new Snap(lenis, {
-        // `proximity` keeps the user from being yanked back past the last
-        // target — `mandatory` would bounce-back into Act 03 when entering
-        // the excluded Acts 04+. Short debounce so snap engages quickly
-        // after the wheel settles without competing against active input.
+        // `proximity` only snaps when the hero is already close to settled, so
+        // it never yanks the reader back from further down the page. A small
+        // distanceThreshold + longer debounce make the pull subtle and easy to
+        // scroll past.
         type: "proximity",
-        duration: 0.7,
+        duration: 0.5,
         easing: (t: number) => 1 - Math.pow(1 - t, 3),
-        distanceThreshold: "55%",
-        debounce: 140,
+        distanceThreshold: "18%",
+        debounce: 260,
       });
       // Only the hero (Act 01) is a snap target. Every other section runs
       // its own scroll choreography (Act 04 is GSAP-pinned, Act 05 stages
