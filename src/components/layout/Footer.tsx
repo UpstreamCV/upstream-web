@@ -103,7 +103,7 @@ function FooterLink({
         href={href}
         target={external ? "_blank" : undefined}
         rel={external ? "noopener noreferrer" : undefined}
-        className="text-sm text-ink-soft transition-colors duration-200 hover:text-ink"
+        className="block py-1 text-sm text-ink-soft transition-colors duration-200 hover:text-ink"
       >
         {children}
       </Link>

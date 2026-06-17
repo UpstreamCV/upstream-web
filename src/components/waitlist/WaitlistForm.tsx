@@ -368,7 +368,7 @@ export function WaitlistForm() {
                   <button
                     type="button"
                     onClick={retry}
-                    className="inline-flex items-center gap-2 rounded-full bg-creek-deep px-5 py-2.5 text-[13px] font-semibold text-ink transition-all duration-300 hover:translate-y-[-1px] hover:bg-[#3D5731]"
+                    className="inline-flex items-center gap-2 rounded-full bg-creek-deep px-5 py-3 text-[13px] font-semibold text-ink transition-all duration-300 hover:translate-y-[-1px] hover:bg-[#3D5731]"
                   >
                     Try again
                   </button>
