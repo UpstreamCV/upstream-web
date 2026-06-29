@@ -11,12 +11,24 @@
  */
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { useReducedMotion } from "@/lib/motion";
-import { MagneticButton } from "@/components/atmosphere/MagneticButton";
 
 const POSTER = "/assets/river-splash-blur.jpg";
 const VIDEO = "/assets/river.mp4";
+
+// Shared "warm-white card" treatment for the hero's paired CTA + credential.
+// Both render as the same rounded box: Reed Cream fill (never pure #fff, per
+// the No-Pure-White rule), 1px inset highlight + soft ambient lift. Equal
+// height comes from items-stretch on their flex row.
+const CARD_CLASS = "inline-flex items-center rounded-2xl px-5 py-3 md:px-6 md:py-3.5";
+const CARD_STYLE: React.CSSProperties = {
+  background: "#F5F1E7",
+  boxShadow:
+    "0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 24px 55px -28px rgba(0, 0, 0, 0.7)",
+};
 
 export function Act01Water() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -114,18 +126,55 @@ export function Act01Water() {
             The pipeline behind your cameras — we catch the moment one
             stops telling the truth.
           </motion.p>
+          {/* Partner credential + primary CTA as two matching warm-white
+              cards, side by side ("Backed by" left, CTA right). Equal height
+              via items-stretch; they wrap to stacked rows on narrow viewports. */}
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 1.3 }}
-            className="mt-9 md:mt-10"
+            className="mt-9 flex flex-wrap items-stretch gap-3 md:mt-10 md:gap-4"
           >
-            <MagneticButton href="/waitlist" variant="primary">
-              Join the waitlist
-              <span aria-hidden="true" className="font-mono text-sm">
+            <div className={`${CARD_CLASS} gap-3.5 md:gap-4`} style={CARD_STYLE}>
+              <span
+                className="font-mono text-[10px] uppercase tracking-kicker md:text-[11px]"
+                style={{ color: "rgba(15, 24, 9, 0.55)" }}
+              >
+                Backed by
+              </span>
+              <span
+                aria-hidden="true"
+                className="h-8 w-px"
+                style={{ background: "rgba(15, 24, 9, 0.14)" }}
+              />
+              <Image
+                src="/assets/NV_Inception_Program.png"
+                alt="NVIDIA Inception Program"
+                width={1080}
+                height={458}
+                className="h-9 w-auto md:h-10"
+              />
+            </div>
+
+            <Link
+              href="/waitlist"
+              className={`${CARD_CLASS} group gap-3 transition-transform duration-300 hover:-translate-y-0.5`}
+              style={CARD_STYLE}
+            >
+              <span
+                className="font-mono text-[11px] uppercase tracking-kicker md:text-xs"
+                style={{ color: "rgba(15, 24, 9, 0.92)" }}
+              >
+                Join the waitlist
+              </span>
+              <span
+                aria-hidden="true"
+                className="font-mono text-sm transition-transform duration-300 group-hover:translate-x-0.5"
+                style={{ color: "rgba(15, 24, 9, 0.92)" }}
+              >
                 →
               </span>
-            </MagneticButton>
+            </Link>
           </motion.div>
         </div>
       </div>
