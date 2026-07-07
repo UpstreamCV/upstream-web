@@ -10,22 +10,17 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { useMediaQuery } from "@/lib/motion";
 
 const POSTER = "/assets/river-splash-blur.jpg";
 const VIDEO = "/assets/river.mp4";
 
 export function HeroVideoMask() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [enabled, setEnabled] = useState(true);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(max-width: 767px)");
-    setEnabled(!mq.matches);
-    const onChange = (e: MediaQueryListEvent) => setEnabled(!e.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
+  // <768px swaps the video for the poster. SSR/first paint keeps the
+  // video enabled (server snapshot false -> !false), matching the old
+  // useState(true) initial.
+  const enabled = !useMediaQuery("(max-width: 767px)");
 
   // Try to play after mount (some browsers gate autoplay until then)
   useEffect(() => {

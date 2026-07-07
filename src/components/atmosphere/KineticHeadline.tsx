@@ -44,22 +44,17 @@ export function KineticHeadline({ lines, className = "", scale = "xl" }: Props) 
   const ref = useRef<HTMLHeadingElement | null>(null);
   const reduced = useReducedMotion();
   const [shown, setShown] = useState(false);
+  // Reduced motion renders the final state immediately, no observer needed.
+  const visible = shown || reduced;
 
   useEffect(() => {
-    if (reduced) {
-      setShown(true);
-      return;
-    }
+    if (reduced) return;
     const node = ref.current;
     if (!node) return;
 
-    // If the headline is already in view at mount, fire immediately.
-    const rect = node.getBoundingClientRect();
-    if (rect.top < window.innerHeight && rect.bottom > 0) {
-      setShown(true);
-      return;
-    }
-
+    // The observer delivers the initial intersection state asynchronously on
+    // observe(), so already-in-view headlines still fire without a
+    // synchronous getBoundingClientRect fast-path.
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
@@ -90,7 +85,7 @@ export function KineticHeadline({ lines, className = "", scale = "xl" }: Props) 
           <motion.span
             className="block will-change-transform"
             initial="hidden"
-            animate={shown ? "visible" : "hidden"}
+            animate={visible ? "visible" : "hidden"}
             custom={idx}
             variants={lineVariants}
           >
