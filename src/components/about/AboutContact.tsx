@@ -42,7 +42,7 @@ export function AboutContact() {
           >
             <p className="max-w-[44ch] text-ink-soft" style={{ lineHeight: 1.65 }}>
               We onboard a small number of facilities per quarter. The fastest
-              path is the waitlist; tell us what you have running and we'll
+              path is the waitlist; tell us what you have running and we&apos;ll
               follow up.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
