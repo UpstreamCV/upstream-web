@@ -80,9 +80,9 @@ export function DeltaCta() {
             transition={{ duration: 1, ease: EASE.outQuint, delay: 0.3 }}
             className="mx-auto mt-8 max-w-[58ch] text-ink-soft md:text-lg"
           >
-            We're onboarding a small group of facilities through 2026. If you
-            run live CV and have a camera that's been silently lying to you,
-            we'd like to hear about it.
+            We&apos;re onboarding a small group of facilities through 2026. If you
+            run live CV and have a camera that&apos;s been silently lying to you,
+            we&apos;d like to hear about it.
           </motion.p>
 
           <motion.div

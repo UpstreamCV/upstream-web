@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { useReducedMotion } from "@/lib/motion";
+
 interface MetricProps {
   target: number;
   suffix?: string;
@@ -18,14 +20,13 @@ export default function Metric({
   const [val, setVal] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const fired = useRef(false);
+  // Reduced motion: skip the count-up and render the target directly.
+  const reduced = useReducedMotion();
+  const displayVal = reduced ? target : val;
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setVal(target);
-      return;
-    }
+    if (!el || reduced) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -48,12 +49,12 @@ export default function Metric({
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [target]);
+  }, [target, reduced]);
 
   return (
     <div className="metric" ref={ref}>
       <div className="v">
-        {val.toFixed(decimals)}
+        {displayVal.toFixed(decimals)}
         <sup>{suffix}</sup>
       </div>
       <div className="k">{label}</div>

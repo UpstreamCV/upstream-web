@@ -4,7 +4,13 @@
  * primitive in one place so every animated surface speaks the same language.
  */
 
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import {
+  useCallback,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type MouseEvent,
+} from "react";
 import { useMotionValue, useSpring } from "framer-motion";
 
 export const EASE = {
@@ -29,18 +35,29 @@ export const DURATION = {
  * the user actually prefers reduced motion.
  */
 export function useReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
+  return useMediaQuery("(prefers-reduced-motion: reduce)");
+}
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mql.matches);
-    const onChange = (e: MediaQueryListEvent) => setReduced(e.matches);
-    mql.addEventListener("change", onChange);
-    return () => mql.removeEventListener("change", onChange);
-  }, []);
-
-  return reduced;
+/**
+ * matchMedia as an external store — the lint-clean (and tear-free) way to
+ * read a media query during render. SSR snapshot is `false` so the first
+ * paint matches the most common case; flips right after hydration when the
+ * client snapshot disagrees, exactly like the old effect-based version.
+ */
+export function useMediaQuery(query: string): boolean {
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      const mql = window.matchMedia(query);
+      mql.addEventListener("change", onStoreChange);
+      return () => mql.removeEventListener("change", onStoreChange);
+    },
+    [query],
+  );
+  return useSyncExternalStore(
+    subscribe,
+    () => window.matchMedia(query).matches,
+    () => false,
+  );
 }
 
 /**
@@ -50,18 +67,7 @@ export function useReducedMotion(): boolean {
  * touch and cost paint every frame, so skipping them removes idle work.
  */
 export function useCoarsePointer(): boolean {
-  const [coarse, setCoarse] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mql = window.matchMedia("(pointer: coarse)");
-    setCoarse(mql.matches);
-    const onChange = (e: MediaQueryListEvent) => setCoarse(e.matches);
-    mql.addEventListener("change", onChange);
-    return () => mql.removeEventListener("change", onChange);
-  }, []);
-
-  return coarse;
+  return useMediaQuery("(pointer: coarse)");
 }
 
 /** Stagger helper for masked reveals. */

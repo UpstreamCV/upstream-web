@@ -46,10 +46,10 @@ export function AboutHero() {
           className="mt-10 max-w-[64ch] text-ink-soft md:text-lg"
           style={{ lineHeight: 1.6 }}
         >
-          The hardest part of running CV in the real world isn't the model.
-          It's the day the model stops working and nobody notices. We are
+          The hardest part of running CV in the real world isn&apos;t the model.
+          It&apos;s the day the model stops working and nobody notices. We are
           three operators who got tired of stitched-together stacks and a
-          pager that lied to us. Upstream is the system we wished we'd
+          pager that lied to us. Upstream is the system we wished we&apos;d
           had.
         </motion.p>
       </div>

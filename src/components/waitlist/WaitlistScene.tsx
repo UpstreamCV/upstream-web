@@ -6,19 +6,14 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { useMediaQuery } from "@/lib/motion";
 
 export function WaitlistScene() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [enabled, setEnabled] = useState(true);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(max-width: 767px)");
-    setEnabled(!mq.matches);
-    const onChange = (e: MediaQueryListEvent) => setEnabled(!e.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
+  // <768px swaps the video for the poster. SSR/first paint keeps the
+  // video enabled (server snapshot false -> !false), matching the old
+  // useState(true) initial.
+  const enabled = !useMediaQuery("(max-width: 767px)");
 
   useEffect(() => {
     if (!enabled) return;
