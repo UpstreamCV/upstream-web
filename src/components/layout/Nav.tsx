@@ -22,6 +22,7 @@ const NAV = [
   { href: "/#act-observation", label: "Pipeline" },
   { href: "/#act-drift", label: "Drift" },
   { href: "/#act-reports", label: "Field" },
+  { href: "/gov", label: "Government" },
   { href: "/about", label: "About" },
 ];
 
@@ -194,7 +195,7 @@ function MenuToggle({
 }
 
 /**
- * Full-viewport overlay menu. Renders the four nav links as stacked
+ * Full-viewport overlay menu. Renders the nav links as stacked
  * editorial mono lines and repeats the Request access CTA at the bottom.
  * Locks page scroll while open via `overflow: hidden` on <html>. Closes
  * on link tap, ESC, route change, and outside tap.
