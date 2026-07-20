@@ -115,8 +115,8 @@ export const contractingProfile = [
   },
   {
     label: "Team",
-    value: "Founder-led pod",
-    detail: "flexible 1–3 person engineering team",
+    value: "Founder-led technical team",
+    detail: "Direct engineering accountability from scope through handoff.",
   },
   {
     label: "NAICS",

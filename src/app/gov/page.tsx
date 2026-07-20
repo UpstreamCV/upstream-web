@@ -300,10 +300,12 @@ export default function GovernmentPage() {
             <div className="work-package-list">
               {workPackages.map((workPackage) => (
                 <article className="work-package-row" key={workPackage.number}>
-                  <span className="work-package-number">
-                    {workPackage.number}
-                  </span>
-                  <h3>{workPackage.title}</h3>
+                  <div className="work-package-heading">
+                    <span className="work-package-number">
+                      {workPackage.number}
+                    </span>
+                    <h3>{workPackage.title}</h3>
+                  </div>
                   <div className="work-package-details">
                     <div className="work-package-detail">
                       <span>When it is useful</span>
