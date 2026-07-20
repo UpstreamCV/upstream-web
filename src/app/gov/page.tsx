@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   },
 };
 
-const systemStages = [
+const supportAreas = [
   { number: "01", label: "Sensors + devices", detail: "Physical interface" },
   { number: "02", label: "Edge + cloud", detail: "Reliable compute" },
   { number: "03", label: "Data + AI", detail: "Mission logic" },
@@ -151,30 +151,28 @@ export default function GovernmentPage() {
             <div
               className="system-visual"
               role="img"
-              aria-label="Technical system diagram showing sensors and devices flowing through edge and cloud, data and AI, and operational applications inside a defined work package"
+              aria-label="Technical support options spanning sensors and devices, edge and cloud, data and AI, and operational applications; each area can stand alone or be combined in a defined work package"
             >
               <div className="diagram-heading">
                 <span>Defined work package</span>
                 <span className="diagram-status">
                   <span aria-hidden="true" />
-                  Four connected stages
+                  Four focus areas
                 </span>
               </div>
 
               <div className="pipeline">
-                {systemStages.map((stage) => (
-                  <div className="pipeline-stage" key={stage.number}>
-                    <span className="pipeline-number">{stage.number}</span>
-                    <strong>{stage.label}</strong>
-                    <span>{stage.detail}</span>
+                {supportAreas.map((area) => (
+                  <div className="pipeline-stage" key={area.number}>
+                    <span className="pipeline-number">{area.number}</span>
+                    <strong>{area.label}</strong>
+                    <span>{area.detail}</span>
                   </div>
                 ))}
               </div>
 
               <p className="diagram-note">
-                Inputs <span aria-hidden="true">→</span> Integration{" "}
-                <span aria-hidden="true">→</span> Delivery{" "}
-                <span aria-hidden="true">→</span> Support
+                Choose one focus area or combine capabilities to fit the scope
               </p>
             </div>
           </div>
