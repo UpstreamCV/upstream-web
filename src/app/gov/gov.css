@@ -562,6 +562,53 @@
   color: var(--white-soft);
 }
 
+.gov-root .proof-bar {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--line-light);
+  border-bottom: 1px solid var(--line-light);
+  background: rgba(15, 24, 9, 0.56);
+  color: var(--paper);
+}
+
+.gov-root .proof-list {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  list-style: none;
+}
+
+.gov-root .proof-list li {
+  min-width: 0;
+  min-height: 86px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  padding: 20px clamp(22px, 3vw, 42px);
+}
+
+.gov-root .proof-list li + li {
+  border-left: 1px solid var(--line-light);
+}
+
+.gov-root .proof-list li > span {
+  color: var(--creek-mid);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  line-height: 1;
+}
+
+.gov-root .proof-list strong {
+  color: var(--white-soft);
+  font-size: clamp(14px, 1.2vw, 16px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+
 .gov-root .section,
 .gov-root .contact-section {
   padding: var(--section-space) 0;
@@ -1367,6 +1414,10 @@
     gap: 38px;
   }
 
+  .gov-root .proof-list li {
+    padding-inline: 20px;
+  }
+
   .gov-root .section-intro > p {
     max-width: 700px;
   }
@@ -1531,6 +1582,24 @@
 
   .gov-root .hero-bottomline > span {
     max-width: 180px;
+  }
+
+  .gov-root .proof-list {
+    grid-template-columns: 1fr;
+  }
+
+  .gov-root .proof-list li {
+    min-height: 66px;
+    padding: 16px 4px;
+  }
+
+  .gov-root .proof-list li + li {
+    border-top: 1px solid var(--line-light);
+    border-left: 0;
+  }
+
+  .gov-root .proof-list strong {
+    font-size: 14px;
   }
 
   .gov-root .section-intro h2,

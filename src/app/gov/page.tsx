@@ -44,6 +44,12 @@ const supportAreas = [
   { number: "04", label: "Applications", detail: "Operational use" },
 ] as const;
 
+const proofPoints = [
+  "25 pilot locations",
+  "Camera → edge → cloud systems",
+  "Federal health data experience",
+] as const;
+
 function Brand({ footer = false }: { footer?: boolean }) {
   return (
     <a className="brand" href="#top" aria-label="Upstream government home">
@@ -185,6 +191,21 @@ export default function GovernmentPage() {
           </div>
         </section>
 
+        <aside className="proof-bar" aria-label="Selected team proof points">
+          <div className="shell">
+            <ul className="proof-list">
+              {proofPoints.map((proofPoint, index) => (
+                <li key={proofPoint}>
+                  <span aria-hidden="true">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <strong>{proofPoint}</strong>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </aside>
+
         <section
           className="section section-light"
           id="capabilities"
@@ -219,6 +240,43 @@ export default function GovernmentPage() {
         </section>
 
         <section
+          className="section experience"
+          id="experience"
+          aria-labelledby="experience-title"
+        >
+          <div className="shell experience-layout">
+            <div className="experience-heading">
+              <p className="section-index">02 / Team experience</p>
+              <h2 id="experience-title">
+                Experience that crosses system boundaries.
+              </h2>
+            </div>
+            <div className="experience-copy">
+              <p className="experience-note">
+                Team-member experience, not a claim of Upstream corporate past
+                performance.
+              </p>
+            </div>
+          </div>
+
+          <div
+            className="shell experience-cases"
+            aria-label="Selected team experience"
+          >
+            {experienceCases.map((experience) => (
+              <article className="experience-case" key={experience.number}>
+                <span className="experience-case-number">
+                  {experience.number}
+                </span>
+                <h3>{experience.title}</h3>
+                <strong>{experience.signal}</strong>
+                <p>{experience.description}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section
           className="section work-packages"
           id="work-packages"
           aria-labelledby="work-packages-title"
@@ -226,7 +284,7 @@ export default function GovernmentPage() {
           <div className="shell">
             <div className="section-intro">
               <div>
-                <p className="section-index">02 / Work packages</p>
+                <p className="section-index">03 / Work packages</p>
                 <h2 id="work-packages-title">
                   Focused technical work, ready to hand off.
                 </h2>
@@ -319,7 +377,7 @@ export default function GovernmentPage() {
           <div className="shell support-layout">
             <div className="support-copy">
               <p className="section-index section-index-dark">
-                03 / How we support
+                04 / How we support
               </p>
               <h2 id="support-title">
                 A focused team inside a larger program.
@@ -373,43 +431,6 @@ export default function GovernmentPage() {
                 <span>Maintainable handoff</span>
               </div>
             </div>
-          </div>
-        </section>
-
-        <section
-          className="section experience"
-          id="experience"
-          aria-labelledby="experience-title"
-        >
-          <div className="shell experience-layout">
-            <div className="experience-heading">
-              <p className="section-index">04 / Team experience</p>
-              <h2 id="experience-title">
-                Experience that crosses system boundaries.
-              </h2>
-            </div>
-            <div className="experience-copy">
-              <p className="experience-note">
-                Team-member experience, not a claim of Upstream corporate past
-                performance.
-              </p>
-            </div>
-          </div>
-
-          <div
-            className="shell experience-cases"
-            aria-label="Selected team experience"
-          >
-            {experienceCases.map((experience) => (
-              <article className="experience-case" key={experience.number}>
-                <span className="experience-case-number">
-                  {experience.number}
-                </span>
-                <h3>{experience.title}</h3>
-                <strong>{experience.signal}</strong>
-                <p>{experience.description}</p>
-              </article>
-            ))}
           </div>
         </section>
 
