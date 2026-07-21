@@ -147,6 +147,14 @@ export default function GovernmentPage() {
                   Discuss a Work Package
                   <Arrow />
                 </a>
+                <a
+                  className="button button-secondary"
+                  href="/assets/upstream_capability_statement.pdf"
+                  download="upstream_capability_statement.pdf"
+                >
+                  Download Capability Statement
+                  <Arrow />
+                </a>
                 <a className="button button-secondary" href="#capabilities">
                   Explore Capabilities
                   <Arrow />
