@@ -26,14 +26,30 @@ export const metadata: Metadata = {
     title: "Upstream Government Systems",
     description:
       "Focused software, data, AI, and deployed-system work for government programs.",
-    images: ["/assets/river-splash.jpeg"],
+    images: [
+      {
+        url: "/assets/upstream-gov-social-card.png",
+        width: 1200,
+        height: 630,
+        alt: "Upstream Government Systems.",
+        type: "image/png",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Upstream Government Systems",
     description:
       "Focused software, data, AI, and deployed-system work for government programs.",
-    images: ["/assets/river-splash.jpeg"],
+    images: [
+      {
+        url: "/assets/upstream-gov-social-card.png",
+        width: 1200,
+        height: 630,
+        alt: "Upstream Government Systems.",
+        type: "image/png",
+      },
+    ],
   },
 };
 
