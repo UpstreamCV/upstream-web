@@ -365,13 +365,19 @@ export default function GovernmentPage() {
                   Share the technical context, interfaces, and desired end state.
                 </p>
               </div>
-              <a
-                className="button button-primary"
-                href="mailto:josh@upstreamcv.com"
-              >
-                Send Us a Technical Backlog Item
-                <Arrow />
-              </a>
+              <div className="work-package-cta-actions">
+                <a className="button button-secondary" href="/gov/engage">
+                  Explore Ways to Engage
+                  <Arrow />
+                </a>
+                <a
+                  className="button button-primary"
+                  href="mailto:josh@upstreamcv.com"
+                >
+                  Send Us a Technical Backlog Item
+                  <Arrow />
+                </a>
+              </div>
             </div>
 
             <div
