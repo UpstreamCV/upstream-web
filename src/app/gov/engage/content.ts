@@ -188,6 +188,59 @@ export const workAreas: readonly WorkArea[] = [
     ctaLabel: "Discuss an Automation Scope",
     emailSubject: "Government automation scope",
   },
+  {
+    number: "03",
+    slug: "prototype",
+    title: "Prototype AI, Vision, or Edge Systems",
+    bestFor:
+      "A technical concept that needs to be tested before a larger investment or deployment.",
+    deliverables: [
+      "Data and AI prototypes",
+      "Computer-vision pipelines",
+      "Camera and sensor integration",
+      "Edge-device processing",
+      "Detection, tracking, counting, or event logic",
+      "Performance evaluation",
+      "Production recommendations",
+    ],
+    example:
+      "We need to determine whether existing cameras can reliably measure activity at a facility.",
+    outcome:
+      "A working prototype, measured results, documented limitations, and a recommended next phase.",
+    transition: {
+      from: "Unproven camera use case",
+      to: "Prototype and measured results",
+    },
+    ctaLabel: "Discuss a Prototype",
+    emailSubject: "Government prototype scope",
+  },
+  {
+    number: "04",
+    slug: "deployment",
+    title: "Deploy and Strengthen Technical Systems",
+    bestFor:
+      "An application or service that needs repeatable deployment, better visibility, or more reliable operation.",
+    deliverables: [
+      "Cloud deployment",
+      "Containerization",
+      "Environment configuration",
+      "CI/CD improvements",
+      "Logging, monitoring, and alerts",
+      "Health checks",
+      "Reliability and recovery improvements",
+      "Operating documentation",
+    ],
+    example:
+      "Our application works in development but needs a repeatable path into a production environment.",
+    outcome:
+      "A deployable system with monitoring, documentation, and a clear operating process.",
+    transition: {
+      from: "Unreliable deployment",
+      to: "Repeatable operation and monitoring",
+    },
+    ctaLabel: "Discuss a Deployment Scope",
+    emailSubject: "Government deployment scope",
+  },
 ];
 
 export const programFits = [
