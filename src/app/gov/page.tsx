@@ -8,7 +8,7 @@ import {
   engagementPrinciples,
   experienceCases,
   navigation,
-  workPackages,
+  workAreaPreviews,
 } from "./content";
 import "./gov.css";
 import { SiteBackdrop } from "./site-backdrop";
@@ -308,76 +308,37 @@ export default function GovernmentPage() {
           <div className="shell">
             <div className="section-intro">
               <div>
-                <p className="section-index">03 / Work packages</p>
+                <p className="section-index">03 / Work areas</p>
                 <h2 id="work-packages-title">
-                  Focused technical work, ready to hand off.
+                  Give Us a Technical Problem to Own
                 </h2>
               </div>
               <p>
-                Four practical starting points for prime contractors with a
-                bounded backlog item, a known technical gap, or a prototype that
-                needs focused engineering attention. Most fit within a 2–6 week
-                delivery window.
+                Upstream can take ownership of a focused technical scope or
+                contribute inside a larger government delivery team.
               </p>
             </div>
 
-            <div className="work-package-list">
-              {workPackages.map((workPackage) => (
-                <article className="work-package-row" key={workPackage.number}>
-                  <div className="work-package-heading">
-                    <span className="work-package-number">
-                      {workPackage.number}
-                    </span>
-                    <h3>{workPackage.title}</h3>
-                  </div>
-                  <div className="work-package-details">
-                    <div className="work-package-detail">
-                      <span>When it is useful</span>
-                      <p>{workPackage.usefulWhen}</p>
-                    </div>
-                    <div className="work-package-detail">
-                      <span>Example deliverables</span>
-                      <ul>
-                        {workPackage.deliverables.map((deliverable) => (
-                          <li key={deliverable}>{deliverable}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className="work-package-terms">
-                      <div>
-                        <span>Typical timeline</span>
-                        <strong>{workPackage.timeline}</strong>
-                      </div>
-                      <div>
-                        <span>Handoff</span>
-                        <strong>{workPackage.handoff}</strong>
-                      </div>
-                    </div>
-                  </div>
+            <div className="work-area-preview-list">
+              {workAreaPreviews.map((workArea) => (
+                <article key={workArea.number}>
+                  <span>{workArea.number}</span>
+                  <h3>{workArea.title}</h3>
                 </article>
               ))}
             </div>
 
             <div className="work-package-cta">
               <div>
-                <span>Have a bounded item in mind?</span>
+                <span>See the work in concrete terms</span>
                 <p>
-                  Share the technical context, interfaces, and desired end state.
+                  Review example requests, deliverables, and handoff outcomes.
                 </p>
               </div>
-              <div className="work-package-cta-actions">
-                <a className="button button-secondary" href="/gov/engage">
-                  Explore Ways to Engage
-                  <Arrow />
-                </a>
-                <a
-                  className="button button-primary"
-                  href="mailto:josh@upstreamcv.com"
-                >
-                  Send Us a Technical Backlog Item
-                  <Arrow />
-                </a>
-              </div>
+              <a className="button button-primary" href="/gov/engage">
+                View Ways to Work With Upstream
+                <Arrow />
+              </a>
             </div>
 
             <div

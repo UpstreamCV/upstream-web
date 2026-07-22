@@ -1,7 +1,7 @@
 export const navigation = [
   { label: "Capabilities", href: "#capabilities" },
   { label: "Experience", href: "#experience" },
-  { label: "Work Packages", href: "#work-packages" },
+  { label: "Work Areas", href: "#work-packages" },
   { label: "Contact", href: "#contact" },
 ] as const;
 
@@ -43,62 +43,22 @@ export const capabilities = [
   },
 ] as const;
 
-export const workPackages = [
+export const workAreaPreviews = [
   {
     number: "01",
-    title: "Software Feature Sprint",
-    usefulWhen:
-      "A defined operator or program need is blocked by missing software, manual steps, or a fragmented workflow.",
-    deliverables: [
-      "Dashboard or internal tool",
-      "API or workflow integration",
-      "Tested automation",
-    ],
-    timeline: "2–4 weeks",
-    handoff:
-      "Source code, tests, deployment notes, and a working-session walkthrough",
+    title: "Build or improve software",
   },
   {
     number: "02",
-    title: "Data Integration Sprint",
-    usefulWhen:
-      "Program data is split across APIs, databases, files, or legacy systems and needs a reliable path between them.",
-    deliverables: [
-      "Source connectors",
-      "Transformation and validation",
-      "Documented data flow",
-    ],
-    timeline: "3–6 weeks",
-    handoff:
-      "Connector map, transformation notes, operating runbook, and ownership transfer",
+    title: "Connect data and automate workflows",
   },
   {
     number: "03",
-    title: "Edge & Vision Prototype",
-    usefulWhen:
-      "A camera or sensor concept needs to be proven on real hardware before broader system integration.",
-    deliverables: [
-      "Camera or sensor integration",
-      "Local processing or CV pipeline",
-      "Event delivery interface",
-    ],
-    timeline: "4–6 weeks",
-    handoff:
-      "Prototype code, configuration notes, test results, and a live technical demo",
+    title: "Prototype AI, vision, or edge systems",
   },
   {
     number: "04",
-    title: "System Reliability Sprint",
-    usefulWhen:
-      "An existing service or deployment needs clearer operating visibility and more predictable recovery.",
-    deliverables: [
-      "Monitoring and health checks",
-      "Alerts and structured logging",
-      "Deployment improvements",
-    ],
-    timeline: "2–5 weeks",
-    handoff:
-      "Dashboards, alert guide, deployment notes, and an operator-ready runbook",
+    title: "Deploy and strengthen technical systems",
   },
 ] as const;
 

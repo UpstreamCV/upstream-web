@@ -705,7 +705,7 @@
   background: rgba(15, 24, 9, 0.34);
 }
 
-.gov-root .work-package-list {
+.gov-root .work-area-preview-list {
   margin-top: clamp(56px, 6vw, 84px);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -714,24 +714,18 @@
   background: var(--line-light);
 }
 
-.gov-root .work-package-row {
+.gov-root .work-area-preview-list article {
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  padding: clamp(26px, 2.8vw, 38px);
-  background: rgba(15, 24, 9, 0.88);
-}
-
-.gov-root .work-package-heading {
+  min-height: clamp(160px, 16vw, 220px);
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr);
   gap: 14px;
-  align-items: start;
+  align-content: space-between;
+  padding: clamp(26px, 3vw, 42px);
+  background: rgba(15, 24, 9, 0.88);
 }
 
-.gov-root .work-package-number,
-.gov-root .work-package-detail > span,
-.gov-root .work-package-terms span,
+.gov-root .work-area-preview-list article > span,
 .gov-root .contract-profile-heading,
 .gov-root .contract-profile-grid > div > span {
   font-family: var(--font-mono);
@@ -740,90 +734,20 @@
   text-transform: uppercase;
 }
 
-.gov-root .work-package-number {
-  padding-top: 6px;
+.gov-root .work-area-preview-list article > span {
+  grid-row: 1;
+  padding-top: 5px;
   color: var(--signal);
 }
 
-.gov-root .work-package-row h3 {
+.gov-root .work-area-preview-list h3 {
+  grid-column: 2;
+  align-self: end;
   margin: 0;
-  font-size: clamp(25px, 2.1vw, 32px);
+  font-size: clamp(28px, 2.7vw, 40px);
   font-weight: 700;
   letter-spacing: -0.035em;
-  line-height: 1.1;
-}
-
-.gov-root .work-package-details {
-  min-width: 0;
-  flex: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(170px, 0.92fr);
-  gap: 24px clamp(24px, 2.6vw, 38px);
-  margin-top: 28px;
-}
-
-.gov-root .work-package-detail > span,
-.gov-root .work-package-terms span {
-  display: block;
-  color: var(--white-muted);
-  letter-spacing: 0.09em;
-}
-
-.gov-root .work-package-detail p {
-  margin: 12px 0 0;
-  color: var(--white-soft);
-  font-size: 15px;
-  line-height: 1.6;
-}
-
-.gov-root .work-package-detail ul {
-  margin: 10px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.gov-root .work-package-detail li {
-  position: relative;
-  padding: 4px 0 4px 14px;
-  color: var(--white-soft);
-  font-size: 15px;
-  line-height: 1.55;
-}
-
-.gov-root .work-package-detail li::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--signal);
-  transform: translateY(-50%);
-}
-
-.gov-root .work-package-terms {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: minmax(120px, 0.55fr) minmax(0, 1.45fr);
-  gap: clamp(24px, 2.6vw, 38px);
-  align-self: end;
-  margin-top: auto;
-  padding-top: 22px;
-  border-top: 1px solid var(--line-light);
-}
-
-.gov-root .work-package-terms > div {
-  min-width: 0;
-}
-
-.gov-root .work-package-terms strong {
-  display: block;
-  margin-top: 7px;
-  color: var(--graph);
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.4;
+  line-height: 1.05;
 }
 
 .gov-root .work-package-cta {
@@ -854,14 +778,6 @@
 
 .gov-root .work-package-cta .button {
   flex: 0 0 auto;
-}
-
-.gov-root .work-package-cta-actions {
-  display: flex;
-  flex: 0 0 auto;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 10px;
 }
 
 .gov-root .contract-profile {
@@ -1448,17 +1364,9 @@
     display: none;
   }
 
-  .gov-root .work-package-list {
-    grid-template-columns: 1fr;
-  }
-
   .gov-root .work-package-cta {
     align-items: flex-start;
     flex-direction: column;
-  }
-
-  .gov-root .work-package-cta-actions {
-    justify-content: flex-start;
   }
 
   .gov-root .contract-profile-grid {
@@ -1645,37 +1553,19 @@
     font-size: 15px;
   }
 
-  .gov-root .work-package-list {
+  .gov-root .work-area-preview-list {
+    grid-template-columns: 1fr;
     margin-top: 50px;
   }
 
-  .gov-root .work-package-row {
+  .gov-root .work-area-preview-list article {
+    min-height: 136px;
+    grid-template-columns: 34px minmax(0, 1fr);
     padding: 24px 20px;
   }
 
-  .gov-root .work-package-heading {
-    grid-template-columns: 34px minmax(0, 1fr);
-    gap: 12px;
-  }
-
-  .gov-root .work-package-number {
-    padding-top: 5px;
-  }
-
-  .gov-root .work-package-row h3 {
+  .gov-root .work-area-preview-list h3 {
     font-size: 28px;
-  }
-
-  .gov-root .work-package-details {
-    grid-template-columns: 1fr;
-    gap: 20px;
-    margin-top: 24px;
-  }
-
-  .gov-root .work-package-terms {
-    grid-template-columns: 1fr;
-    gap: 14px;
-    padding-top: 20px;
   }
 
   .gov-root .work-package-cta {
@@ -1685,10 +1575,6 @@
   .gov-root .work-package-cta .button {
     width: 100%;
     gap: 18px;
-  }
-
-  .gov-root .work-package-cta-actions {
-    width: 100%;
   }
 
   .gov-root .contract-profile-heading {
