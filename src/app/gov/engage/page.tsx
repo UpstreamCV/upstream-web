@@ -9,7 +9,9 @@ import {
   engagementPaths,
   engagementNavigation,
   readyWorkPackages,
+  workAreas,
 } from "./content";
+import type { WorkArea } from "./content";
 import "./engage.css";
 
 export const metadata: Metadata = {
@@ -73,6 +75,52 @@ function Arrow({ direction = "right" }: { direction?: "right" | "down" }) {
 }
 
 const emailSubject = encodeURIComponent("Government technical requirement");
+
+function WorkAreaSection({ workArea }: { workArea: WorkArea }) {
+  return (
+    <article className="work-area" id={`work-area-${workArea.slug}`}>
+      <div className="work-area-heading">
+        <span>{workArea.number}</span>
+        <h3>{workArea.title}</h3>
+        <p>
+          <strong>Best for:</strong> {workArea.bestFor}
+        </p>
+      </div>
+
+      <div className="work-area-transition" aria-label={`${workArea.transition.from} becomes ${workArea.transition.to}`}>
+        <span>{workArea.transition.from}</span>
+        <span aria-hidden="true">→</span>
+        <strong>{workArea.transition.to}</strong>
+      </div>
+
+      <div className="work-area-body">
+        <div className="work-area-deliverables">
+          <span>Upstream can deliver</span>
+          <ul>
+            {workArea.deliverables.map((deliverable) => (
+              <li key={deliverable}>{deliverable}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="work-area-proof">
+          <div>
+            <span>Example request</span>
+            <p>“{workArea.example}”</p>
+          </div>
+          <div>
+            <span>What you receive</span>
+            <p>{workArea.outcome}</p>
+          </div>
+          <a className="button button-secondary" href="#contact">
+            {workArea.ctaLabel}
+            <Arrow />
+          </a>
+        </div>
+      </div>
+    </article>
+  );
+}
 
 export default function GovernmentEngagementPage() {
   return (
@@ -142,7 +190,7 @@ export default function GovernmentEngagementPage() {
                   Discuss a Requirement
                   <Arrow />
                 </a>
-                <a className="button button-secondary" href="#work-packages">
+                <a className="button button-secondary" href="#work-areas">
                   View Work Areas
                   <Arrow direction="down" />
                 </a>
@@ -183,9 +231,34 @@ export default function GovernmentEngagementPage() {
               Subcontract work packages · Specialized engineering support ·
               Prototypes and pilots
             </span>
-            <a href="#work-packages">
+            <a href="#work-areas">
               View work areas <span aria-hidden="true">↓</span>
             </a>
+          </div>
+        </section>
+
+        <section
+          className="section work-areas"
+          id="work-areas"
+          aria-labelledby="work-areas-title"
+        >
+          <div className="shell">
+            <div className="section-intro work-areas-intro">
+              <div>
+                <p className="section-index">01 / Common starting points</p>
+                <h2 id="work-areas-title">What can you hand us?</h2>
+              </div>
+              <p>
+                Start with a real technical problem. We will define the boundary,
+                build the work, and leave your team with something usable.
+              </p>
+            </div>
+
+            <div className="work-area-list">
+              {workAreas.map((workArea) => (
+                <WorkAreaSection key={workArea.slug} workArea={workArea} />
+              ))}
+            </div>
           </div>
         </section>
 

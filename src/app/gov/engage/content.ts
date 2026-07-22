@@ -1,6 +1,6 @@
 export const engagementNavigation = [
-  { label: "How We Engage", href: "#engagement-models" },
-  { label: "Work Packages", href: "#work-packages" },
+  { label: "Work Areas", href: "#work-areas" },
+  { label: "How It Fits", href: "#engagement-models" },
   { label: "Custom Scope", href: "#custom-scope" },
   { label: "Contact", href: "#contact" },
 ] as const;
