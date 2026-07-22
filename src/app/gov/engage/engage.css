@@ -3,7 +3,7 @@
 }
 
 .engage-root .engage-hero {
-  min-height: 860px;
+  min-height: 760px;
 }
 
 .engage-root .engage-hero-layout {
@@ -23,7 +23,7 @@
   font-size: clamp(17px, 1.35vw, 21px);
 }
 
-.engage-root .role-diagram {
+.engage-root .hero-exchange {
   width: 100%;
   padding: clamp(24px, 3vw, 36px);
   border: 1px solid rgba(232, 227, 216, 0.13);
@@ -36,144 +36,66 @@
   -webkit-backdrop-filter: blur(18px) saturate(115%);
 }
 
-.engage-root .role-options {
+.engage-root .hero-exchange-flow {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 26px;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 22px;
+  margin-top: 28px;
 }
 
-.engage-root .role-option {
-  position: relative;
-  min-height: 230px;
+.engage-root .hero-exchange-flow > div {
+  min-height: 190px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   padding: clamp(22px, 2.5vw, 32px);
-  overflow: hidden;
   border: 1px solid rgba(232, 227, 216, 0.12);
   border-radius: 16px;
   background: rgba(232, 227, 216, 0.035);
 }
 
-.engage-root .role-option::before {
-  content: "";
-  position: absolute;
-  top: 26px;
-  right: 26px;
-  width: 54px;
-  height: 54px;
-  border: 1px solid currentColor;
-  border-radius: 50%;
-  opacity: 0.28;
+.engage-root .hero-exchange-flow > div:last-child {
+  background: rgba(52, 76, 44, 0.42);
 }
 
-.engage-root .role-option::after {
-  content: "";
-  position: absolute;
-  top: 52px;
-  right: 0;
-  width: 80px;
-  height: 1px;
-  background: currentColor;
-  opacity: 0.22;
-}
-
-.engage-root .role-option-owner {
-  color: var(--graph);
-  background: rgba(52, 76, 44, 0.35);
-}
-
-.engage-root .role-option-partner {
-  color: oklch(77% 0.045 92);
-  background: rgba(129, 118, 75, 0.16);
-}
-
-.engage-root .role-option > span {
-  color: currentColor;
+.engage-root .hero-exchange-flow span:not(.hero-exchange-arrow) {
+  color: var(--creek-text);
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
-.engage-root .role-option strong {
-  max-width: 250px;
-  margin-top: 14px;
+.engage-root .hero-exchange-flow strong {
+  margin-top: 16px;
   color: var(--paper);
-  font-size: clamp(24px, 2.1vw, 32px);
+  font-size: clamp(24px, 2.2vw, 34px);
   letter-spacing: -0.035em;
   line-height: 1.08;
 }
 
-.engage-root .role-option p {
-  max-width: 260px;
-  margin: 14px 0 0;
-  color: var(--white-muted);
-  font-size: 14px;
-  line-height: 1.55;
-}
-
-.engage-root .role-flow {
-  display: grid;
-  grid-template-columns: auto 1fr auto 1fr auto;
-  align-items: center;
-  gap: 12px;
-  margin-top: 24px;
+.engage-root .hero-exchange-flow small {
+  margin-top: 12px;
   color: var(--white-muted);
   font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
   text-transform: uppercase;
 }
 
-.engage-root .role-flow i {
-  position: relative;
-  height: 1px;
-  background: rgba(232, 227, 216, 0.18);
-}
-
-.engage-root .role-flow i::after {
-  content: "";
-  position: absolute;
-  top: -2px;
-  right: 0;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--creek-text);
-}
-
-.engage-root .engage-signal-bar {
-  position: relative;
-  z-index: 2;
-  border-block: 1px solid var(--line-light);
-  background: rgba(15, 24, 9, 0.74);
-}
-
-.engage-root .engage-signal-list {
-  min-height: 86px;
+.engage-root .hero-exchange-arrow {
+  width: 42px;
+  height: 42px;
   display: grid;
-  grid-template-columns: 1fr auto 1fr auto 1fr;
-  align-items: center;
-  gap: clamp(20px, 4vw, 64px);
-}
-
-.engage-root .engage-signal-list p {
-  margin: 0;
-  color: var(--white-soft);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.15em;
-  text-align: center;
-  text-transform: uppercase;
-}
-
-.engage-root .engage-signal-list > span {
-  width: 5px;
-  height: 5px;
+  place-items: center;
+  border: 1px solid rgba(95, 184, 105, 0.24);
   border-radius: 50%;
-  background: var(--creek-text);
+  background: rgba(95, 184, 105, 0.08);
+  color: var(--graph);
+  font-family: var(--font-mono);
+  font-size: 18px;
 }
 
 .engage-root .engage-models {
@@ -544,7 +466,7 @@
     gap: 64px;
   }
 
-  .engage-root .role-diagram {
+  .engage-root .hero-exchange {
     width: min(100%, 760px);
     justify-self: center;
   }
@@ -590,28 +512,19 @@
     font-size: clamp(48px, 14vw, 74px);
   }
 
-  .engage-root .engage-signal-list {
-    grid-template-columns: 1fr;
-    gap: 0;
-    padding-block: 12px;
-  }
-
-  .engage-root .engage-signal-list p {
-    padding: 10px 0;
-  }
-
-  .engage-root .engage-signal-list > span {
-    display: none;
-  }
-
-  .engage-root .role-options,
+  .engage-root .hero-exchange-flow,
   .engage-root .engagement-path,
   .engage-root .ready-package {
     grid-template-columns: 1fr;
   }
 
-  .engage-root .role-option {
-    min-height: 190px;
+  .engage-root .hero-exchange-flow > div {
+    min-height: 165px;
+  }
+
+  .engage-root .hero-exchange-arrow {
+    justify-self: center;
+    transform: rotate(90deg);
   }
 
   .engage-root .engagement-path-heading {
@@ -657,19 +570,14 @@
     width: 100%;
   }
 
-  .engage-root .role-diagram {
+  .engage-root .hero-exchange {
     padding: 18px;
     border-radius: 18px;
   }
 
-  .engage-root .role-diagram .diagram-heading {
+  .engage-root .hero-exchange .diagram-heading {
     align-items: flex-start;
     flex-direction: column;
-  }
-
-  .engage-root .role-flow {
-    gap: 8px;
-    font-size: 9px;
   }
 
   .engage-root .package-prompt {

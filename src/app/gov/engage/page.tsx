@@ -13,18 +13,18 @@ import {
 import "./engage.css";
 
 export const metadata: Metadata = {
-  title: "Ways to Engage Upstream / Government Systems",
+  title: "Ways to Work With Upstream / Government Systems",
   description:
-    "Engage Upstream through focused work packages, specialized subcontract support, rapid prototypes, technical discovery, and custom government delivery.",
+    "Give Upstream a defined government software, data, AI, edge, or deployment problem to build and deliver.",
   alternates: {
     canonical: "/gov/engage",
   },
   openGraph: {
     type: "website",
     url: "/gov/engage",
-    title: "Ways to Engage Upstream",
+    title: "Ways to Work With Upstream",
     description:
-      "Focused technical work packages and specialized delivery support for government agencies, prime contractors, and technical teams.",
+      "Concrete technical work areas for government agencies, prime contractors, and delivery teams.",
     images: [
       {
         url: "/assets/upstream-gov-social-card.png",
@@ -37,9 +37,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ways to Engage Upstream",
+    title: "Ways to Work With Upstream",
     description:
-      "Focused technical work packages and specialized delivery support for government programs.",
+      "Concrete software, data, AI, edge, and deployment work for government programs.",
     images: ["/assets/upstream-gov-social-card.png"],
   },
 };
@@ -131,10 +131,11 @@ export default function GovernmentEngagementPage() {
                 <span className="eyebrow-line" aria-hidden="true" />
                 Government engagement
               </p>
-              <h1 id="hero-title">Ways to Engage Upstream</h1>
+              <h1 id="hero-title">Ways to Work With Upstream</h1>
               <p className="hero-summary">
-                Give us a defined technical outcome to own, or bring us into an
-                existing program where focused engineering depth is needed.
+                Give us a defined technical problem, backlog item, or prototype.
+                We can own the work directly or contribute inside an existing
+                delivery team.
               </p>
               <div className="hero-actions">
                 <a className="button button-primary" href="#contact">
@@ -142,65 +143,51 @@ export default function GovernmentEngagementPage() {
                   <Arrow />
                 </a>
                 <a className="button button-secondary" href="#work-packages">
-                  View Work Packages
+                  View Work Areas
                   <Arrow direction="down" />
                 </a>
               </div>
             </div>
 
             <div
-              className="role-diagram"
+              className="hero-exchange"
               role="img"
-              aria-label="Upstream can own a defined work package or join an existing team as specialized technical support. Both roles move from scope through build to handoff."
+              aria-label="A defined technical problem becomes working, documented delivery"
             >
               <div className="diagram-heading">
-                <span>Choose the delivery role</span>
+                <span>Give us the problem</span>
                 <span className="diagram-status">
                   <span aria-hidden="true" />
-                  Two clear options
+                  Get working delivery
                 </span>
               </div>
 
-              <div className="role-options" aria-hidden="true">
-                <div className="role-option role-option-owner">
-                  <span>01 / Own it</span>
-                  <strong>Defined work package</strong>
-                  <p>One bounded outcome. Upstream is accountable.</p>
+              <div className="hero-exchange-flow" aria-hidden="true">
+                <div>
+                  <span>Input</span>
+                  <strong>Technical problem</strong>
+                  <small>Requirement · backlog · prototype</small>
                 </div>
-                <div className="role-option role-option-partner">
-                  <span>02 / Join it</span>
-                  <strong>Specialized support</strong>
-                  <p>Add capability or capacity inside the program.</p>
+                <span className="hero-exchange-arrow">→</span>
+                <div>
+                  <span>Output</span>
+                  <strong>Working delivery</strong>
+                  <small>Code · tests · documentation</small>
                 </div>
-              </div>
-
-              <div className="role-flow" aria-hidden="true">
-                <span>Scope</span>
-                <i />
-                <span>Build</span>
-                <i />
-                <span>Handoff</span>
               </div>
             </div>
           </div>
 
           <div className="shell hero-bottomline">
-            <span>Own the work or strengthen the team</span>
-            <a href="#engagement-models">
-              Engagement models <span aria-hidden="true">↓</span>
+            <span>
+              Subcontract work packages · Specialized engineering support ·
+              Prototypes and pilots
+            </span>
+            <a href="#work-packages">
+              View work areas <span aria-hidden="true">↓</span>
             </a>
           </div>
         </section>
-
-        <aside className="engage-signal-bar" aria-label="Engagement summary">
-          <div className="shell engage-signal-list">
-            <p>Own a package</p>
-            <span aria-hidden="true" />
-            <p>Join a team</p>
-            <span aria-hidden="true" />
-            <p>Prove a concept</p>
-          </div>
-        </aside>
 
         <section
           className="section engage-models"
