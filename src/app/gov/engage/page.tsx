@@ -76,6 +76,16 @@ function Arrow({ direction = "right" }: { direction?: "right" | "down" }) {
 
 const emailSubject = encodeURIComponent("Government technical requirement");
 
+function getWorkAreaEmailHref(workArea: WorkArea) {
+  const body = [
+    `Selected work area: ${workArea.title}`,
+    "",
+    "Requirement or backlog item:",
+  ].join("\n");
+
+  return `mailto:${contact.email}?subject=${encodeURIComponent(workArea.emailSubject)}&body=${encodeURIComponent(body)}`;
+}
+
 function WorkAreaSection({ workArea }: { workArea: WorkArea }) {
   return (
     <article className="work-area" id={`work-area-${workArea.slug}`}>
@@ -87,7 +97,10 @@ function WorkAreaSection({ workArea }: { workArea: WorkArea }) {
         </p>
       </div>
 
-      <div className="work-area-transition" aria-label={`${workArea.transition.from} becomes ${workArea.transition.to}`}>
+      <div
+        className="work-area-transition"
+        aria-label={`${workArea.transition.from} becomes ${workArea.transition.to}`}
+      >
         <span>{workArea.transition.from}</span>
         <span aria-hidden="true">→</span>
         <strong>{workArea.transition.to}</strong>
@@ -112,7 +125,10 @@ function WorkAreaSection({ workArea }: { workArea: WorkArea }) {
             <span>What you receive</span>
             <p>{workArea.outcome}</p>
           </div>
-          <a className="button button-secondary" href="#contact">
+          <a
+            className="button button-secondary"
+            href={getWorkAreaEmailHref(workArea)}
+          >
             {workArea.ctaLabel}
             <Arrow />
           </a>
