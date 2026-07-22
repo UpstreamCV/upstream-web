@@ -5,8 +5,8 @@ import { contact } from "../content";
 import "../gov.css";
 import { SiteBackdrop } from "../site-backdrop";
 import {
-  customCapabilities,
-  engagementModels,
+  customCapabilityGroups,
+  engagementPaths,
   engagementNavigation,
   readyWorkPackages,
 } from "./content";
@@ -133,11 +133,8 @@ export default function GovernmentEngagementPage() {
               </p>
               <h1 id="hero-title">Ways to Engage Upstream</h1>
               <p className="hero-summary">
-                Upstream supports government agencies, prime contractors, and
-                technical teams through focused work packages, specialized
-                subcontract support, rapid prototypes, and custom technical
-                delivery. We can own a defined effort or contribute within a
-                larger program.
+                Give us a defined technical outcome to own, or bring us into an
+                existing program where focused engineering depth is needed.
               </p>
               <div className="hero-actions">
                 <a className="button button-primary" href="#contact">
@@ -152,44 +149,43 @@ export default function GovernmentEngagementPage() {
             </div>
 
             <div
-              className="engagement-map"
+              className="role-diagram"
               role="img"
-              aria-label="Government agencies, prime contractors, and technical teams can engage Upstream for a defined work package, specialized support, or rapid technical delivery"
+              aria-label="Upstream can own a defined work package or join an existing team as specialized technical support. Both roles move from scope through build to handoff."
             >
               <div className="diagram-heading">
-                <span>Flexible delivery role</span>
+                <span>Choose the delivery role</span>
                 <span className="diagram-status">
                   <span aria-hidden="true" />
-                  Scope ready
+                  Two clear options
                 </span>
               </div>
 
-              <div className="engagement-map-body">
-                <div className="engagement-map-sources" aria-hidden="true">
-                  <span>Agency</span>
-                  <span>Prime</span>
-                  <span>Technical team</span>
+              <div className="role-options" aria-hidden="true">
+                <div className="role-option role-option-owner">
+                  <span>01 / Own it</span>
+                  <strong>Defined work package</strong>
+                  <p>One bounded outcome. Upstream is accountable.</p>
                 </div>
-                <div className="engagement-map-current" aria-hidden="true">
-                  <span />
-                  <strong>Upstream</strong>
-                  <small>Focused technical ownership</small>
-                </div>
-                <div className="engagement-map-outcomes" aria-hidden="true">
-                  <span>Work package</span>
-                  <span>Specialist support</span>
-                  <span>Prototype or pilot</span>
+                <div className="role-option role-option-partner">
+                  <span>02 / Join it</span>
+                  <strong>Specialized support</strong>
+                  <p>Add capability or capacity inside the program.</p>
                 </div>
               </div>
 
-              <p className="diagram-note">
-                One bounded outcome, clear interfaces, maintainable handoff
-              </p>
+              <div className="role-flow" aria-hidden="true">
+                <span>Scope</span>
+                <i />
+                <span>Build</span>
+                <i />
+                <span>Handoff</span>
+              </div>
             </div>
           </div>
 
           <div className="shell hero-bottomline">
-            <span>Join an existing program or own a defined effort</span>
+            <span>Own the work or strengthen the team</span>
             <a href="#engagement-models">
               Engagement models <span aria-hidden="true">↓</span>
             </a>
@@ -198,11 +194,11 @@ export default function GovernmentEngagementPage() {
 
         <aside className="engage-signal-bar" aria-label="Engagement summary">
           <div className="shell engage-signal-list">
-            <p>Take ownership</p>
+            <p>Own a package</p>
             <span aria-hidden="true" />
-            <p>Add technical depth</p>
+            <p>Join a team</p>
             <span aria-hidden="true" />
-            <p>Clear delivery capacity</p>
+            <p>Prove a concept</p>
           </div>
         </aside>
 
@@ -216,31 +212,34 @@ export default function GovernmentEngagementPage() {
               <div>
                 <p className="section-index">01 / Engagement models</p>
                 <h2 id="engagement-models-title">
-                  Several ways into the work. One accountable technical team.
+                  Choose the shape of the engagement.
                 </h2>
               </div>
               <p>
-                Start with the role the program needs. Upstream can work as a
-                bounded subcontractor, add specialist depth to an existing team,
-                or turn an uncertain concept into a scope that can move forward.
+                Start with what the program needs most: ownership, added depth,
+                or evidence for the next decision.
               </p>
             </div>
 
-            <div className="engagement-model-list">
-              {engagementModels.map((model) => (
-                <article className="engagement-model" key={model.number}>
-                  <span className="engagement-model-number">
-                    {model.number}
-                  </span>
-                  <div className="engagement-model-copy">
-                    <h3>{model.title}</h3>
-                    <p>{model.summary}</p>
+            <div className="engagement-paths">
+              {engagementPaths.map((path) => (
+                <article className="engagement-path" key={path.number}>
+                  <div className="engagement-path-heading">
+                    <span>{path.number}</span>
+                    <p>{path.signal}</p>
                   </div>
-                  <ul aria-label={`${model.title} examples`}>
-                    {model.examples.map((example) => (
-                      <li key={example}>{example}</li>
+                  <div className="engagement-path-copy">
+                    <h3>{path.title}</h3>
+                    <p>{path.summary}</p>
+                  </div>
+                  <div className="engagement-path-models">
+                    {path.models.map((model) => (
+                      <div key={model.title}>
+                        <strong>{model.title}</strong>
+                        <p>{model.detail}</p>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </article>
               ))}
             </div>
@@ -257,15 +256,21 @@ export default function GovernmentEngagementPage() {
               <div>
                 <p className="section-index">02 / Ready to scope</p>
                 <h2 id="work-packages-title">
-                  Work packages built around a concrete outcome.
+                  Six practical starting points.
                 </h2>
               </div>
               <p>
-                These are representative starting points for focused,
-                short-duration technical efforts. Each can be adjusted for the
-                customer environment, contract, mission, security needs, and
-                delivery constraints.
+                Each package starts with one concrete outcome, then adapts to the
+                mission, environment, security needs, and contract.
               </p>
+            </div>
+
+            <div className="package-prompt" aria-label="Example starting points">
+              <span>Bring us one</span>
+              <strong>stuck workflow</strong>
+              <strong>missing feature</strong>
+              <strong>system connection</strong>
+              <strong>unproven idea</strong>
             </div>
 
             <div className="ready-package-list">
@@ -276,18 +281,18 @@ export default function GovernmentEngagementPage() {
                     <h3>{workPackage.title}</h3>
                   </div>
 
-                  <div className="ready-package-focus">
-                    <span>Possible focus</span>
+                  <div className="ready-package-scope">
+                    <span>Scope signals</span>
                     <ul>
-                      {workPackage.focus.map((item) => (
+                      {workPackage.scope.map((item) => (
                         <li key={item}>{item}</li>
                       ))}
                     </ul>
                   </div>
 
                   <div className="ready-package-engagement">
-                    <span>Typical engagement</span>
-                    <p>“{workPackage.engagement}”</p>
+                    <span>Defined outcome</span>
+                    <p>{workPackage.outcome}</p>
                   </div>
                 </article>
               ))}
@@ -296,9 +301,8 @@ export default function GovernmentEngagementPage() {
             <div className="package-flex-note">
               <span>Representative, not restrictive</span>
               <p>
-                A package can stand alone, combine with another package, or be
-                reshaped around an existing statement of work. Scope and
-                delivery structure are defined with the customer or prime.
+                Combine packages or reshape one around an existing statement of
+                work. These are conversation starters, not capability limits.
               </p>
               <a className="button button-secondary" href="#contact">
                 Scope a Package
@@ -321,10 +325,8 @@ export default function GovernmentEngagementPage() {
                 Have a Different Technical Requirement?
               </h2>
               <p>
-                The packages above are useful starting points, not the limits of
-                Upstream’s capabilities. Bring us the system context, technical
-                constraint, or outcome that needs an owner. We can help define
-                the right boundary and delivery path.
+                Bring us the technical constraint or outcome that needs an
+                owner. We will help define the right boundary and delivery path.
               </p>
               <a className="button button-primary" href="#contact">
                 Discuss a Custom Scope
@@ -332,12 +334,13 @@ export default function GovernmentEngagementPage() {
               </a>
             </div>
 
-            <div className="custom-capability-field" aria-label="Additional technical capabilities">
-              {customCapabilities.map((capability, index) => (
-                <span key={capability}>
-                  <small>{String(index + 1).padStart(2, "0")}</small>
-                  {capability}
-                </span>
+            <div className="custom-capability-groups" aria-label="Additional technical capabilities">
+              {customCapabilityGroups.map((group) => (
+                <div key={group.number}>
+                  <span>{group.number}</span>
+                  <h3>{group.title}</h3>
+                  <p>{group.capabilities}</p>
+                </div>
               ))}
             </div>
           </div>
@@ -354,8 +357,8 @@ export default function GovernmentEngagementPage() {
               <p className="section-index">04 / Start a conversation</p>
               <h2 id="contact-title">Bring the requirement, backlog item, or technical unknown.</h2>
               <p>
-                We will help identify a useful boundary for discovery, delivery,
-                or a focused prototype.
+                We will find a useful boundary for discovery, delivery, or a
+                focused prototype.
               </p>
             </div>
 
@@ -419,4 +422,3 @@ export default function GovernmentEngagementPage() {
     </div>
   );
 }
-
