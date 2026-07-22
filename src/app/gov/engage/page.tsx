@@ -5,7 +5,7 @@ import { contact } from "../content";
 import "../gov.css";
 import { SiteBackdrop } from "../site-backdrop";
 import {
-  customCapabilityGroups,
+  customCapabilityLine,
   deliverySteps,
   engagementNavigation,
   programFits,
@@ -322,30 +322,32 @@ export default function GovernmentEngagementPage() {
           aria-labelledby="custom-scope-title"
         >
           <div className="custom-scope-grid" aria-hidden="true" />
-          <div className="shell custom-scope-layout">
+          <div className="shell custom-scope-inner">
             <div className="custom-scope-copy">
-              <p className="section-index">03 / Custom technical scope</p>
-              <h2 id="custom-scope-title">
-                Have a Different Technical Requirement?
-              </h2>
+              <p className="section-index">04 / Custom technical scope</p>
+              <h2 id="custom-scope-title">Have Something Else in Mind?</h2>
               <p>
-                Bring us the technical constraint or outcome that needs an
-                owner. We will help define the right boundary and delivery path.
+                These work areas are common starting points, not limits on what
+                Upstream can support. Bring us an existing requirement or
+                technical problem, and we can shape a focused scope around it.
               </p>
-              <a className="button button-primary" href="#contact">
-                Discuss a Custom Scope
-                <Arrow />
-              </a>
             </div>
 
-            <div className="custom-capability-groups" aria-label="Additional technical capabilities">
-              {customCapabilityGroups.map((group) => (
-                <div key={group.number}>
-                  <span>{group.number}</span>
-                  <h3>{group.title}</h3>
-                  <p>{group.capabilities}</p>
-                </div>
-              ))}
+            <p className="custom-capability-line">{customCapabilityLine}</p>
+
+            <div className="custom-scope-actions">
+              <a className="button button-primary" href="#contact">
+                Discuss a Requirement
+                <Arrow />
+              </a>
+              <a
+                className="button button-secondary"
+                href="/assets/upstream_capability_statement.pdf"
+                download="upstream_capability_statement.pdf"
+              >
+                Download Capability Statement
+                <Arrow />
+              </a>
             </div>
           </div>
         </section>
@@ -358,11 +360,12 @@ export default function GovernmentEngagementPage() {
           <div className="contact-grid" aria-hidden="true" />
           <div className="shell contact-layout">
             <div>
-              <p className="section-index">04 / Start a conversation</p>
-              <h2 id="contact-title">Bring the requirement, backlog item, or technical unknown.</h2>
+              <p className="section-index">05 / Start a conversation</p>
+              <h2 id="contact-title">Give Us a Technical Problem to Own</h2>
               <p>
-                We will find a useful boundary for discovery, delivery, or a
-                focused prototype.
+                Bring us a defined backlog item, an emerging technical need, or
+                a prototype concept. We will help determine a practical starting
+                scope.
               </p>
             </div>
 

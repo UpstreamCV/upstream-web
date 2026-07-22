@@ -5,29 +5,6 @@ export const engagementNavigation = [
   { label: "Contact", href: "#contact" },
 ] as const;
 
-export const customCapabilityGroups = [
-  {
-    number: "01",
-    title: "Software systems",
-    capabilities: "Custom software, web applications, APIs, and systems integration",
-  },
-  {
-    number: "02",
-    title: "Data and intelligence",
-    capabilities: "Data engineering, analytics, AI, machine learning, and computer vision",
-  },
-  {
-    number: "03",
-    title: "Cloud and operations",
-    capabilities: "Cloud infrastructure, deployment, reliability, and operational systems",
-  },
-  {
-    number: "04",
-    title: "Edge and field",
-    capabilities: "Hardware integration, sensors, edge systems, research, and prototyping",
-  },
-] as const;
-
 export type WorkArea = {
   number: string;
   slug: string;
