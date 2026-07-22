@@ -6,9 +6,9 @@ import "../gov.css";
 import { SiteBackdrop } from "../site-backdrop";
 import {
   customCapabilityGroups,
-  engagementPaths,
+  deliverySteps,
   engagementNavigation,
-  readyWorkPackages,
+  programFits,
   workAreas,
 } from "./content";
 import type { WorkArea } from "./content";
@@ -263,43 +263,27 @@ export default function GovernmentEngagementPage() {
         </section>
 
         <section
-          className="section engage-models"
-          id="engagement-models"
-          aria-labelledby="engagement-models-title"
+          className="section program-fit"
+          id="program-fit"
+          aria-labelledby="program-fit-title"
         >
           <div className="shell">
             <div className="section-intro">
               <div>
-                <p className="section-index">01 / Engagement models</p>
-                <h2 id="engagement-models-title">
-                  Choose the shape of the engagement.
+                <p className="section-index">02 / Program fit</p>
+                <h2 id="program-fit-title">
+                  How Upstream Can Fit Into the Program
                 </h2>
               </div>
-              <p>
-                Start with what the program needs most: ownership, added depth,
-                or evidence for the next decision.
-              </p>
+              <p>Choose the smallest useful role for the work in front of you.</p>
             </div>
 
-            <div className="engagement-paths">
-              {engagementPaths.map((path) => (
-                <article className="engagement-path" key={path.number}>
-                  <div className="engagement-path-heading">
-                    <span>{path.number}</span>
-                    <p>{path.signal}</p>
-                  </div>
-                  <div className="engagement-path-copy">
-                    <h3>{path.title}</h3>
-                    <p>{path.summary}</p>
-                  </div>
-                  <div className="engagement-path-models">
-                    {path.models.map((model) => (
-                      <div key={model.title}>
-                        <strong>{model.title}</strong>
-                        <p>{model.detail}</p>
-                      </div>
-                    ))}
-                  </div>
+            <div className="program-fit-list">
+              {programFits.map((fit) => (
+                <article key={fit.number}>
+                  <span>{fit.number}</span>
+                  <h3>{fit.title}</h3>
+                  <p>{fit.description}</p>
                 </article>
               ))}
             </div>
@@ -307,68 +291,28 @@ export default function GovernmentEngagementPage() {
         </section>
 
         <section
-          className="section engage-packages"
-          id="work-packages"
-          aria-labelledby="work-packages-title"
+          className="section delivery-process-section"
+          id="delivery-process"
+          aria-labelledby="delivery-process-title"
         >
           <div className="shell">
             <div className="section-intro">
               <div>
-                <p className="section-index">02 / Ready to scope</p>
-                <h2 id="work-packages-title">
-                  Six practical starting points.
-                </h2>
+                <p className="section-index">03 / Delivery process</p>
+                <h2 id="delivery-process-title">From Requirement to Delivery</h2>
               </div>
-              <p>
-                Each package starts with one concrete outcome, then adapts to the
-                mission, environment, security needs, and contract.
-              </p>
+              <p>Three steps, with the boundary agreed before the build begins.</p>
             </div>
 
-            <div className="package-prompt" aria-label="Example starting points">
-              <span>Bring us one</span>
-              <strong>stuck workflow</strong>
-              <strong>missing feature</strong>
-              <strong>system connection</strong>
-              <strong>unproven idea</strong>
-            </div>
-
-            <div className="ready-package-list">
-              {readyWorkPackages.map((workPackage) => (
-                <article className="ready-package" key={workPackage.number}>
-                  <div className="ready-package-heading">
-                    <span>{workPackage.number}</span>
-                    <h3>{workPackage.title}</h3>
-                  </div>
-
-                  <div className="ready-package-scope">
-                    <span>Scope signals</span>
-                    <ul>
-                      {workPackage.scope.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="ready-package-engagement">
-                    <span>Defined outcome</span>
-                    <p>{workPackage.outcome}</p>
-                  </div>
-                </article>
+            <ol className="delivery-process-list">
+              {deliverySteps.map((step) => (
+                <li key={step.number}>
+                  <span>{step.number}</span>
+                  <h3>{step.title}</h3>
+                  <p>{step.description}</p>
+                </li>
               ))}
-            </div>
-
-            <div className="package-flex-note">
-              <span>Representative, not restrictive</span>
-              <p>
-                Combine packages or reshape one around an existing statement of
-                work. These are conversation starters, not capability limits.
-              </p>
-              <a className="button button-secondary" href="#contact">
-                Scope a Package
-                <Arrow />
-              </a>
-            </div>
+            </ol>
           </div>
         </section>
 
