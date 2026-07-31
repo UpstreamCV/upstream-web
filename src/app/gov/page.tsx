@@ -16,7 +16,7 @@ import { SiteBackdrop } from "./site-backdrop";
 export const metadata: Metadata = {
   title: "Government Systems / Upstream",
   description:
-    "A Boulder-based small business delivering focused government work packages across mission software, data platforms, computer vision, edge systems, and system reliability.",
+    "A Boulder-based small business delivering mission software, data platforms, computer vision, edge systems, and system reliability — directly for government customers or alongside prime contractors.",
   alternates: {
     canonical: "/gov",
   },
@@ -116,7 +116,7 @@ export default function GovernmentPage() {
           </nav>
 
           <a className="button button-header desktop-cta" href="#contact">
-            Discuss a Work Package
+            Discuss a Requirement
             <Arrow />
           </a>
 
@@ -131,7 +131,7 @@ export default function GovernmentPage() {
                 ))}
               </nav>
               <a className="button button-primary" href="#contact">
-                Discuss a Work Package
+                Discuss a Requirement
                 <Arrow />
               </a>
             </div>
@@ -149,18 +149,19 @@ export default function GovernmentPage() {
             <div className="hero-copy">
               <p className="eyebrow">
                 <span className="eyebrow-line" aria-hidden="true" />
-                Technical subcontracting partner
+                Government software and systems contractor
               </p>
               <h1 id="hero-title">
                 Software, data, AI, and deployed systems for government missions.
               </h1>
               <p className="hero-summary">
-                Upstream turns difficult technical gaps into fieldable,
-                maintainable components for larger government programs.
+                Upstream works directly with government customers and alongside
+                prime contractors, turning difficult technical requirements into
+                fieldable, maintainable systems.
               </p>
               <div className="hero-actions">
                 <a className="button button-primary" href="#contact">
-                  Discuss a Work Package
+                  Discuss a Requirement
                   <Arrow />
                 </a>
                 <a
@@ -181,10 +182,10 @@ export default function GovernmentPage() {
             <div
               className="system-visual"
               role="img"
-              aria-label="Technical support options spanning sensors and devices, edge and cloud, data and AI, and operational applications; each area can stand alone or be combined in a defined work package"
+              aria-label="Technical delivery options spanning sensors and devices, edge and cloud, data and AI, and operational applications; each area can stand alone or be combined into a defined scope"
             >
               <div className="diagram-heading">
-                <span>Defined work package</span>
+                <span>Defined scope</span>
                 <span className="diagram-status">
                   <span aria-hidden="true" />
                   Four focus areas
@@ -208,7 +209,7 @@ export default function GovernmentPage() {
           </div>
 
           <div className="shell hero-bottomline">
-            <span>Focused technical work for larger programs</span>
+            <span>Prime contractor or technical teaming partner</span>
             <a href="#capabilities">
               Capabilities <span aria-hidden="true">↓</span>
             </a>
@@ -242,9 +243,10 @@ export default function GovernmentPage() {
                 <h2 id="capabilities-title">Technical depth across the system.</h2>
               </div>
               <p>
-                Upstream helps prime contractors and public-sector teams deliver
-                focused technical work across the software, data, infrastructure,
-                and physical interfaces a mission system depends on.
+                Upstream delivers focused technical work across the software,
+                data, infrastructure, and physical interfaces a mission system
+                depends on — directly for government customers or as part of a
+                prime contractor’s team.
               </p>
             </div>
 
@@ -314,8 +316,9 @@ export default function GovernmentPage() {
                 </h2>
               </div>
               <p>
-                Upstream can take ownership of a focused technical scope or
-                contribute inside a larger government delivery team.
+                Upstream can prime a defined requirement and own delivery end to
+                end, or take responsibility for a focused technical scope inside
+                a larger delivery team.
               </p>
             </div>
 
@@ -347,7 +350,7 @@ export default function GovernmentPage() {
             >
               <div className="contract-profile-heading">
                 <span>Contracting profile</span>
-                <span>Prepared for prime subcontract support</span>
+                <span>Pursuing prime and teaming opportunities</span>
               </div>
               <div className="contract-profile-grid">
                 {contractingProfile.map((item) => (
@@ -370,15 +373,16 @@ export default function GovernmentPage() {
           <div className="shell support-layout">
             <div className="support-copy">
               <p className="section-index section-index-dark">
-                04 / How we support
+                04 / How we deliver
               </p>
               <h2 id="support-title">
-                A focused team inside a larger program.
+                A focused team accountable for the outcome.
               </h2>
               <p className="support-lead">
-                The prime or program team retains mission and system context;
-                Upstream is accountable for the selected component, its
-                interfaces, and a maintainable transition.
+                When Upstream serves as prime, we own delivery from scope
+                through deployment and support. When teaming, we take clear
+                responsibility for the selected component, its interfaces, and
+                a maintainable transition.
               </p>
 
               <ol className="support-list">
@@ -393,18 +397,18 @@ export default function GovernmentPage() {
 
             <div
               className="program-interface"
-              aria-label="Program engagement model"
+              aria-label="Engagement model showing a government customer or prime team setting the requirement and Upstream owning delivery of the defined scope"
             >
               <div className="diagram-heading">
-                <span>Program engagement model</span>
-                <span>Bounded responsibility</span>
+                <span>Engagement model</span>
+                <span>Clear accountability</span>
               </div>
 
               <div className="engagement-flow">
                 <div className="engagement-card">
-                  <span className="engagement-kicker">Larger program</span>
-                  <strong>Prime / program team</strong>
-                  <span>System ownership and mission context</span>
+                  <span className="engagement-kicker">Mission owner</span>
+                  <strong>Government customer or prime team</strong>
+                  <span>Requirement, mission context, acceptance</span>
                 </div>
 
                 <div className="engagement-arrow" aria-hidden="true">
@@ -412,9 +416,9 @@ export default function GovernmentPage() {
                 </div>
 
                 <div className="engagement-card engagement-card-accent">
-                  <span className="engagement-kicker">Focused partner</span>
-                  <strong>Upstream work package</strong>
-                  <span>Build, integration, documentation, handoff</span>
+                  <span className="engagement-kicker">Accountable delivery</span>
+                  <strong>Upstream-owned scope</strong>
+                  <span>Build, integration, deployment, support</span>
                 </div>
               </div>
 
@@ -437,9 +441,9 @@ export default function GovernmentPage() {
             <div>
               <p className="section-index section-index-dark">05 / Contact</p>
               <h2 id="contact-title">
-                Have a technical work package that may fit a focused team?
+                Have a requirement that needs a focused, accountable team?
               </h2>
-              <p>Let’s discuss the scope.</p>
+              <p>Let’s discuss the scope — as prime or as a teaming partner.</p>
             </div>
 
             <div className="contact-card">
@@ -461,9 +465,9 @@ export default function GovernmentPage() {
               </div>
               <a
                 className="button button-contact"
-                href={`mailto:${contact.email}?subject=Government%20work%20package%20discussion`}
+                href={`mailto:${contact.email}?subject=Government%20requirement%20discussion`}
               >
-                Discuss a Work Package
+                Discuss a Requirement
                 <Arrow />
               </a>
             </div>
@@ -475,7 +479,7 @@ export default function GovernmentPage() {
         <div className="shell footer-main">
           <div>
             <Brand footer />
-            <p>Boulder, Colorado · Technical subcontracting partner.</p>
+            <p>Boulder, Colorado · Government software and systems contractor.</p>
           </div>
 
           <nav aria-label="Footer navigation">

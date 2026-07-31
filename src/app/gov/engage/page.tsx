@@ -244,7 +244,7 @@ export default function GovernmentEngagementPage() {
 
           <div className="shell hero-bottomline">
             <span>
-              Subcontract work packages · Specialized engineering support ·
+              Prime or subcontract delivery · Specialized engineering support ·
               Prototypes and pilots
             </span>
             <a href="#work-areas">
@@ -418,7 +418,7 @@ export default function GovernmentEngagementPage() {
         <div className="shell footer-main">
           <div>
             <Brand footer />
-            <p>Boulder, Colorado · Technical subcontracting partner.</p>
+            <p>Boulder, Colorado · Government software and systems contractor.</p>
           </div>
 
           <nav aria-label="Footer navigation">

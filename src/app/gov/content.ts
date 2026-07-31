@@ -70,8 +70,8 @@ export const contractingProfile = [
   },
   {
     label: "Role",
-    value: "Technical subcontractor",
-    detail: "bounded scope within a larger program",
+    value: "Prime contractor or technical partner",
+    detail: "direct ownership of defined requirements, or a focused scope within a larger program",
   },
   {
     label: "Team",
@@ -88,7 +88,7 @@ export const contractingProfile = [
 export const engagementPrinciples = [
   "Start with a bounded outcome, named interfaces, and acceptance criteria",
   "Expose the highest-risk assumption through an early prototype or integration",
-  "Use short, visible checkpoints so the program team can steer before handoff",
+  "Use short, visible checkpoints so the customer or program team can steer delivery",
   "Design monitoring and debugging paths alongside the delivered system",
   "Leave maintainable code, architecture notes, deployment steps, and runbooks",
   "Transition ownership cleanly or remain through fielding and ongoing support",
