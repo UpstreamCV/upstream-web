@@ -279,8 +279,8 @@ export default function GovernmentPage() {
             </div>
             <div className="experience-copy">
               <p className="experience-note">
-                Team-member experience, not a claim of Upstream corporate past
-                performance.
+                Hands-on experience our team members bring from prior roles and
+                programs.
               </p>
             </div>
           </div>
