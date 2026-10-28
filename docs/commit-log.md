@@ -6,6 +6,15 @@ policy.
 
 ---
 
+## 2026-10-27 — docs: replace the create-next-app README
+
+**Type:** docs. The README was still the Next.js starter text. It now
+describes the site, its pages, stack, local setup and layout, and points
+at the design docs and the rest of the UpstreamCV organization.
+
+- `README.md` — rewritten.
+- `docs/commit-log.md` — this entry.
+
 ## 2026-10-27 — chore: stop Dependabot version updates
 
 **Type:** repo hygiene. The project is finished and published for reference, so nobody is
